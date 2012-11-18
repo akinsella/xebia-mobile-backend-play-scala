@@ -1,0 +1,19 @@
+# Routes
+# This file defines all application routes (Higher priority routes first)
+# ~~~~
+
+# Home page
+GET     /                           controllers.Application.index()
+
+# Map static resources from the /public folder to the /assets URL path
+GET     /assets/*file               controllers.Assets.at(path="/public", file)
+
+GET     /api/workouts               api.WorkoutService.workouts
+GET     /api/workout/{id}           api.WorkoutService.edit
+POST    /api/workout                api.WorkoutService.create
+PUT     /api/workout/{id}           api.WorkoutService.save
+DELETE  /api/workout/{id}           api.WorkoutService.delete
+
+
+# GET     /resources/rest/apns/device/register/:id    controllers.Application.processRegisterRequest(id:String)
+# GET     /resources/rest/apns/device/list     controllers.Application.processGetAllRequest
