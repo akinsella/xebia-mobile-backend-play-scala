@@ -3,17 +3,17 @@
 # ~~~~
 
 # Home page
-GET     /                           controllers.Application.index()
+GET     /                           controllers.Home.index()
+
+
+GET     /api/devices                           controllers.api.DeviceService.devices
+GET     /api/device/:id                        controllers.api.DeviceService.show(id: Long)
+POST    /api/device                            controllers.api.DeviceService.create
+PUT     /api/device/:id                        controllers.api.DeviceService.save(id: Option[Long])
+DELETE  /api/device/:id                        controllers.api.DeviceService.delete(id: Long)
+
+
+GET     /api/wordpress/authors                           controllers.api.WordpressService.authors
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.at(path="/public", file)
-
-GET     /api/workouts               api.WorkoutService.workouts
-GET     /api/workout/{id}           api.WorkoutService.edit
-POST    /api/workout                api.WorkoutService.create
-PUT     /api/workout/{id}           api.WorkoutService.save
-DELETE  /api/workout/{id}           api.WorkoutService.delete
-
-
-# GET     /resources/rest/apns/device/register/:id    controllers.Application.processRegisterRequest(id:String)
-# GET     /resources/rest/apns/device/list     controllers.Application.processGetAllRequest

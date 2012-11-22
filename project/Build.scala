@@ -11,10 +11,13 @@ object ApplicationBuild extends Build {
       // Add your project dependencies here,
       "com.notnoop.apns" % "apns" % "0.1.6",
       "com.twitter" % "querulous" % "2.6.5",
-      "mysql" % "mysql-connector-java" % "5.1.21"
+      "mysql" % "mysql-connector-java" % "5.1.21",
+      "postgresql" % "postgresql" % "9.1-901-1.jdbc4",
+      "org.fusesource.scalate" % "scalate-core" % "1.5.3",
+      "net.debasishg" % "redisclient_2.9.2" % "2.7"
     )
 
-    val main = PlayProject(appName, appVersion, appDependencies, mainLang = JAVA).settings(
+    val main = PlayProject(appName, appVersion, appDependencies, mainLang = SCALA).settings(
       // Add your own project settings here
       // Add extra resolver for the twitter
       resolvers += "Twitter repo" at "http://maven.twttr.com/" ,
