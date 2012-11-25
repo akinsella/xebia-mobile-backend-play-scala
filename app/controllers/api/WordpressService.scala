@@ -94,17 +94,24 @@ object WordPressService extends Controller {
 
         val wpPostsRequestHolder: WSRequestHolder = WS.url(wpPostsUrl).withQueryString(queryStringParams.toArray: _*)
 
-        val jsonPosts = redisClient.get(wpPostsUrl).getOrElse {
+        val cacheKey = buildRequestUrl(wpPostsRequestHolder)
+        val jsonPosts = redisClient.get(cacheKey).getOrElse {
           val jsonFetched = Json.parse(wpPostsRequestHolder.get().value.get.body)
           val posts = (jsonFetched \ "posts").as[Seq[JsValue]] map { _.as[WPPost] }
           val jsonFormatted = Json.toJson(posts).toString()
-          redisClient.set(wpPostsUrl, jsonFormatted)
-          redisClient.expire(wpPostsUrl, 60)
+          redisClient.set(cacheKey, jsonFormatted)
+          redisClient.expire(cacheKey, 60)
           jsonFormatted
         }
         Ok( jsonPosts ).as("application/json")
       }
     }
+  }
+
+  def buildRequestUrl(wpPostsRequestHolder: WS.WSRequestHolder): String = {
+    "%1$s?%2$s".format(wpPostsRequestHolder.url, wpPostsRequestHolder.queryString.toSeq.sorted map {
+      case (key, value) => "%s=%s" format(key, value)
+    } mkString ("&"))
   }
 
 }

@@ -33,18 +33,18 @@ object TwitterService extends Controller {
     _ => Results.Redirect(routes.Twitter.authenticate))(username => Action(Ok(html.index())))
 */
 
-
   def timeline = Action { request =>
     redisClients.withClient {
       redisClient => {
-        val jsonTweet = redisClient.get(wpTweetsUrl).getOrElse {
-          val wsRequestHolder: WSRequestHolder = createUserTimelineUrl(request)
+        val wsRequestHolder: WSRequestHolder = createUserTimelineUrl(request)
+        val cacheKey = buildRequestUrl(wsRequestHolder)
+        val jsonTweet = redisClient.get(cacheKey).getOrElse {
           val jsonFetched: JsValue = getAsJson(wsRequestHolder)
           println(jsonFetched)
           val tweets = jsonFetched.as[Seq[JsObject]] map { _.as[TTTweet] }
           val jsonFormatted = Json.toJson(tweets).toString()
-          redisClient.set(wpTweetsUrl, jsonFormatted)
-          redisClient.expire(wpTweetsUrl, 60)
+          redisClient.set(cacheKey, jsonFormatted)
+          redisClient.expire(cacheKey, 60)
           jsonFormatted
         }
         Ok( jsonTweet ).as("application/json")
@@ -140,6 +140,12 @@ object TwitterService extends Controller {
         result
       }
     }
+  }
+
+  def buildRequestUrl(wpPostsRequestHolder: WS.WSRequestHolder): String = {
+    "%1$s?%2$s".format(wpPostsRequestHolder.url, wpPostsRequestHolder.queryString.toSeq.sorted map {
+      case (key, value) => "%s=%s" format(key, value)
+    } mkString ("&"))
   }
 
 }

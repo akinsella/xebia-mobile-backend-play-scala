@@ -20,7 +20,9 @@ object EventBriteService extends Controller {
   def events = Action {
     redisClients.withClient {
       redisClient => {
-        val jsonEvents = redisClient.get(wpEventsUrl).getOrElse {
+
+        val cacheKey = "https://www.eventbrite.com/json/organizer_list_events?id=%s".format(xebiaOrganizationId)
+        val jsonEvents = redisClient.get(cacheKey).getOrElse {
           val wsRequestHolder: WSRequestHolder = WS.url(wpEventsUrl)
             .withQueryString("id" -> xebiaOrganizationId, "app_key" -> appKey)
           val jsonFetched = Json.parse(wsRequestHolder.get().value.get.body)
@@ -28,8 +30,8 @@ object EventBriteService extends Controller {
             .filter { jsonEvent => List("Live").contains(jsonEvent.\("event").\("status").as[String]) }
             .map { jsonEvent => jsonEvent.\("event").as[EBEvent] }
           val jsonFormatted = Json.toJson(events).toString()
-          redisClient.set(wpEventsUrl, jsonFormatted)
-          redisClient.expire(wpEventsUrl, 60)
+          redisClient.set(cacheKey, jsonFormatted)
+          redisClient.expire(cacheKey, 60)
           jsonFormatted
         }
         Ok( jsonEvents ).as("application/json")
