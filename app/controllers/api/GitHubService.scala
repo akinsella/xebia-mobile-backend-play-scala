@@ -1,11 +1,10 @@
 package controllers.api
 
-import models._
+import models.github._
 import play.api.mvc.{Action, Controller}
 import play.api.libs.json._
 import play.api.libs.ws.WS
 
-import github._
 import com.redis.{RedisClientPool, RedisClient}
 
 object GitHubService extends Controller {

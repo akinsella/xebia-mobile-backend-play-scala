@@ -17,17 +17,6 @@ case class TTTweet(
 
 object TTTweet {
 
-/*
-  id:tweet.id,
-  id_str:tweet.id_str,
-  created_at:tweet.created_at,
-  text:tweet.text,
-  favorited:tweet.favorited,
-  retweeted:tweet.retweeted,
-  retweet_count:tweet.retweet_count,
-  entities:tweet.entities
-*/
-
   implicit object TTTweetFormat extends Format[TTTweet] {
     def reads(json: JsValue): TTTweet = TTTweet(
       (json \ "id").as[Long],

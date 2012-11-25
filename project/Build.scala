@@ -14,8 +14,8 @@ object ApplicationBuild extends Build {
       "mysql" % "mysql-connector-java" % "5.1.21",
       "postgresql" % "postgresql" % "9.1-901-1.jdbc4",
       "org.fusesource.scalate" % "scalate-core" % "1.5.3",
-      "net.debasishg" % "redisclient_2.9.2" % "2.7"/*,
-      "eu.teamon" %% "play-navigator" % "0.4.0"*/
+      "net.debasishg" % "redisclient_2.9.2" % "2.7"
+      /*,"eu.teamon" %% "play-navigator" % "0.4.0"*/
     )
 
     val main = PlayProject(appName, appVersion, appDependencies, mainLang = SCALA).settings(
