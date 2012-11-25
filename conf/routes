@@ -13,7 +13,15 @@ PUT     /api/device/:id                        controllers.api.DeviceService.sav
 DELETE  /api/device/:id                        controllers.api.DeviceService.delete(id: Long)
 
 
-GET     /api/wordpress/authors                           controllers.api.WordpressService.authors
+GET     /api/wordpress/authors                 controllers.api.WordPressService.authors
+GET     /api/wordpress/tags                    controllers.api.WordPressService.tags
+GET     /api/wordpress/categories              controllers.api.WordPressService.categories
+
+GET     /api/github/repositories               controllers.api.GitHubService.repositories
+GET     /api/github/users                      controllers.api.GitHubService.users
+GET     /api/github/owners                     controllers.api.GitHubService.owners
+
+GET     /api/eventbrite/events                 controllers.api.EventBriteService.events
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.at(path="/public", file)
