@@ -14,14 +14,16 @@ object ApplicationBuild extends Build {
       "mysql" % "mysql-connector-java" % "5.1.21",
       "postgresql" % "postgresql" % "9.1-901-1.jdbc4",
       "org.fusesource.scalate" % "scalate-core" % "1.5.3",
-      "net.debasishg" % "redisclient_2.9.2" % "2.7"
+      "net.debasishg" % "redisclient_2.9.2" % "2.7"/*,
+      "eu.teamon" %% "play-navigator" % "0.4.0"*/
     )
 
     val main = PlayProject(appName, appVersion, appDependencies, mainLang = SCALA).settings(
       // Add your own project settings here
       // Add extra resolver for the twitter
       resolvers += "Twitter repo" at "http://maven.twttr.com/" ,
-      resolvers += "DevJava repo" at "http://download.java.net/maven/2/"
+      resolvers += "DevJava repo" at "http://download.java.net/maven/2/"/*,
+      resolvers += "scalajars.org repo" at "http://scalajars.org/repository"*/
     )
 
 }

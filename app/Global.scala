@@ -9,7 +9,7 @@ object Global extends GlobalSettings {
   override def onStart(app: Application) {
     if (!Play.isTest) {
       println("inserting seed data...")
-      InitialData.insert()
+//      InitialData.insert()
     }
   }
 }

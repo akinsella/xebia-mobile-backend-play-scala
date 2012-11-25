@@ -4,9 +4,9 @@ import models._
 import eventbrite.EBEvent
 import play.api.mvc.{Action, Controller}
 import play.api.libs.json._
-import play.libs.WS
+import play.api.libs.ws.WS._
+import play.api.libs.ws.WS
 import com.redis.{RedisClientPool, RedisClient}
-import play.libs.WS.WSRequestHolder
 import play.Play
 
 object EventBriteService extends Controller {
@@ -20,24 +20,17 @@ object EventBriteService extends Controller {
   def events = Action {
     redisClients.withClient {
       redisClient => {
-        println("WS Events Url: " + wpEventsUrl)
-
         val jsonEvents = redisClient.get(wpEventsUrl).getOrElse {
           val wsRequestHolder: WSRequestHolder = WS.url(wpEventsUrl)
-            .setQueryParameter("id", xebiaOrganizationId)
-            .setQueryParameter("app_key", appKey)
-
-          val json = Json.parse(wsRequestHolder.get.get.getBody)
-          println(json)
-
-          val events =  (json \\ "events").head.as[Seq[JsObject]]
+            .withQueryString("id" -> xebiaOrganizationId, "app_key" -> appKey)
+          val jsonFetched = Json.parse(wsRequestHolder.get().value.get.body)
+          val events =  (jsonFetched \\ "events").head.as[Seq[JsObject]]
             .filter { jsonEvent => List("Live").contains(jsonEvent.\("event").\("status").as[String]) }
             .map { jsonEvent => jsonEvent.\("event").as[EBEvent] }
-          val jsonEvents = Json.toJson(events).toString()
-          redisClient.set(wpEventsUrl, jsonEvents)
+          val jsonFormatted = Json.toJson(events).toString()
+          redisClient.set(wpEventsUrl, jsonFormatted)
           redisClient.expire(wpEventsUrl, 60)
-
-          jsonEvents
+          jsonFormatted
         }
         Ok( jsonEvents ).as("application/json")
       }

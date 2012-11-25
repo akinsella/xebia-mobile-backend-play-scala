@@ -3,7 +3,8 @@ package controllers.api
 import models._
 import play.api.mvc.{Action, Controller}
 import play.api.libs.json._
-import play.libs.WS
+import play.api.libs.ws.WS
+
 import github._
 import com.redis.{RedisClientPool, RedisClient}
 
@@ -16,12 +17,12 @@ object GitHubService extends Controller {
       redisClient => {
         val ghUsersUrl: String = "https://api.github.com/orgs/xebia-france/public_members"
         val jsonUsers = redisClient.get(ghUsersUrl).getOrElse {
-          val json = Json.parse(WS.url(ghUsersUrl).get.get.getBody)
-          val users = json.as[Seq[JsValue]] map { _.as[GHUser] }
-          val jsonUsers = Json.toJson(users).toString()
-          redisClient.set(ghUsersUrl, jsonUsers)
+          val jsonFetched = Json.parse(WS.url(ghUsersUrl).get().value.get.body)
+          val users = jsonFetched.as[Seq[JsValue]] map { _.as[GHUser] }
+          val jsonFormatted = Json.toJson(users).toString()
+          redisClient.set(ghUsersUrl, jsonFormatted)
           redisClient.expire(ghUsersUrl, 60)
-          jsonUsers
+          jsonFormatted
         }
         Ok( jsonUsers ).as("application/json")
       }
@@ -33,12 +34,12 @@ object GitHubService extends Controller {
       redisClient => {
         val ghRepositoriesUrl: String = "https://api.github.com/orgs/xebia-france/repos"
         val jsonRepositories = redisClient.get(ghRepositoriesUrl).getOrElse {
-          val json = Json.parse(WS.url(ghRepositoriesUrl).get.get.getBody)
-          val repositories =  json.as[Seq[JsValue]] map { _.as[GHRepository] }
-          val jsonRepositories = Json.toJson(repositories).toString()
-          redisClient.set(ghRepositoriesUrl, jsonRepositories)
+          val jsonFetched = Json.parse(WS.url(ghRepositoriesUrl).get().value.get.body)
+          val repositories =  jsonFetched.as[Seq[JsValue]] map { _.as[GHRepository] }
+          val jsonFormatted = Json.toJson(repositories).toString()
+          redisClient.set(ghRepositoriesUrl, jsonFormatted)
           redisClient.expire(ghRepositoriesUrl, 60)
-          jsonRepositories
+          jsonFormatted
         }
         Ok( jsonRepositories ).as("application/json")
       }
@@ -50,12 +51,12 @@ object GitHubService extends Controller {
       redisClient => {
         val ghOwnersUrl: String = "https://api.github.com/orgs/xebia-france/public_members"
         val jsonOwners = redisClient.get(ghOwnersUrl).getOrElse {
-          val json = Json.parse(WS.url(ghOwnersUrl).get.get.getBody)
-          val owners =  json.as[Seq[JsValue]] map { _.as[GHOwner] }
-          val jsonOwners = Json.toJson(owners).toString()
-          redisClient.set(ghOwnersUrl, jsonOwners)
+          val jsonFetched = Json.parse(WS.url(ghOwnersUrl).get().value.get.body)
+          val owners =  jsonFetched.as[Seq[JsValue]] map { _.as[GHOwner] }
+          val jsonFormatted = Json.toJson(owners).toString()
+          redisClient.set(ghOwnersUrl, jsonFormatted)
           redisClient.expire(ghOwnersUrl, 60)
-          jsonOwners
+          jsonFormatted
         }
         Ok( jsonOwners ).as("application/json")
       }

@@ -3,7 +3,7 @@ package controllers.api
 import models._
 import play.api.mvc.{Action, Controller}
 import play.api.libs.json._
-import play.libs.WS
+import play.api.libs.ws.WS
 import wordpress._
 import com.redis.{RedisClientPool, RedisClient}
 
@@ -17,12 +17,12 @@ object WordPressService extends Controller {
 
         val wpAuthorsUrl: String = "http://blog.xebia.fr/wp-json-api/get_author_index/"
         val jsonAuthors = redisClient.get(wpAuthorsUrl).getOrElse {
-          val json = Json.parse(WS.url(wpAuthorsUrl).get.get.getBody)
-          val authors =  (json \ "authors").as[Seq[JsValue]] map { _.as[WPAuthor] }
-          val jsonAuthors = Json.toJson(authors).toString()
-          redisClient.set(wpAuthorsUrl, jsonAuthors)
+          val jsonFetched = Json.parse(WS.url(wpAuthorsUrl).get().value.get.body)
+          val authors =  (jsonFetched \ "authors").as[Seq[JsValue]] map { _.as[WPAuthor] }
+          val jsonFormatted = Json.toJson(authors).toString()
+          redisClient.set(wpAuthorsUrl, jsonFormatted)
           redisClient.expire(wpAuthorsUrl, 60)
-          jsonAuthors
+          jsonFormatted
         }
         Ok( jsonAuthors ).as("application/json")
       }
@@ -35,12 +35,12 @@ object WordPressService extends Controller {
 
         val wpTagsUrl: String = "http://blog.xebia.fr/wp-json-api/get_tag_index/"
         val jsonTags = redisClient.get(wpTagsUrl).getOrElse {
-          val json = Json.parse(WS.url(wpTagsUrl).get.get.getBody)
-          val tags =  (json \ "tags").as[Seq[JsValue]] map { _.as[WPTag] }
-          val jsonTags = Json.toJson(tags).toString()
-          redisClient.set(wpTagsUrl, jsonTags)
+          val jsonFetched = Json.parse(WS.url(wpTagsUrl).get().value.get.body)
+          val tags =  (jsonFetched \ "tags").as[Seq[JsValue]] map { _.as[WPTag] }
+          val jsonFormatted = Json.toJson(tags).toString()
+          redisClient.set(wpTagsUrl, jsonFormatted)
           redisClient.expire(wpTagsUrl, 60)
-          jsonTags
+          jsonFormatted
         }
         Ok( jsonTags ).as("application/json")
       }
@@ -53,12 +53,12 @@ object WordPressService extends Controller {
 
         val wpCategoriesUrl: String = "http://blog.xebia.fr/wp-json-api/get_category_index/"
         val jsonCategories = redisClient.get(wpCategoriesUrl).getOrElse {
-          val json = Json.parse(WS.url(wpCategoriesUrl).get.get.getBody)
-          val categories =  (json \ "categories").as[Seq[JsValue]] map { _.as[WPCategory] }
-          val jsonCategories = Json.toJson(categories).toString()
-          redisClient.set(wpCategoriesUrl, jsonCategories)
+          val jsonFetched = Json.parse(WS.url(wpCategoriesUrl).get().value.get.body)
+          val categories =  (jsonFetched \ "categories").as[Seq[JsValue]] map { _.as[WPCategory] }
+          val jsonFormatted = Json.toJson(categories).toString()
+          redisClient.set(wpCategoriesUrl, jsonFormatted)
           redisClient.expire(wpCategoriesUrl, 60)
-          jsonCategories
+          jsonFormatted
         }
         Ok( jsonCategories ).as("application/json")
       }

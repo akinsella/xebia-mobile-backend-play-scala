@@ -15,20 +15,17 @@ log
 logs
 modules
 precompiled
->>>>>>> ee05810439d0819dae9fd8d20c0b5f073139648d
 project/project
 project/target
 target
 tmp
-<<<<<<< HEAD
 .history
 dist
 .idea
 .idea_modules
 .settings
-=======
 test-result
 server.pid
 *.iml
 *.eml
->>>>>>> ee05810439d0819dae9fd8d20c0b5f073139648d
+dump.rdb
