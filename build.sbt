@@ -1,6 +1,6 @@
 //import com.mojolly.scalate.ScalatePlugin._
 
-seq(scalateSettings:_*)
+//seq(scalateSettings:_*)
 
 // scalateTemplateDirectory in Compile <<= (baseDirectory) { _ / "app/views" }
 
