@@ -1,4 +1,4 @@
-import com.mojolly.scalate.ScalatePlugin._
+//import com.mojolly.scalate.ScalatePlugin._
 
 seq(scalateSettings:_*)
 
