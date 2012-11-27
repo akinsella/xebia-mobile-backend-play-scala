@@ -16,13 +16,13 @@ import play.api.libs.oauth.OAuthCalculator
 import play.api.libs.ws.WS.WSRequestHolder
 import play.api.libs.oauth.ConsumerKey
 import play.api.libs.json.JsObject
+import cloud.{Connectivity, CloudFoundry}
 
 object TwitterService extends Controller {
 
-  val redisClients = new RedisClientPool("localhost", 6379)
-
   val appKey = Play.application().configuration().getString("api.twitter.app.key")
   val appSecret = Play.application().configuration().getString("api.twitter.app.secret")
+  val appBasePath = Play.application().configuration().getString("app.base.path")
 
   val oauthInfosKey = "api.twitter.oauth.infos"
   val wpTweetsUrl = "http://api.twitter.com/1/statuses/user_timeline.json"
@@ -34,7 +34,7 @@ object TwitterService extends Controller {
 */
 
   def timeline = Action { request =>
-    redisClients.withClient {
+    Connectivity.withRedisClient {
       redisClient => {
         val wsRequestHolder: WSRequestHolder = createUserTimelineUrl(request)
         val cacheKey = buildRequestUrl(wsRequestHolder)
@@ -102,7 +102,7 @@ object TwitterService extends Controller {
       // We got the verifier; now get the access token, store it and back to index
       TWITTER.retrieveAccessToken(tokenPair, verifier) match {
         case Right(t) => {
-          redisClients.withClient {
+          Connectivity.withRedisClient {
             redisClient => {
               redisClient.set(oauthInfosKey, Json.toJson(Map("token" -> t.token, "secret" -> t.secret)).toString())
               Redirect(controllers.routes.Home.index())
@@ -112,10 +112,10 @@ object TwitterService extends Controller {
         case Left(e) => throw e
       }
     }.getOrElse(
-      TWITTER.retrieveRequestToken("http://dev.xebia.fr:9000/api/twitter/authenticate") match {
+      TWITTER.retrieveRequestToken("%s/api/twitter/authenticate".format(appBasePath)) match {
         case Right(t) => {
           // We received the unauthorized tokens in the OAuth object - store it before we proceed
-          redisClients.withClient {
+          Connectivity.withRedisClient {
             redisClient => {
               redisClient.set(oauthInfosKey, Json.toJson(Map("token" -> t.token, "secret" -> t.secret)).toString())
               Redirect(TWITTER.redirectUrl(t.token))
@@ -128,7 +128,7 @@ object TwitterService extends Controller {
   }
 
   def getTokenFromRedis(request:RequestHeader):Either[Exception, RequestToken] = {
-    redisClients.withClient {
+    Connectivity.withRedisClient {
       redisClient => {
         val result :Either[Exception, RequestToken] = try {
           val json = Json.parse(redisClient.get(oauthInfosKey).getOrElse("")).as[JsObject]
