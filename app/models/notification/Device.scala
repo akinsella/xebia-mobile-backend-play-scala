@@ -1,12 +1,13 @@
 package models.notification
 
+import java.util.Date
+
 import play.api.db._
 import play.api.Play.current
 
 import anorm._
 import anorm.SqlParser._
 
-import java.util.Date
 import play.api.libs.json._
 import anorm.~
 import play.api.libs.json.JsString
@@ -89,11 +90,11 @@ object Device {
     }
   }
 
-  def findById(id: Option[Long]): Device = {
+  def findById(id: Long): Option[Device] = {
     DB.withConnection {
       implicit connection =>
         SQL("select * from device where id = {id}")
-          .on("id" -> id.get).using(simple).single()
+          .on("id" -> id).using(simple).singleOpt()
     }
   }
 
