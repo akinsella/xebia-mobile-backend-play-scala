@@ -2,8 +2,9 @@
 
 CREATE TABLE Device (
     id SERIAL PRIMARY KEY,
-    uuid varchar(255) NOT NULL,
-    createdAt timestamp NOT NULL
+    udid varchar(40) NOT NULL,
+	  token varchar(64) NOT NULL,
+	  created_at timestamp NOT NULL
 );
 
 # --- !Downs

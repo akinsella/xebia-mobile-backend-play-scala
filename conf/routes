@@ -3,30 +3,33 @@
 # ~~~~
 
 # Home page
-GET     /                                      controllers.Home.index
+GET     /                                           controllers.Home.index
 
-GET     /api/devices                           controllers.api.DeviceService.devices
-GET     /api/device/:id                        controllers.api.DeviceService.show(id: Long)
-POST    /api/device                            controllers.api.DeviceService.create
-PUT     /api/device/:id                        controllers.api.DeviceService.save(id: Option[Long])
-DELETE  /api/device/:id                        controllers.api.DeviceService.delete(id: Long)
+GET     /api/devices                                controllers.api.DeviceService.devices
+GET     /api/device/:id                             controllers.api.DeviceService.show(id: Long)
+POST    /api/device                                 controllers.api.DeviceService.create
+PUT     /api/device/:id                             controllers.api.DeviceService.save(id: Option[Long])
+DELETE  /api/device/:id                             controllers.api.DeviceService.delete(id: Long)
 
-GET     /api/wordpress/authors                 controllers.api.WordPressService.authors
-GET     /api/wordpress/tags                    controllers.api.WordPressService.tags
-GET     /api/wordpress/categories              controllers.api.WordPressService.categories
-GET     /api/wordpress/category/:id/posts      controllers.api.WordPressService.categoryPosts(id: Long)
-GET     /api/wordpress/tag/:id/posts           controllers.api.WordPressService.tagPosts(id: Long)
-GET     /api/wordpress/author/:id/posts        controllers.api.WordPressService.authorPosts(id: Long)
-GET     /api/wordpress/posts/recent            controllers.api.WordPressService.recentPosts
+POST     /api/notification/register                 controllers.api.NotificationService.register
+POST     /api/notification/push                     controllers.api.NotificationService.push
 
-GET     /api/github/repositories               controllers.api.GitHubService.repositories
-GET     /api/github/users                      controllers.api.GitHubService.users
-GET     /api/github/owners                     controllers.api.GitHubService.owners
+GET     /api/wordpress/authors                      controllers.api.WordPressService.authors
+GET     /api/wordpress/tags                         controllers.api.WordPressService.tags
+GET     /api/wordpress/categories                   controllers.api.WordPressService.categories
+GET     /api/wordpress/category/:id/posts           controllers.api.WordPressService.categoryPosts(id: Long)
+GET     /api/wordpress/tag/:id/posts                controllers.api.WordPressService.tagPosts(id: Long)
+GET     /api/wordpress/author/:id/posts             controllers.api.WordPressService.authorPosts(id: Long)
+GET     /api/wordpress/posts/recent                 controllers.api.WordPressService.recentPosts
 
-GET     /api/eventbrite/events                 controllers.api.EventBriteService.events
+GET     /api/github/repositories                    controllers.api.GitHubService.repositories
+GET     /api/github/users                           controllers.api.GitHubService.users
+GET     /api/github/owners                          controllers.api.GitHubService.owners
 
-GET     /api/twitter/authenticate              controllers.api.TwitterService.authenticate
-GET     /api/twitter/timeline                  controllers.api.TwitterService.timeline
+GET     /api/eventbrite/events                      controllers.api.EventBriteService.events
+
+GET     /api/twitter/authenticate                   controllers.api.TwitterService.authenticate
+GET     /api/twitter/timeline                       controllers.api.TwitterService.timeline
 
 
 # Map static resources from the /public folder to the /assets URL path

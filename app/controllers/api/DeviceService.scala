@@ -1,6 +1,7 @@
 package controllers.api
 
 import models._
+import models.notification.Device
 import play.api.mvc.{Action, Controller}
 import play.api.libs.json._
 

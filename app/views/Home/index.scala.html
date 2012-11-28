@@ -1,10 +1,11 @@
 @(message: String, device: Device)
+@import models.notification.Device
 
 @main("Welcome to Play 2.0") {
-    
+
     @play20.welcome(message)
 
-    <h1>Your device with uuid: @device.uuid was created on @device.createdAt</h1>
+    <h1>Your device with udid: @device.udid and token: @device.token was created on @device.createdAt</h1>
 }
 
 
