@@ -5,11 +5,21 @@
 # Home page
 GET     /                                      controllers.Home.index
 
-GET     /api/devices                           controllers.api.DeviceService.devices
+GET     /api-docs.json                         controllers.ApiHelpController.getResources
+
+GET     /api-docs.json/admin                   controllers.ApiHelpController.getResource(path = "/api-docs.json/admin")
+GET     /api-docs.json/device                  controllers.ApiHelpController.getResource(path = "/api-docs.json/device")
+
+OPTIONS /api/device                            controllers.api.DeviceService.devices
+GET     /api/device                            controllers.api.DeviceService.devices
 GET     /api/device/:id                        controllers.api.DeviceService.show(id: Long)
 POST    /api/device                            controllers.api.DeviceService.create
-PUT     /api/device/:id                        controllers.api.DeviceService.save(id: Option[Long])
+PUT     /api/device/:id                        controllers.api.DeviceService.save(id: Long)
 DELETE  /api/device/:id                        controllers.api.DeviceService.delete(id: Long)
+
+
+GET     /health                                controllers.HealthController.getHealth()
+GET     /ping                                  controllers.HealthController.ping()
 
 GET     /api/wordpress/authors                 controllers.api.WordPressService.authors
 GET     /api/wordpress/tags                    controllers.api.WordPressService.tags
