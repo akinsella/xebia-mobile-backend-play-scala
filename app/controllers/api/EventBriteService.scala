@@ -8,17 +8,16 @@ import play.api.libs.ws.WS._
 import play.api.libs.ws.WS
 import com.redis.{RedisClientPool, RedisClient}
 import play.Play
+import cloud.{Connectivity, CloudFoundry}
 
 object EventBriteService extends Controller {
-
-  val redisClients = new RedisClientPool("localhost", 6379)
 
   val appKey = Play.application().configuration().getString("api.eventbrite.app.key")
   val xebiaOrganizationId = "1627902102"
   val wpEventsUrl = "https://www.eventbrite.com/json/organizer_list_events"
 
   def events = Action {
-    redisClients.withClient {
+    Connectivity.withRedisClient {
       redisClient => {
 
         val cacheKey = "https://www.eventbrite.com/json/organizer_list_events?id=%s".format(xebiaOrganizationId)

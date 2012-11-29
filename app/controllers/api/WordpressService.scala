@@ -7,13 +7,12 @@ import play.api.libs.ws.WS
 import com.redis.{RedisClientPool, RedisClient}
 import play.api.libs.ws.WS.WSRequestHolder
 import wordpress._
+import cloud._
 
 object WordPressService extends Controller {
 
-  val redisClients = new RedisClientPool("localhost", 6379)
-
   def authors = Action {
-    redisClients.withClient {
+    Connectivity.withRedisClient {
       redisClient => {
 
         val wpAuthorsUrl: String = "http://blog.xebia.fr/wp-json-api/get_author_index/"
@@ -31,7 +30,7 @@ object WordPressService extends Controller {
   }
 
   def tags = Action {
-    redisClients.withClient {
+    Connectivity.withRedisClient {
       redisClient => {
 
         val wpTagsUrl: String = "http://blog.xebia.fr/wp-json-api/get_tag_index/"
@@ -49,7 +48,7 @@ object WordPressService extends Controller {
   }
 
   def categories = Action {
-    redisClients.withClient {
+    Connectivity.withRedisClient {
       redisClient => {
 
         val wpCategoriesUrl: String = "http://blog.xebia.fr/wp-json-api/get_category_index/"
@@ -83,7 +82,7 @@ object WordPressService extends Controller {
   }
 
   def posts(id:Option[Long], _type:String, count:Long = 100) = Action {
-    redisClients.withClient {
+    Connectivity.withRedisClient {
       redisClient => {
         val wpPostsUrl: String = "http://blog.xebia.fr/wp-json-api/get_%1$s_posts/".format(_type)
         var queryStringParams:Seq[(String, String)] = Seq("count" -> count.toString)

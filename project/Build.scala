@@ -15,17 +15,19 @@ object ApplicationBuild extends Build {
       "postgresql" % "postgresql" % "9.1-901-1.jdbc4",
       "org.fusesource.scalate" % "scalate-core" % "1.5.3",
       "net.debasishg" % "redisclient_2.9.2" % "2.7",
-      "com.wordnik" %% "swagger-play2" % "1.2.0",
-      "com.wordnik" %% "swagger-play2-utils" % "1.2.0"
       /*,"eu.teamon" %% "play-navigator" % "0.4.0"*/
+      "com.wordnik" %% "swagger-play2" % "1.2.0",
+      "com.wordnik" %% "swagger-play2-utils" % "1.2.0",
+      "org.cloudfoundry" % "cloudfoundry-runtime" % "0.8.2"
     )
 
     val main = PlayProject(appName, appVersion, appDependencies, mainLang = SCALA).settings(
       // Add your own project settings here
       // Add extra resolver for the twitter
       resolvers += "Twitter repo" at "http://maven.twttr.com/" ,
-      resolvers += "DevJava repo" at "http://download.java.net/maven/2/"/*,
-      resolvers += "scalajars.org repo" at "http://scalajars.org/repository"*/
+      resolvers += "DevJava repo" at "http://download.java.net/maven/2/",
+      /*, resolvers += "scalajars.org repo" at "http://scalajars.org/repository"*/
+      resolvers += "SpringSource Milestones" at "http://repo.springsource.org/milestone/"
     )
 
 }

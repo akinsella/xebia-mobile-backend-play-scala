@@ -1,0 +1,18 @@
+---
+applications:
+  dist/xebia-mobile-backend-play-scala-1.0-SNAPSHOT.zip:
+    name: xebia-mobile-backend
+    framework:
+      name: play
+      info:
+        mem: 256M
+        description: Play Framework Application
+        exec: 
+    url: ${name}.${target-base}
+    mem: 256M
+    instances: 1
+    services:
+      xebia-mobile-backend-pgsql:
+        type: postgresql
+      xebia-mobile-backend-redis:
+        type: redis

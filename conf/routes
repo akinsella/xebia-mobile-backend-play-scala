@@ -5,12 +5,13 @@
 # Home page
 GET     /                                      controllers.Home.index
 
+
 GET     /api-docs.json                         controllers.ApiHelpController.getResources
-
 GET     /api                                   controllers.Api.index
-
 GET     /api-docs.json/admin                   controllers.ApiHelpController.getResource(path = "/api-docs.json/admin")
 GET     /api-docs.json/device                  controllers.ApiHelpController.getResource(path = "/api-docs.json/device")
+GET     /health                                controllers.HealthController.getHealth()
+GET     /ping                                  controllers.HealthController.ping()
 
 OPTIONS /api/device                            controllers.api.DeviceService.devices
 GET     /api/device                            controllers.api.DeviceService.devices
@@ -18,10 +19,6 @@ GET     /api/device/:id                        controllers.api.DeviceService.sho
 POST    /api/device                            controllers.api.DeviceService.create
 PUT     /api/device/:id                        controllers.api.DeviceService.save(id: Long)
 DELETE  /api/device/:id                        controllers.api.DeviceService.delete(id: Long)
-
-
-GET     /health                                controllers.HealthController.getHealth()
-GET     /ping                                  controllers.HealthController.ping()
 
 GET     /api/wordpress/authors                 controllers.api.WordPressService.authors
 GET     /api/wordpress/tags                    controllers.api.WordPressService.tags
@@ -42,5 +39,5 @@ GET     /api/twitter/timeline                  controllers.api.TwitterService.ti
 
 
 # Map static resources from the /public folder to the /assets URL path
-GET     /assets/*file                          controllers.Assets.at(path="/public", file)
+GET     /assets/*file               controllers.Assets.at(path="/public", file)
 

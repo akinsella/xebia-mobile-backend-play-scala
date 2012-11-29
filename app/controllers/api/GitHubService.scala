@@ -5,14 +5,13 @@ import play.api.mvc.{Action, Controller}
 import play.api.libs.json._
 import play.api.libs.ws.WS
 
-import com.redis.{RedisClientPool, RedisClient}
+import com.redis._
+import cloud.{Connectivity, CloudFoundry}
 
 object GitHubService extends Controller {
 
-  val redisClients = new RedisClientPool("localhost", 6379)
-
   def users = Action {
-    redisClients.withClient {
+    Connectivity.withRedisClient {
       redisClient => {
         val ghUsersUrl: String = "https://api.github.com/orgs/xebia-france/public_members"
         val jsonUsers = redisClient.get(ghUsersUrl).getOrElse {
@@ -29,7 +28,7 @@ object GitHubService extends Controller {
   }
 
   def repositories = Action {
-    redisClients.withClient {
+    Connectivity.withRedisClient {
       redisClient => {
         val ghRepositoriesUrl: String = "https://api.github.com/orgs/xebia-france/repos"
         val jsonRepositories = redisClient.get(ghRepositoriesUrl).getOrElse {
@@ -46,7 +45,7 @@ object GitHubService extends Controller {
   }
 
   def owners = Action {
-    redisClients.withClient {
+    Connectivity.withRedisClient {
       redisClient => {
         val ghOwnersUrl: String = "https://api.github.com/orgs/xebia-france/public_members"
         val jsonOwners = redisClient.get(ghOwnersUrl).getOrElse {
