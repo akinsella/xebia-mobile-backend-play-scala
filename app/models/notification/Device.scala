@@ -53,7 +53,7 @@ object Device {
   def apply(udid: String, token: String) = new Device(NotAssigned, udid, token, new Date())
 
   implicit object DeviceFormat extends Format[Device] {
-    def reads(json: JsValue): Device = Device( (json \ "udid").as[String] , (json \ "token").as[String])
+    def reads(json: JsValue): Device = Device((json \ "udid").as[String], (json \ "token").as[String])
 
     def writes(device: Device): JsValue = JsObject(Seq(
       "id" -> JsNumber(device.id.get),
@@ -143,10 +143,10 @@ object Device {
    *
    * @param device The device values.
    */
-  def create(device: Device): Device = {
+  def create(device: Device): Option[Device] = {
     DB.withConnection {
-      implicit connection =>
-        SQL(
+      implicit connection => {
+        val newId = SQL(
           """
           insert into device(udid, token, created_at)
           values ({udid}, {token}, {createdAt})
@@ -155,8 +155,10 @@ object Device {
           'udid -> device.udid,
           'token -> device.token,
           'createdAt -> device.createdAt
-        ).executeInsert()
-      device
+        ).executeInsert().get
+
+        findById(newId)
+      }
     }
   }
 
