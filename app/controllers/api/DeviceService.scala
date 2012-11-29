@@ -9,8 +9,10 @@ import com.wordnik.swagger.annotations._
 
 @Api(value = "/api/device", description = "Operations about devices", listingPath = "/api-docs.{format}/device")
 object DeviceService extends Controller {
-  
-  def devices = Action { implicit request =>
+
+  @ApiOperation(value = "Get all devices", httpMethod = "GET", responseClass = "models.notification.Device", multiValueResponse = true)
+  def devices = Action {
+    implicit request =>
     // Necessary if you want to run a mobile app in local browser
       if (request.method == "OPTIONS") {
         println("OPTIONS")
@@ -42,7 +44,7 @@ object DeviceService extends Controller {
     }
   }
 
-  @ApiOperation(value = "Create a new device", httpMethod = "POST")
+  @ApiOperation(value = "Create a new device", httpMethod = "POST", responseClass = "models.notification.Device")
   @ApiParamsImplicit(Array(
     new ApiParamImplicit(name = "Add a new device in the database", required = true, dataType = "models.notification.Device", paramType = "body")
   ))
@@ -86,7 +88,7 @@ object DeviceService extends Controller {
   @ApiErrors(Array(
     new ApiError(code = 404, reason = "Device not found")))
   @ApiParamsImplicit(Array(
-    new ApiParamImplicit(name = "Add a new device in the database", required = true, dataType = "models.notification.Device", paramType = "body")
+    new ApiParamImplicit(name = "id", required = true, dataType = "Long", paramType = "path")
   ))
   def delete(id: Long) = Action {
     if (Device.findById(id).isDefined) {
