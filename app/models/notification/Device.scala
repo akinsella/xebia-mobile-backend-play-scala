@@ -127,7 +127,7 @@ object Device {
           """
           update device
           set udid = {udid}
-          set token = {token}
+          , token = {token}
           where id = {id}
           """
         ).on(
