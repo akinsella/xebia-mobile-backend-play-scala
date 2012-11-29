@@ -73,7 +73,6 @@ object DeviceService extends Controller {
         if (Device.findById(id).isDefined) {
           val device = query.as[Device]
           Device.update(device)
-          println(device)
           Ok
         }
         else {
