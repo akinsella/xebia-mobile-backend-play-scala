@@ -44,8 +44,7 @@ object DeviceService extends Controller {
       request.body.asJson match {
         case None => NotAcceptable
         case Some(query) => {
-          Device.create(query.as[Device])
-          Created
+          Created(toJson(Device.create(query.as[Device]))).as("application/json")
         }
       }
     }
