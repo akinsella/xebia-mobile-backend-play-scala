@@ -7,6 +7,8 @@ GET     /                                      controllers.Home.index
 
 GET     /api-docs.json                         controllers.ApiHelpController.getResources
 
+GET     /api                                   controllers.Api.index
+
 GET     /api-docs.json/admin                   controllers.ApiHelpController.getResource(path = "/api-docs.json/admin")
 GET     /api-docs.json/device                  controllers.ApiHelpController.getResource(path = "/api-docs.json/device")
 
@@ -40,5 +42,5 @@ GET     /api/twitter/timeline                  controllers.api.TwitterService.ti
 
 
 # Map static resources from the /public folder to the /assets URL path
-GET     /assets/*file               controllers.Assets.at(path="/public", file)
+GET     /assets/*file                          controllers.Assets.at(path="/public", file)
 

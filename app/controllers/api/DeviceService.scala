@@ -3,13 +3,13 @@ package controllers.api
 import models._
 import play.api.mvc.{Action, Controller}
 import play.api.libs.json.Json.toJson
-import play.api.libs.json.Json
+
 import com.wordnik.swagger.annotations._
 
 @Api(value = "/api/device", description = "Operations about devices", listingPath = "/api-docs.{format}/device")
 object DeviceService extends Controller {
 
-  @ApiOperation(value = "Show all devices", httpMethod = "GET")
+  @ApiOperation(value = "Show all devices", httpMethod = "GET", responseClass = "models.Device", multiValueResponse = true)
   def devices = Action {
     implicit request =>
     // Necessary if you want to run a mobile app in local browser
@@ -32,17 +32,21 @@ object DeviceService extends Controller {
       }
   }
 
-  @ApiOperation(value = "Find one device by id", httpMethod = "GET")
-  def show(@ApiParam(name = "id", value = "Internal id of the device", required = true) id: Long) = Action {
+  @ApiOperation(value = "Find one device by id", httpMethod = "GET", responseClass = "models.Device")
+  @ApiParamsImplicit(Array(
+    new ApiParamImplicit(name = "id", required = true, dataType = "Long", paramType = "path")
+  ))
+  def show(id: Long) = Action {
     Ok(toJson(Device.findById(id))).as("application/json")
   }
 
-  @ApiOperation(value = "Create a new device", httpMethod = "PUT")
+  @ApiOperation(value = "Create a new device", httpMethod = "POST")
   @ApiParamsImplicit(Array(
-    new ApiParamImplicit(value = "Add a new device in the database", required = true, dataType = "Device", paramType = "body")
+    new ApiParamImplicit(name = "Add a new device in the database", required = true, dataType = "models.Device", paramType = "body")
   ))
   def create() = Action {
     implicit request => {
+      println(request.body.asJson)
       request.body.asJson match {
         case None => NotAcceptable
         case Some(query) => {
@@ -53,15 +57,19 @@ object DeviceService extends Controller {
     }
   }
 
-  @ApiOperation(value = "Update an existing device", httpMethod = "POST")
+  @ApiOperation(value = "Update an existing device", httpMethod = "PUT")
   @ApiErrors(Array(
     new ApiError(code = 404, reason = "Device not found")))
-  def save(@ApiParam(name = "id", value = "Internal id of the device", required = true) id: Long) = Action {
-    implicit request => request.body.asText match {
+  @ApiParamsImplicit(Array(
+    new ApiParamImplicit(name = "device", required = true, dataType = "models.Device", paramType = "body"),
+    new ApiParamImplicit(name = "id", required = true, dataType = "Long", paramType = "path")
+  ))
+  def save(id: Long) = Action {
+    implicit request => request.body.asJson match {
       case None => NotAcceptable
       case Some(query) => {
         if (Device.findById(id).isDefined) {
-          val device = Json.parse(query).as[Device]
+          val device = query.as[Device]
           Device.update(device)
           println(device)
           Ok
@@ -76,18 +84,16 @@ object DeviceService extends Controller {
   @ApiOperation(value = "Delete an existing device", httpMethod = "DELETE")
   @ApiErrors(Array(
     new ApiError(code = 404, reason = "Device not found")))
-  def delete(@ApiParam(name = "id", value = "Internal id of the device", required = true) id: Long) = Action {
-    implicit request => request.body.asText match {
-      case None => NotAcceptable
-      case Some(query) => {
-        if (Device.findById(id).isDefined) {
-          Device.delete(id)
-          Ok
-        }
-        else {
-          NotFound
-        }
-      }
+  @ApiParamsImplicit(Array(
+    new ApiParamImplicit(name = "Add a new device in the database", required = true, dataType = "models.Device", paramType = "body")
+  ))
+  def delete(id: Long) = Action {
+    if (Device.findById(id).isDefined) {
+      Device.delete(id)
+      Ok
+    }
+    else {
+      NotFound
     }
   }
 }
