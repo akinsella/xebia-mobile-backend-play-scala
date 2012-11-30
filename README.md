@@ -20,11 +20,12 @@ This software needs :
 
 
 ### Play! Framework 2.0 and Scala compiler
-Check and download this url.
+Check and download the last version of 2.0 Play Framework version [here](http://download.playframework.org/releases/play-2.0.4.zip)
+
 Think about installing the Play! Plugin for your favorite IDE.
 
 ### Redis 
-The cache system uses Redis. You can download the source from the Redis website.
+The cache system uses Redis. You can download the source from the [Redis website](http://redis.io/).
 
 
 ```
@@ -38,7 +39,7 @@ Then you can launch the Redis server with
 
 
 ### Postgres
-On MacOS, you can download the Postgres quick App from …
+On MacOS, you can download the Postgres quick App from [here](http://postgresapp.com/).
 
 Simply launch the application to get an up and running database. Create a database named 
 
@@ -51,14 +52,13 @@ This application feeds data from several public providers thanks to their REST A
 In order to get a fully working version of this backend, you need your own keys.
 
 ### Eventbrite
-Go to this URL and suscribe to EventBrite.
+Go to [the Eventbrite website for developper](https://www.eventbrite.com/api/key/) and suscribe to EventBrite to get your own key.
 Then, set an environment variable with it
 
 	export EVENBRITE_KEY = xxxx
 
 ### Twitter
-Go to this URL and sign in with your twitter account.
-Then, set an environment variable in your system called : 
+In the same manner, go to [Dev Twitter website](https://dev.twitter.com/apps/new) and sign in with your twitter account. Declare your new app. Register a token for your account then, get the key XXX and set and environment variable for it : 
 
 	export TWITTER_KEY = xxxx
 
@@ -66,5 +66,20 @@ Then, set an environment variable in your system called :
 
 
 ## REST APIs
-REST APIs powered by Swagger
+REST APIs will be powered by [Swagger](http://swagger.wordnik.com/)
+Swagger provides a set of annotations to be placed in the REST controllers.
+The framework has its own controller that generates JSON description your the application REST APIs. 
+To get this controller, you need to clone Swagger from the [Github repo](https://github.com/wordnik/swagger-core).
+Then publish in local the modules *swagger-play2-utils*
+
+	git clone https://github.com/wordnik/swagger-core.git
+	
+	cd modules/swagger-play2-utils
+
+	play publish-local
+
+
+Start the server, then go to the URL **/api**. You can parse the content of your API and try it from live!
+
+
 
