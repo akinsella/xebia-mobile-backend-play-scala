@@ -5,11 +5,11 @@
 # Home page
 GET     /                                           controllers.Home.index
 
-GET     /api/device                            controllers.api.DeviceService.devices
-GET     /api/device/:id                        controllers.api.DeviceService.show(id: Long)
-POST    /api/device                            controllers.api.DeviceService.create
-PUT     /api/device/:id                        controllers.api.DeviceService.save(id: Long)
-DELETE  /api/device/:id                        controllers.api.DeviceService.delete(id: Long)
+GET     /api/device                                 controllers.api.DeviceService.devices
+GET     /api/device/:id                             controllers.api.DeviceService.show(id: Long)
+POST    /api/device                                 controllers.api.DeviceService.create
+PUT     /api/device/:id                             controllers.api.DeviceService.save(id: Long)
+DELETE  /api/device/:id                             controllers.api.DeviceService.delete(id: Long)
 
 POST     /api/notification/register                 controllers.api.NotificationService.register
 POST     /api/notification/push                     controllers.api.NotificationService.push
