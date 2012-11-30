@@ -55,14 +55,13 @@ In order to get a fully working version of this backend, you need your own keys.
 Go to [the Eventbrite website for developper](https://www.eventbrite.com/api/key/) and suscribe to EventBrite to get your own key.
 Then, set an environment variable with it
 
-	export EVENBRITE_KEY = xxxx
+	export API_EVENTBRITE_APP_KEY = xxxx
 
 ### Twitter
 In the same manner, go to [Dev Twitter website](https://dev.twitter.com/apps/new) and sign in with your twitter account. Declare your new app. Register a token for your account then, get the key XXX and set and environment variable for it : 
 
-	export TWITTER_KEY = xxxx
-
-
+	export API_TWITTER_APP_KEY = XXX
+	export API_TWITTER_APP_SECRET = XXX
 
 
 ## REST APIs
