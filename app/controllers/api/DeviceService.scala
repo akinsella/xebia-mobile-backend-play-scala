@@ -1,7 +1,6 @@
 package controllers.api
 
-import models._
-import notification.Device
+import models.notification.Device
 import play.api.mvc.{Action, Controller}
 import play.api.libs.json.Json.toJson
 
@@ -53,7 +52,10 @@ object DeviceService extends Controller {
       request.body.asJson match {
         case None => NotAcceptable
         case Some(query) => {
-          Created(toJson(Device.create(query.as[Device]))).as("application/json")
+          Device.create(query.as[Device]) match {
+            case Some(newId) => Redirect(routes.DeviceService.show(newId))
+            case _ => NotModified
+          }
         }
       }
     }
@@ -72,8 +74,11 @@ object DeviceService extends Controller {
       case Some(query) => {
         if (Device.findById(id).isDefined) {
           val device = query.as[Device]
-          Device.update(device)
-          Ok
+          if (Device.update(id, device) > 0) {
+            Ok
+          } else {
+            NotModified
+          }
         }
         else {
           NotFound
@@ -90,8 +95,11 @@ object DeviceService extends Controller {
   ))
   def delete(id: Long) = Action {
     if (Device.findById(id).isDefined) {
-      Device.delete(id)
-      Ok
+      if (Device.delete(id) > 0) {
+        Ok
+      } else {
+        NotModified
+      }
     }
     else {
       NotFound

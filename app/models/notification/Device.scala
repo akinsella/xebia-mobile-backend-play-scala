@@ -120,7 +120,7 @@ object Device {
    *
    * @param device The device values.
    */
-  def update(device: Device) = {
+  def update(id: Long, device: Device) = {
     DB.withConnection {
       implicit connection =>
         SQL(
@@ -131,7 +131,7 @@ object Device {
           where id = {id}
           """
         ).on(
-          'id -> device.id,
+          'id -> id,
           'token -> device.token,
           'udid -> device.udid
         ).executeUpdate()
@@ -143,10 +143,10 @@ object Device {
    *
    * @param device The device values.
    */
-  def create(device: Device): Option[Device] = {
+  def create(device: Device): Option[Long] = {
     DB.withConnection {
       implicit connection => {
-        val newId = SQL(
+        SQL(
           """
           insert into device(udid, token, created_at)
           values ({udid}, {token}, {createdAt})
@@ -155,9 +155,8 @@ object Device {
           'udid -> device.udid,
           'token -> device.token,
           'createdAt -> device.createdAt
-        ).executeInsert().get
+        ).executeInsert()
 
-        findById(newId)
       }
     }
   }
