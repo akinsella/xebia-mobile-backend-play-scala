@@ -53,7 +53,10 @@ object DeviceService extends Controller {
         case None => NotAcceptable
         case Some(query) => {
           Device.create(query.as[Device]) match {
-            case Some(newId) => Redirect(routes.DeviceService.show(newId))
+            case Some(newId) => {
+		val url = routes.DeviceService.show(newId).url
+		Status(CREATED).withHeaders(LOCATION -> url)
+		}
             case _ => NotModified
           }
         }
