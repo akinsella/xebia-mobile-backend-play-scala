@@ -11,7 +11,6 @@ object DeviceService extends Controller {
     implicit request =>
     // Necessary if you want to run a mobile app in local browser
       if (request.method == "OPTIONS") {
-        println("OPTIONS")
         Ok.withHeaders(
           "Access-Control-Allow-Origin" -> "*",
           "Access-Control-Allow-Methods" -> "GET,POST,PUT",
@@ -20,7 +19,7 @@ object DeviceService extends Controller {
         )
       } else {
         val json = toJson(Device.all)
-        Ok(json).as("application/json").withHeaders(
+        Ok(json).as(JSON).withHeaders(
           "Access-Control-Allow-Origin" -> "*",
           "Access-Control-Allow-Methods" -> "GET,POST",
           "Access-Control-Max-Age" -> "360",
@@ -32,7 +31,7 @@ object DeviceService extends Controller {
   def show(id: Long) = Action {
     Device.findById(id) match {
       case None => NotFound
-      case Some(d) => Ok(toJson(d)).as("application/json")
+      case Some(d) => Ok(toJson(d)).as(JSON)
     }
 
   }
@@ -44,9 +43,9 @@ object DeviceService extends Controller {
         case Some(query) => {
           Device.create(query.as[Device]) match {
             case Some(newId) => {
-		val url = routes.DeviceService.show(newId).url
-		Status(CREATED).withHeaders(LOCATION -> url)
-		}
+              val url = routes.DeviceService.show(newId).url
+              Status(CREATED).withHeaders(LOCATION -> url)
+            }
             case _ => NotModified
           }
         }
