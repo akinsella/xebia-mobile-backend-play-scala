@@ -120,7 +120,7 @@ object Device {
    *
    * @param device The device values.
    */
-  def update(id: Long, device: Device) = {
+  def update(id: Long, device: Device):Boolean = {
     DB.withConnection {
       implicit connection =>
         SQL(
@@ -134,7 +134,7 @@ object Device {
           'id -> id,
           'token -> device.token,
           'udid -> device.udid
-        ).executeUpdate()
+        ).executeUpdate()  == 1
     }
   }
 
@@ -166,10 +166,10 @@ object Device {
    *
    * @param id Id of the device to delete.
    */
-  def delete(id: Long) = {
+  def delete(id: Long):Boolean = {
     DB.withConnection {
       implicit connection =>
-        SQL("delete from device where id = {id}").on('id -> id).executeUpdate()
+        SQL("delete from device where id = {id}").on('id -> id).executeUpdate() == 1
     }
   }
 

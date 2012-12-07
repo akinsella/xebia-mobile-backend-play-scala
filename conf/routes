@@ -5,6 +5,7 @@
 # Home page
 GET     /                                           controllers.Home.index
 
+OPTIONS /api/device                                 controllers.api.DeviceService.options
 GET     /api/device                                 controllers.api.DeviceService.devices
 GET     /api/device/:id                             controllers.api.DeviceService.show(id: Long)
 POST    /api/device                                 controllers.api.DeviceService.create
