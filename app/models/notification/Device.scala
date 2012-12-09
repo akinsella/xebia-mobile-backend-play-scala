@@ -14,7 +14,7 @@ import play.api.libs.json.JsString
 import scala.Some
 import play.api.libs.json.JsNumber
 
-case class Device(id: Pk[Long], udid: String, token: String, createdAt: Date) {
+case class Device(id: Pk[Long] = NotAssigned, udid: String, token: String, createdAt: Date = new Date(), lastModified: Date = new Date()) {
 
   def prevNext: (Option[Device], Option[Device]) = {
     DB.withConnection {
@@ -50,15 +50,18 @@ case class Device(id: Pk[Long], udid: String, token: String, createdAt: Date) {
 
 object Device {
 
-  def apply(udid: String, token: String) = new Device(NotAssigned, udid, token, new Date())
+  def apply(udid: String, token: String) = new Device(udid = udid, token = token)
 
+
+  //JSON
   implicit object DeviceFormat extends Format[Device] {
-    def reads(json: JsValue): Device = Device((json \ "udid").as[String], (json \ "token").as[String])
+    def reads(json: JsValue): Device = Device(udid = (json \ "udid").as[String], token = (json \ "token").as[String])
 
     def writes(device: Device): JsValue = JsObject(Seq(
       "id" -> JsNumber(device.id.get),
       "udid" -> JsString(device.udid),
-      "createdAt" -> JsNumber(device.createdAt.getTime)
+      "createdAt" -> JsNumber(device.createdAt.getTime),
+      "lastModified" -> JsNumber(device.lastModified.getTime)
     ))
   }
 
@@ -69,16 +72,17 @@ object Device {
     get[Pk[Long]]("device.id") ~
       get[String]("device.udid") ~
       get[String]("device.token") ~
-      get[Date]("device.created_at") map {
-      case id ~ udid ~ token ~ createdAt =>
-        Device(id, udid, token, createdAt)
+      get[Date]("device.created_at") ~
+      get[Date]("device.last_modified") map {
+      case id ~ udid ~ token ~ createdAt ~ last_modified =>
+        Device(id, udid, token, createdAt, last_modified)
     }
   }
 
   lazy val withPrevNext = {
-    get[Pk[Long]]("id") ~ get[String]("udid") ~ get[String]("token") ~ get[Date]("created_at") ~ get[String]("pos") map {
-      case id ~ udid ~ token ~ createdAt ~ pos =>
-        (Device(id, udid, token, createdAt), pos)
+    get[Pk[Long]]("id") ~ get[String]("udid") ~ get[String]("token") ~ get[Date]("created_at") ~ get[Date]("last_modified") ~ get[String]("pos") map {
+      case id ~ udid ~ token ~ createdAt ~ lastModified ~ pos =>
+        (Device(id, udid, token, createdAt,lastModified), pos)
     }
   }
 
@@ -120,7 +124,7 @@ object Device {
    *
    * @param device The device values.
    */
-  def update(id: Long, device: Device):Boolean = {
+  def update(id: Long, device: Device): Boolean = {
     DB.withConnection {
       implicit connection =>
         SQL(
@@ -128,13 +132,15 @@ object Device {
           update device
           set udid = {udid}
           , token = {token}
+          , last_modified = {lastModified}
           where id = {id}
           """
         ).on(
           'id -> id,
           'token -> device.token,
-          'udid -> device.udid
-        ).executeUpdate()  == 1
+          'udid -> device.udid,
+          'lastModified -> new Date()
+        ).executeUpdate() == 1
     }
   }
 
@@ -148,13 +154,14 @@ object Device {
       implicit connection => {
         SQL(
           """
-          insert into device(udid, token, created_at)
-          values ({udid}, {token}, {createdAt})
+          insert into device(udid, token, created_at,last_modified)
+          values ({udid}, {token}, {createdAt},{lastModified})
           """
         ).on(
           'udid -> device.udid,
           'token -> device.token,
-          'createdAt -> device.createdAt
+          'createdAt -> device.createdAt,
+          'lastModified -> device.lastModified
         ).executeInsert()
 
       }
@@ -166,7 +173,7 @@ object Device {
    *
    * @param id Id of the device to delete.
    */
-  def delete(id: Long):Boolean = {
+  def delete(id: Long): Boolean = {
     DB.withConnection {
       implicit connection =>
         SQL("delete from device where id = {id}").on('id -> id).executeUpdate() == 1

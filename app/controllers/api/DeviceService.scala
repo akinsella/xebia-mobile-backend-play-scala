@@ -1,52 +1,64 @@
 package controllers.api
 
 import models.notification.Device
-import play.api.mvc.{PlainResult, Action, Controller}
 import play.api.libs.json.Json.toJson
+import play.api.mvc.{Action, Controller}
+import utils.RestHelper
 
 
-object DeviceService extends Controller {
+object DeviceService extends Controller with RestHelper {
 
-  private def applyHeader(result:PlainResult):PlainResult  =
-    result.withHeaders(
-    "Access-Control-Allow-Origin" -> "*",
-    "Access-Control-Allow-Methods" -> "GET,POST,PUT,DELETE",
-    "Access-Control-Max-Age" -> "360",
-    "Access-Control-Allow-Headers" -> "x-requested-with")
 
-  def options = Action {
-    applyHeader(Ok)
-  }
+  def options = Action(
+    Ok.withHeaders(
+      "Access-Control-Allow-Origin" -> "*",
+      "Access-Control-Allow-Methods" -> "GET,POST,PUT,DELETE"
+    )
+  )
 
-  def devices = Action {
-    applyHeader(Ok(toJson(Device.all)))
-  }
+  def devices = Action(Ok(toJson(Device.all)))
 
   def show(id: Long) = Action {
-    Device.findById(id)
-      .map(device => Ok(toJson(device)).as(JSON))
-      .getOrElse(NotFound)
+    request => {
+      Device.findById(id).map(device => {
+        withLastModified(device.lastModified)(
+          request.headers.get(IF_MODIFIED_SINCE).map(h => {
+
+            val lastModifiedFromClient = fromHttpDate(h)
+            val clientOutdated: Boolean = lastModifiedFromClient.isBefore(device.lastModified.getTime)
+
+            if (clientOutdated)
+              Ok(toJson(device))
+            else
+              NotModified
+
+          }).getOrElse(Ok(toJson(device)))
+        )
+
+      }).getOrElse(NotFound)
+    }
   }
 
   def create() = Action {
-    implicit request => {
-      request.body.asJson
-        .map(query => {
-        Device.create(query.as[Device])
-          .map(newId => {
-          val url = routes.DeviceService.show(newId).url
-          Status(CREATED).withHeaders(LOCATION -> url)
-        }).getOrElse(NotModified)
-      }).getOrElse(NotAcceptable)
+    request => {
+      request.body.asJson.map(query => {
+        Device.create(query.as[Device]).map(newId => {
+
+          CachedEntityCreated(routes.DeviceService.show(newId), request)
+        }
+        ).getOrElse(NotAcceptable)
+      }
+      ).getOrElse(NotAcceptable)
     }
   }
 
   def save(id: Long) = Action {
-    implicit request => {
+    request => {
       request.body.asJson.map(query => {
+
         if (Device.findById(id).isDefined) {
           val device = query.as[Device]
-          if (Device.update(id, device)) Ok else NotModified
+          if (Device.update(id, device)) lastModifiedNow(Ok) else NotModified
         }
         else {
           NotFound

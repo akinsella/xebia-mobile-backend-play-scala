@@ -4,19 +4,26 @@ import org.specs2.mutable.Specification
 
 import play.api.libs.ws.{Response, WS}
 import play.api.test._
-import play.api.test.Helpers.{running, await,inMemoryDatabase}
-import play.api.test.Helpers.{OK, CREATED, NOT_FOUND}
+import play.api.test.Helpers.{running, await, inMemoryDatabase}
+import play.api.test.Helpers.{OK, CREATED, NOT_FOUND, NOT_MODIFIED}
+import play.api.http.HeaderNames.{CONTENT_TYPE, IF_MODIFIED_SINCE, LOCATION}
+import org.joda.time.DateTime
+import utils.RestHelper
+import play.api.http.ContentTypes.JSON
 
-class DeviceServiceTest extends Specification {
+class DeviceServiceTest extends Specification with RestHelper {
 
 
   val serverUrl = "http://localhost:3333%s"
 
   "api devices is UP and running" in {
-    running(TestServer(3333,FakeApplication(additionalConfiguration = inMemoryDatabase()))) {
+    running(TestServer(3333, FakeApplication(additionalConfiguration = inMemoryDatabase()))) {
 
       //OPTIONS
-      await(WS.url(serverUrl.format(routes.DeviceService.options().url)).options()).status must equalTo(OK)
+      await(WS
+        .url(serverUrl.format(routes.DeviceService.options().url))
+        .options()
+      ).status must equalTo(OK)
 
       //POST DEVICE
       val creationDevice =
@@ -25,23 +32,37 @@ class DeviceServiceTest extends Specification {
           "token":"toktok"
           } """
 
-      val creationQuery = WS.url(serverUrl.format(routes.DeviceService.create().url))
+      val creationRequest = WS.url(serverUrl.format(routes.DeviceService.create().url))
 
-      val creationResponse: Response = await(creationQuery
-        .withHeaders("Content-Type" -> "application/json")
-        .post(creationDevice))
+      val creationResponse: Response = await(
+        creationRequest
+          .withHeaders(CONTENT_TYPE -> JSON)
+          .post(creationDevice))
 
       creationResponse.status must equalTo(CREATED)
-      val locationHeader = creationResponse.header("Location")
+      val locationHeader = creationResponse.header(LOCATION)
       locationHeader.isDefined must beTrue
 
-
       //GET DEVICE BY ID
-      val showResponse: Response = await(WS.url(serverUrl.format(locationHeader.get)).get())
+      val showResponse: Response = await(WS
+        .url(locationHeader.get)
+        .get())
+
       showResponse.status must equalTo(OK)
+
       (showResponse.json \ "udid").as[String] must equalTo("1e2a3")
       val idDevice = (showResponse.json \ "id").as[Long]
+      val lastModified = new DateTime((showResponse.json \ "lastModified").as[Long])
 
+      //GET WITH UP-TO-DATE CACHE
+      val futureDate = lastModified.plusDays(1)
+
+      val updateToDateCacheRequest = WS
+        .url(locationHeader.get)
+        .withHeaders((IF_MODIFIED_SINCE -> toHttpDate(futureDate.toDate)))
+        .get()
+
+      await(updateToDateCacheRequest).status must equalTo(NOT_MODIFIED)
 
       //PUT DEVICE
       val updateDevice =
@@ -49,30 +70,47 @@ class DeviceServiceTest extends Specification {
           "udid": "1e2a3-updated",
           "token":"toktok"
           } """
-      val updateQuery = WS.url(serverUrl.format(routes.DeviceService.save(idDevice)))
-      val updateResponse = await(updateQuery
-        .withHeaders("Content-Type" -> "application/json")
-        .put(updateDevice))
+      val updateRequest = WS.url(serverUrl.format(routes.DeviceService.save(idDevice)))
 
-      updateResponse.status must equalTo(OK)
+      await(
+        updateRequest
+          .withHeaders(CONTENT_TYPE -> JSON)
+          .put(updateDevice)
+      ).status must equalTo(OK)
 
       //GET DEVICES
-      val getResponse: Response = await(WS.url(serverUrl.format(routes.DeviceService.devices().url)).get())
+      val getResponse: Response = await(WS
+        .url(serverUrl.format(routes.DeviceService.devices().url))
+        .get())
+
       getResponse.status must equalTo(OK)
       ((getResponse.json \\ "udid").map(_.as[String])) must containAnyOf(Seq("1e2a3-updated"))
 
       //DELETE DEVICE
-      await(WS.url((serverUrl).format(routes.DeviceService.delete(idDevice).url)).delete()).status must equalTo(OK)
+      await(WS
+        .url((serverUrl).format(routes.DeviceService.delete(idDevice).url))
+        .delete()
+      ).status must equalTo(OK)
 
+      await(WS
+        .url((serverUrl).format(routes.DeviceService.delete(idDevice).url)).delete()
+      ).status must equalTo(NOT_FOUND)
 
-      await(WS.url((serverUrl).format(routes.DeviceService.delete(idDevice).url)).delete()).status must equalTo(NOT_FOUND)
-      await(WS.url((serverUrl).format(routes.DeviceService.show(idDevice).url)).delete()).status must equalTo(NOT_FOUND)
-      await(WS.url((serverUrl).format(routes.DeviceService.save(idDevice).url))
-        .withHeaders("Content-Type" -> "application/json")
+      await(WS
+        .url((serverUrl).format(routes.DeviceService.show(idDevice).url))
+        .delete()
+      ).status must equalTo(NOT_FOUND)
+
+      await(WS
+        .url((serverUrl).format(routes.DeviceService.save(idDevice).url))
+        .withHeaders(CONTENT_TYPE -> JSON)
         .put(updateDevice)
       ).status must equalTo(NOT_FOUND)
 
-      (await(WS.url(serverUrl.format(routes.DeviceService.devices().url)).get()).json \\ "udid") must beEmpty
+      (await(WS
+        .url(serverUrl.format(routes.DeviceService.devices().url))
+        .get()
+      ).json \\ "udid") must beEmpty
 
 
     }
