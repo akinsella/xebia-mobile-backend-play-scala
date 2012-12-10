@@ -1,52 +1,70 @@
 package controllers.api
 
-import models._
 import models.notification.Device
-import play.api.mvc.{Action, Controller}
-import play.api.libs.json._
+import play.api.mvc.{PlainResult, Action, Controller}
+import play.api.libs.json.Json.toJson
 
-object DeviceService extends Controller  {
 
-  def devices = Action { implicit request =>
-    // Necessary if you want to run a mobile app in local browser
-    if (request.method == "OPTIONS") {
-      println("OPTIONS")
-      Ok.withHeaders(
-        "Access-Control-Allow-Origin" -> "*",
-        "Access-Control-Allow-Methods" -> "GET,POST",
-        "Access-Control-Max-Age" -> "360",
-        "Access-Control-Allow-Headers" -> "x-requested-with"
-      )
-    } else {
-      val json = Json.toJson(Device.all)
-      Ok(json).as("application/json").withHeaders(
-        "Access-Control-Allow-Origin" -> "*",
-        "Access-Control-Allow-Methods" -> "GET,POST",
-        "Access-Control-Max-Age" -> "360",
-        "Access-Control-Allow-Headers" -> "x-requested-with"
-      )
-    }
+object DeviceService extends Controller {
+
+  private def applyHeader(result:PlainResult):PlainResult  =
+    result.withHeaders(
+    "Access-Control-Allow-Origin" -> "*",
+    "Access-Control-Allow-Methods" -> "GET,POST,PUT,DELETE",
+    "Access-Control-Max-Age" -> "360",
+    "Access-Control-Allow-Headers" -> "x-requested-with")
+
+  def options = Action {
+    applyHeader(Ok)
+  }
+
+  def devices = Action {
+    applyHeader(Ok(toJson(Device.all)))
   }
 
   def show(id: Long) = Action {
-    Ok(Json.toJson(Device.findById(Some(id)))).as("application/json")
+    Device.findById(id)
+      .map(device => Ok(toJson(device)).as(JSON))
+      .getOrElse(NotFound)
   }
 
-  def create() = Action { implicit request =>
-    val device = Json.parse(request.body.asText.get).as[Device]
-    println(device)
-    Created
+  def create() = Action {
+    implicit request => {
+      request.body.asJson
+        .map(query => {
+        Device.create(query.as[Device])
+          .map(newId => {
+          val url = routes.DeviceService.show(newId).url
+          Status(CREATED).withHeaders(LOCATION -> url)
+        }).getOrElse(NotModified)
+      }).getOrElse(NotAcceptable)
+    }
   }
 
-  def save(id: Option[Long]) = Action { implicit request =>
-    val device = Json.parse(request.body.asText.get).as[Device]
-    println(device)
-    Ok
+  def save(id: Long) = Action {
+    implicit request => {
+      request.body.asJson.map(query => {
+        if (Device.findById(id).isDefined) {
+          val device = query.as[Device]
+          if (Device.update(id, device)) Ok else NotModified
+        }
+        else {
+          NotFound
+        }
+      }).getOrElse(NotAcceptable)
+    }
   }
 
   def delete(id: Long) = Action {
-    println("deleting {id}", id)
-    Device.delete(id)
-    Ok
+    if (Device.findById(id).isDefined) {
+      if (Device.delete(id)) {
+        Ok
+      } else {
+        NotModified
+      }
+    }
+    else {
+      NotFound
+    }
   }
 }

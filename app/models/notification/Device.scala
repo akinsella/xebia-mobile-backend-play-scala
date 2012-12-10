@@ -1,12 +1,13 @@
 package models.notification
 
+import java.util.Date
+
 import play.api.db._
 import play.api.Play.current
 
 import anorm._
 import anorm.SqlParser._
 
-import java.util.Date
 import play.api.libs.json._
 import anorm.~
 import play.api.libs.json.JsString
@@ -52,7 +53,7 @@ object Device {
   def apply(udid: String, token: String) = new Device(NotAssigned, udid, token, new Date())
 
   implicit object DeviceFormat extends Format[Device] {
-    def reads(json: JsValue): Device = Device( (json \ "udid").as[String] , (json \ "token").as[String])
+    def reads(json: JsValue): Device = Device((json \ "udid").as[String], (json \ "token").as[String])
 
     def writes(device: Device): JsValue = JsObject(Seq(
       "id" -> JsNumber(device.id.get),
@@ -89,11 +90,11 @@ object Device {
     }
   }
 
-  def findById(id: Option[Long]): Device = {
+  def findById(id: Long): Option[Device] = {
     DB.withConnection {
       implicit connection =>
         SQL("select * from device where id = {id}")
-          .on("id" -> id.get).using(simple).single()
+          .on("id" -> id).using(simple).singleOpt()
     }
   }
 
@@ -119,21 +120,21 @@ object Device {
    *
    * @param device The device values.
    */
-  def update(device: Device) = {
+  def update(id: Long, device: Device):Boolean = {
     DB.withConnection {
       implicit connection =>
         SQL(
           """
           update device
           set udid = {udid}
-          set token = {token}
+          , token = {token}
           where id = {id}
           """
         ).on(
-          'id -> device.id,
+          'id -> id,
           'token -> device.token,
           'udid -> device.udid
-        ).executeUpdate()
+        ).executeUpdate()  == 1
     }
   }
 
@@ -142,9 +143,9 @@ object Device {
    *
    * @param device The device values.
    */
-  def create(device: Device): Device = {
+  def create(device: Device): Option[Long] = {
     DB.withConnection {
-      implicit connection =>
+      implicit connection => {
         SQL(
           """
           insert into device(udid, token, created_at)
@@ -155,7 +156,8 @@ object Device {
           'token -> device.token,
           'createdAt -> device.createdAt
         ).executeInsert()
-      device
+
+      }
     }
   }
 
@@ -164,10 +166,10 @@ object Device {
    *
    * @param id Id of the device to delete.
    */
-  def delete(id: Long) = {
+  def delete(id: Long):Boolean = {
     DB.withConnection {
       implicit connection =>
-        SQL("delete from device where id = {id}").on('id -> id).executeUpdate()
+        SQL("delete from device where id = {id}").on('id -> id).executeUpdate() == 1
     }
   }
 
