@@ -6,11 +6,21 @@ import play.api.libs.json._
 import com.notnoop.apns._
 import play.Play
 import java.io.{FileInputStream, InputStream}
+import javax.net.ssl.{TrustManager, SSLContext}
+import controllers.Utilities
+import java.security.SecureRandom
 
 object NotificationService extends Controller  {
 
-  val certPassword = Play.application().configuration().getString("notification.ios.dev.cert.password")
-  val p12Path = "conf/Xebia2.p12"
+  val jssecacertsPath= "cert/jssecacerts"
+  val jssecacertsPassword = Play.application().configuration().getString("notification.ios.dev.jssecacerts.password")
+
+  val p12Path = "cert/xebia-apns.p12"
+  val p12Password = Play.application().configuration().getString("notification.ios.dev.p12.password")
+
+  System.setProperty("javax.net.debug", "all")
+  System.setProperty("javax.net.ssl.trustStore", jssecacertsPath)
+  System.setProperty("javax.net.ssl.trustStorePassword", jssecacertsPassword)
 
   def register = Action { implicit request =>
     val json: JsValue = request.body.asJson.get
@@ -25,8 +35,10 @@ object NotificationService extends Controller  {
 
     val notification = request.body.asJson.get.as[Notification]
 
+    println("Cert password: %s".format(jssecacertsPassword))
+
     val apnsService: ApnsService = APNS.newService()
-      .withCert(Play.application().getFile(p12Path).getAbsolutePath, certPassword)
+      .withCert(Play.application().getFile(p12Path).getAbsolutePath, p12Password)
       .withDelegate(new ApnsDelegate {
       def messageSent(notification: ApnsNotification) {
         println("Notification send: %s".format(notification))
@@ -59,5 +71,6 @@ object NotificationService extends Controller  {
 
     Ok("Notified")
   }
+
 
 }

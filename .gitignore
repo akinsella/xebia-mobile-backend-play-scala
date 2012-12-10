@@ -32,4 +32,6 @@ dump.rdb
 *.cert
 *.pem
 *.p12
-
+jssecacerts
+cacerts
+*.class

@@ -2,10 +2,7 @@ package models.notification
 
 import play.api.libs.json._
 
-case class Notification(
-                        message:String,
-                        tokens:Array[String]
-                        ) {
+case class Notification( message:String, tokens:Array[String] ) {
 
 }
 
