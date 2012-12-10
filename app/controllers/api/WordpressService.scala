@@ -107,6 +107,28 @@ object WordPressService extends Controller {
     }
   }
 
+  def post(id:Long) = Action {
+    Connectivity.withRedisClient {
+      redisClient => {
+        val wpPostsUrl: String = "http://blog.xebia.fr/wp-json-api/get_post/"
+        val queryStringParams:Seq[(String, String)] = Seq("post_id" -> id.toString)
+
+        val wpPostRequestHolder: WSRequestHolder = WS.url(wpPostsUrl).withQueryString(queryStringParams.toArray: _*)
+
+        val cacheKey = buildRequestUrl(wpPostRequestHolder)
+        val jsonPosts = redisClient.get(cacheKey).getOrElse {
+          val jsonFetched = Json.parse(wpPostRequestHolder.get().value.get.body)
+          val post = (jsonFetched \ "post").as[WPPost]
+          val jsonFormatted = Json.toJson(post).toString()
+          redisClient.set(cacheKey, jsonFormatted)
+          redisClient.expire(cacheKey, 60)
+          jsonFormatted
+        }
+        Ok( jsonPosts ).as("application/json")
+      }
+    }
+  }
+
   def buildRequestUrl(wpPostsRequestHolder: WS.WSRequestHolder): String = {
     "%1$s?%2$s".format(wpPostsRequestHolder.url, wpPostsRequestHolder.queryString.toSeq.sorted map {
       case (key, value) => "%s=%s" format(key, value)

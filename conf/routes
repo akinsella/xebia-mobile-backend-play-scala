@@ -22,6 +22,7 @@ GET     /api/wordpress/category/:id/posts           controllers.api.WordPressSer
 GET     /api/wordpress/tag/:id/posts                controllers.api.WordPressService.tagPosts(id: Long)
 GET     /api/wordpress/author/:id/posts             controllers.api.WordPressService.authorPosts(id: Long)
 GET     /api/wordpress/posts/recent                 controllers.api.WordPressService.recentPosts
+GET     /api/wordpress/post/:id                     controllers.api.WordPressService.post(id: Long)
 
 GET     /api/github/repositories                    controllers.api.GitHubService.repositories
 GET     /api/github/users                           controllers.api.GitHubService.users
