@@ -1,135 +1,116 @@
 package controllers.api
 
+import cloud._
 import models._
-import play.api.mvc.{Action, Controller}
 import play.api.libs.json._
 import play.api.libs.ws.WS
-import com.redis.{RedisClientPool, RedisClient}
-import play.api.libs.ws.WS.WSRequestHolder
+import play.api.mvc.{PlainResult, Action, Controller}
 import wordpress._
-import cloud._
 
+
+/**
+ * Adapters for Wordpress Webservices API
+ */
 object WordPressService extends Controller {
 
+
+  /**
+   * @return authors from Xebia blogs
+   */
   def authors = Action {
-    Connectivity.withRedisClient {
-      redisClient => {
-
-        val wpAuthorsUrl: String = "http://blog.xebia.fr/wp-json-api/get_author_index/"
-        val jsonAuthors = redisClient.get(wpAuthorsUrl).getOrElse {
-          val jsonFetched = Json.parse(WS.url(wpAuthorsUrl).get().value.get.body)
-          val authors =  (jsonFetched \ "authors").as[Seq[JsValue]] map { _.as[WPAuthor] }
-          val jsonFormatted = Json.toJson(authors).toString()
-          redisClient.set(wpAuthorsUrl, jsonFormatted)
-          redisClient.expire(wpAuthorsUrl, 60)
-          jsonFormatted
-        }
-        Ok( jsonAuthors ).as("application/json")
-      }
+    Connectivity.getJsonWithCache("http://blog.xebia.fr/wp-json-api/get_author_index/") {
+      jsonFetched => (jsonFetched \ "authors").as[Seq[JsValue]] map (_.as[WPAuthor])
     }
   }
 
+  /**
+   * @return tags from Xebia blogs
+   */
   def tags = Action {
-    Connectivity.withRedisClient {
-      redisClient => {
-
-        val wpTagsUrl: String = "http://blog.xebia.fr/wp-json-api/get_tag_index/"
-        val jsonTags = redisClient.get(wpTagsUrl).getOrElse {
-          val jsonFetched = Json.parse(WS.url(wpTagsUrl).get().value.get.body)
-          val tags =  (jsonFetched \ "tags").as[Seq[JsValue]] map { _.as[WPTag] }
-          val jsonFormatted = Json.toJson(tags).toString()
-          redisClient.set(wpTagsUrl, jsonFormatted)
-          redisClient.expire(wpTagsUrl, 60)
-          jsonFormatted
-        }
-        Ok( jsonTags ).as("application/json")
-      }
+    Connectivity.getJsonWithCache("http://blog.xebia.fr/wp-json-api/get_tag_index/") {
+      jsonFetched => (jsonFetched \ "tags").as[Seq[JsValue]] map (_.as[WPTag])
     }
   }
 
+
+  /**
+   * @return categories of posts from Xebia blogs
+   */
   def categories = Action {
-    Connectivity.withRedisClient {
-      redisClient => {
-
-        val wpCategoriesUrl: String = "http://blog.xebia.fr/wp-json-api/get_category_index/"
-        val jsonCategories = redisClient.get(wpCategoriesUrl).getOrElse {
-          val jsonFetched = Json.parse(WS.url(wpCategoriesUrl).get().value.get.body)
-          val categories =  (jsonFetched \ "categories").as[Seq[JsValue]] map { _.as[WPCategory] }
-          val jsonFormatted = Json.toJson(categories).toString()
-          redisClient.set(wpCategoriesUrl, jsonFormatted)
-          redisClient.expire(wpCategoriesUrl, 60)
-          jsonFormatted
-        }
-        Ok( jsonCategories ).as("application/json")
-      }
+    Connectivity.getJsonWithCache("http://blog.xebia.fr/wp-json-api/get_category_index/") {
+      jsonFetched => (jsonFetched \ "categories").as[Seq[JsValue]] map (_.as[WPCategory])
     }
   }
 
-  def tagPosts(id:Long) = Action {
-    posts(Some(id), "tag")
-  }
+  /**
+   * @param id id of the post
+   * @return tags of the post
+   */
+  def tagPosts(id: Long) = posts("tag", Some(id))
 
-  def categoryPosts(id:Long) = Action {
-    posts(Some(id), "category")
-  }
+  /**
+   * @param id id of the post
+   * @return category of the post
+   */
+  def categoryPosts(id: Long) = posts("category", Some(id))
 
-  def authorPosts(id:Long) = Action {
-    posts(Some(id), "author")
-  }
+  /**
+   * @param id id of the post
+   * @return author of the post
+   */
+  def authorPosts(id: Long) = posts("author", Some(id))
 
+  /**
+   * @return recent posts
+   */
   def recentPosts = Action {
-    posts(None, "recent")
+    posts("recent")
   }
 
-  def posts(id:Option[Long], _type:String, count:Long = 100) = Action {
-    Connectivity.withRedisClient {
-      redisClient => {
-        val wpPostsUrl: String = "http://blog.xebia.fr/wp-json-api/get_%1$s_posts/".format(_type)
-        var queryStringParams:Seq[(String, String)] = Seq("count" -> count.toString)
+  /**
+   * @param _type type of entity fetched
+   * @param id optional id of a post or all posts if None
+   * @param count number of elements fetched
+   * @return _type element from a post identified by id or all posts limited by count
+   */
+  def posts(_type: String, id: Option[Long] = None, count: Long = 100) = Action {
+    val wpPostsUrl = "http://blog.xebia.fr/wp-json-api/get_%1$s_posts/".format(_type)
+    var queryStringParams = Seq("count" -> count.toString)
 
-        if (id.isDefined) {
-          queryStringParams = queryStringParams.:+("id" -> id.get.toString)
-        }
+    if (id.isDefined) {
+      queryStringParams = queryStringParams.:+("id" -> id.get.toString)
+    }
 
-        val wpPostsRequestHolder: WSRequestHolder = WS.url(wpPostsUrl).withQueryString(queryStringParams.toArray: _*)
+    val wpPostsRequestHolder = WS
+      .url(wpPostsUrl)
+      .withQueryString(queryStringParams.toArray: _*)
 
-        val cacheKey = buildRequestUrl(wpPostsRequestHolder)
-        val jsonPosts = redisClient.get(cacheKey).getOrElse {
-          val jsonFetched = Json.parse(wpPostsRequestHolder.get().value.get.body)
-          val posts = (jsonFetched \ "posts").as[Seq[JsValue]] map { _.as[WPPost] }
-          val jsonFormatted = Json.toJson(posts).toString()
-          redisClient.set(cacheKey, jsonFormatted)
-          redisClient.expire(cacheKey, 60)
-          jsonFormatted
-        }
-        Ok( jsonPosts ).as("application/json")
-      }
+    val cacheKey = buildRequestUrl(wpPostsRequestHolder)
+
+    Connectivity.getJsonWithCache(cacheKey, wpPostsRequestHolder) {
+      jsonFetched => (jsonFetched \ "posts").as[Seq[JsValue]] map (_.as[WPPost])
     }
   }
 
-  def showPost(id:Long) = Action {
-    Connectivity.withRedisClient {
-      redisClient => {
-        val wpPostsUrl: String = "http://blog.xebia.fr/wp-json-api/get_post/"
-        val queryStringParams:Seq[(String, String)] = Seq("post_id" -> id.toString)
+  /**
+   *
+   * @param id id of the post
+   * @return the post identified by its id
+   */
+  def showPost(id: Long) = Action {
+    val url: String = "http://blog.xebia.fr/wp-json-api/get_post"
+    val cacheKey: String = url + "?post_id=%s".format(id)
 
-        val wpPostRequestHolder: WSRequestHolder = WS.url(wpPostsUrl).withQueryString(queryStringParams.toArray: _*)
+    WS
+      .url(url)
+      .withQueryString(("post_id" -> id.toString))
 
-        val cacheKey = buildRequestUrl(wpPostRequestHolder)
-        val jsonPosts = redisClient.get(cacheKey).getOrElse {
-          val jsonFetched = Json.parse(wpPostRequestHolder.get().value.get.body)
-          val post = (jsonFetched \ "post").as[WPPost]
-          val jsonFormatted = Json.toJson(post).toString()
-          redisClient.set(cacheKey, jsonFormatted)
-          redisClient.expire(cacheKey, 60)
-          jsonFormatted
-        }
-        Ok( jsonPosts ).as("application/json")
-      }
+    Connectivity.getJsonWithCache(cacheKey) {
+      jsonFetched => (jsonFetched \ "post").as[WPPost]
     }
   }
 
-  def buildRequestUrl(wpPostsRequestHolder: WS.WSRequestHolder): String = {
+  private def buildRequestUrl(wpPostsRequestHolder: WS.WSRequestHolder): String = {
     "%1$s?%2$s".format(wpPostsRequestHolder.url, wpPostsRequestHolder.queryString.toSeq.sorted map {
       case (key, value) => "%s=%s" format(key, value)
     } mkString ("&"))
