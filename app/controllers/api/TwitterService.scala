@@ -1,59 +1,57 @@
 package controllers.api
 
-import play.api.mvc.{RequestHeader, Action, Controller}
-import play.api.libs.json._
-import com.redis.RedisClientPool
-import play.Play
+import cloud.Connectivity
 import models.twitter.TTTweet
-import play.api.libs.ws.WS
-import scala.Predef._
-import scala.Left
-import play.api.libs.oauth.OAuth
-import scala.Right
-import play.api.libs.oauth.ServiceInfo
-import play.api.libs.oauth.RequestToken
-import play.api.libs.oauth.OAuthCalculator
-import play.api.libs.ws.WS.WSRequestHolder
+import play.Play
+import play.api.libs.json._
 import play.api.libs.oauth.ConsumerKey
-import play.api.libs.json.JsObject
-import cloud.{Connectivity, CloudFoundry}
+import play.api.libs.oauth.OAuth
+import play.api.libs.oauth.OAuthCalculator
+import play.api.libs.oauth.RequestToken
+import play.api.libs.oauth.ServiceInfo
+import play.api.libs.ws.WS
+import play.api.libs.ws.WS.WSRequestHolder
+import play.api.mvc.{RequestHeader, Action, Controller}
+import scala.Left
+import scala.Predef._
+import scala.Right
 
+/**
+ * * Adapters for Twitter  Webservices API
+ */
 object TwitterService extends Controller {
 
-  val appKey = Play.application().configuration().getString("api.twitter.app.key")
-  val appSecret = Play.application().configuration().getString("api.twitter.app.secret")
-  val appBasePath = Play.application().configuration().getString("app.base.path")
+  private val appKey = Play.application().configuration().getString("api.twitter.app.key")
+  private val appSecret = Play.application().configuration().getString("api.twitter.app.secret")
+  private val appBasePath = Play.application().configuration().getString("app.base.path")
 
-  val oauthInfosKey = "api.twitter.oauth.infos"
-  val wpTweetsUrl = "http://api.twitter.com/1/statuses/user_timeline.json"
+  private val oauthInfosKey = "api.twitter.oauth.infos"
+  private val wpTweetsUrl = "http://api.twitter.com/1/statuses/user_timeline.json"
 
-/*
-  def index = Security.Authenticated(
-    request => request.session.get("token"),
-    _ => Results.Redirect(routes.Twitter.authenticate))(username => Action(Ok(html.index())))
-*/
+  private val KEY = ConsumerKey(appKey, appSecret)
 
-  def timeline = Action { request =>
-    Connectivity.withRedisClient {
-      redisClient => {
+  private val TWITTER = OAuth(ServiceInfo(
+    "https://api.twitter.com/oauth/request_token",
+    "https://api.twitter.com/oauth/access_token",
+    "https://api.twitter.com/oauth/authorize", KEY),
+    false)
+
+
+  def timeline = Action {
+    request => {
         val wsRequestHolder: WSRequestHolder = createUserTimelineUrl(request)
         val cacheKey = buildRequestUrl(wsRequestHolder)
-        val jsonTweet = redisClient.get(cacheKey).getOrElse {
-          val jsonFetched: JsValue = getAsJson(wsRequestHolder)
-          println(jsonFetched)
-          val tweets = jsonFetched.as[Seq[JsObject]] map { _.as[TTTweet] }
-          val jsonFormatted = Json.toJson(tweets).toString()
-          redisClient.set(cacheKey, jsonFormatted)
-          redisClient.expire(cacheKey, 60)
-          jsonFormatted
+
+      Connectivity.getJsonWithCache(cacheKey, wsRequestHolder) {
+        jsonFetched => jsonFetched.as[Seq[JsObject]] map (_.as[TTTweet])
         }
-        Ok( jsonTweet ).as("application/json")
       }
     }
-  }
 
-  def getAsJson(request:WSRequestHolder): JsValue = {
-    Json.parse(request.get().value.get.body)
+  private def buildRequestUrl(wpPostsRequestHolder: WS.WSRequestHolder): String = {
+    "%1$s?%2$s".format(wpPostsRequestHolder.url, wpPostsRequestHolder.queryString.toSeq.sorted map {
+      case (key, value) => "%s=%s" format(key, value)
+    } mkString ("&"))
   }
 
   def createUserTimelineUrl(request:RequestHeader): WSRequestHolder = {
@@ -72,28 +70,25 @@ object TwitterService extends Controller {
     }
   }
 
-  case class TwitterUser( login: String, email: String, avatar_url: String, name: String )
-
-  implicit def TwitterUserReads: Reads[TwitterUser] = new Reads[TwitterUser]{
-    def reads(json: JsValue) =
-      TwitterUser(
-        (json \ "login").as[String],
-        (json \ "email").as[String],
-        (json \ "avatar_url").as[String],
-        (json \ "name").as[String]
-      )
+  def getTokenFromRedis(request: RequestHeader): Either[Exception, RequestToken] = {
+    Connectivity.withRedisClient {
+      redisClient => {
+        val result: Either[Exception, RequestToken] = try {
+          val json = Json.parse(redisClient.get(oauthInfosKey).getOrElse("")).as[JsObject]
+          val token: RequestToken = RequestToken((json \ "token").as[String], (json \ "secret").as[String])
+          Right(token)
+        } catch {
+          case ex: Exception => Left(ex)
+  }
+        result
+      }
+    }
   }
 
-  val KEY = ConsumerKey(appKey, appSecret)
-
-  val TWITTER = OAuth(ServiceInfo(
-    "https://api.twitter.com/oauth/request_token",
-    "https://api.twitter.com/oauth/access_token",
-    "https://api.twitter.com/oauth/authorize", KEY),
-    false)
-
-  def authenticate = Action { request =>
-    request.queryString.get("oauth_verifier").flatMap(_.headOption).map { verifier =>
+  def authenticate = Action {
+    request =>
+      request.queryString.get("oauth_verifier").flatMap(_.headOption).map {
+        verifier =>
       val tokenPair = getTokenFromRedis(request) match {
         case Right(requestToken) => requestToken
         case Left(e) => throw e
@@ -127,25 +122,5 @@ object TwitterService extends Controller {
       })
   }
 
-  def getTokenFromRedis(request:RequestHeader):Either[Exception, RequestToken] = {
-    Connectivity.withRedisClient {
-      redisClient => {
-        val result :Either[Exception, RequestToken] = try {
-          val json = Json.parse(redisClient.get(oauthInfosKey).getOrElse("")).as[JsObject]
-          val token: RequestToken = RequestToken((json \ "token").as[String], (json \ "secret").as[String])
-          Right(token)
-        } catch {
-          case ex:Exception => Left(ex)
-        }
-        result
-      }
-    }
-  }
-
-  def buildRequestUrl(wpPostsRequestHolder: WS.WSRequestHolder): String = {
-    "%1$s?%2$s".format(wpPostsRequestHolder.url, wpPostsRequestHolder.queryString.toSeq.sorted map {
-      case (key, value) => "%s=%s" format(key, value)
-    } mkString ("&"))
-  }
 
 }

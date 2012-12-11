@@ -1,40 +1,35 @@
 package controllers.api
 
-import models._
-import eventbrite.EBEvent
-import play.api.mvc.{Action, Controller}
-import play.api.libs.json._
-import play.api.libs.ws.WS._
-import play.api.libs.ws.WS
-import com.redis.{RedisClientPool, RedisClient}
+import cloud.Connectivity
+import models.eventbrite.EBEvent
 import play.Play
-import cloud.{Connectivity, CloudFoundry}
+import play.api.libs.json._
+import play.api.libs.ws.WS
+import play.api.mvc.{Action, Controller}
 
+/**
+ * Adapters for EventBrite Webservices API
+ */
 object EventBriteService extends Controller {
 
-  val appKey = Play.application().configuration().getString("api.eventbrite.app.key")
-  val xebiaOrganizationId = "1627902102"
-  val wpEventsUrl = "https://www.eventbrite.com/json/organizer_list_events"
+  private val appKey = Play.application().configuration().getString("api.eventbrite.app.key")
+  private val xebiaOrganizationId = "1627902102"
+  private val wpEventsUrl = "https://www.eventbrite.com/json/organizer_list_events"
 
+  /**
+   * @return get the "Live" events from Xebia Organization
+   */
   def events = Action {
-    Connectivity.withRedisClient {
-      redisClient => {
+    val cacheKey = wpEventsUrl + "?id=%s".format(xebiaOrganizationId)
 
-        val cacheKey = "https://www.eventbrite.com/json/organizer_list_events?id=%s".format(xebiaOrganizationId)
-        val jsonEvents = redisClient.get(cacheKey).getOrElse {
-          val wsRequestHolder: WSRequestHolder = WS.url(wpEventsUrl)
+    val wsRequestHolder = WS
+      .url(wpEventsUrl)
             .withQueryString("id" -> xebiaOrganizationId, "app_key" -> appKey)
-          val jsonFetched = Json.parse(wsRequestHolder.get().value.get.body)
-          val events =  (jsonFetched \\ "events").head.as[Seq[JsObject]]
-            .filter { jsonEvent => List("Live").contains(jsonEvent.\("event").\("status").as[String]) }
-            .map { jsonEvent => jsonEvent.\("event").as[EBEvent] }
-          val jsonFormatted = Json.toJson(events).toString()
-          redisClient.set(cacheKey, jsonFormatted)
-          redisClient.expire(cacheKey, 60)
-          jsonFormatted
-        }
-        Ok( jsonEvents ).as("application/json")
-      }
+
+    Connectivity.getJsonWithCache(cacheKey, wsRequestHolder) {
+      jsonFetched => (jsonFetched \\ "events").head.as[Seq[JsObject]]
+        .filter(jsonEvent => List("Live").contains(jsonEvent.\("event").\("status").as[String]))
+        .map(_.\("event").as[EBEvent])
     }
   }
 

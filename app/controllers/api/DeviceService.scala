@@ -6,9 +6,16 @@ import play.api.mvc.{Action, Controller}
 import utils.RestHelper
 
 
+/**
+ * CRUD Service for devices registred in the API (Android or iOS)
+ */
 object DeviceService extends Controller with RestHelper {
 
 
+  /**
+   *
+   * @return options available for this API
+   */
   def options = Action(
     Ok.withHeaders(
       "Access-Control-Allow-Origin" -> "*",
@@ -16,8 +23,17 @@ object DeviceService extends Controller with RestHelper {
     )
   )
 
+  /**
+   * @return all registered device
+   */
   def devices = Action(Ok(toJson(Device.all)))
 
+
+  /**
+   * This call manages the IF_MODIFIED_SINCE and LAST_MODIFIED http headers
+   * @param id unique identifier of a device
+   * @return a device identified by its id
+   */
   def show(id: Long) = Action {
     request => {
       Device.findById(id).map(device => {
@@ -39,6 +55,10 @@ object DeviceService extends Controller with RestHelper {
     }
   }
 
+  /**
+   *
+   * @return create a new device and give LOCATION to the resource
+   */
   def create() = Action {
     request => {
       request.body.asJson.map(query => {
@@ -52,6 +72,11 @@ object DeviceService extends Controller with RestHelper {
     }
   }
 
+  /**
+   *  update a device
+   * @param id identifier of the device
+   * @return status of the delete process (OK, NOT_FOUND, NOT_MODIFIED or NOT_ACCEPTABLE)
+   */
   def save(id: Long) = Action {
     request => {
       request.body.asJson.map(query => {
@@ -67,6 +92,11 @@ object DeviceService extends Controller with RestHelper {
     }
   }
 
+  /**
+   *  delete a device
+   * @param id identifier of the device
+   * @return status of the delete OK, NOT_FOUND or NOT_MODIFIED)
+   */
   def delete(id: Long) = Action {
     if (Device.findById(id).isDefined) {
       if (Device.delete(id)) {

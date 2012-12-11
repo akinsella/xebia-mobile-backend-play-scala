@@ -107,7 +107,7 @@ object WordPressService extends Controller {
     }
   }
 
-  def post(id:Long) = Action {
+  def showPost(id:Long) = Action {
     Connectivity.withRedisClient {
       redisClient => {
         val wpPostsUrl: String = "http://blog.xebia.fr/wp-json-api/get_post/"
