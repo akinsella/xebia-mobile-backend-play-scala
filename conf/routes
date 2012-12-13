@@ -18,10 +18,10 @@ POST     /api/notification/push                     controllers.api.Notification
 GET     /api/wordpress/authors                      controllers.api.WordPressService.authors
 GET     /api/wordpress/tags                         controllers.api.WordPressService.tags
 GET     /api/wordpress/categories                   controllers.api.WordPressService.categories
-GET     /api/wordpress/category/:id/posts           controllers.api.WordPressService.categoryPosts(id: Long)
-GET     /api/wordpress/tag/:id/posts                controllers.api.WordPressService.tagPosts(id: Long)
-GET     /api/wordpress/author/:id/posts             controllers.api.WordPressService.authorPosts(id: Long)
-GET     /api/wordpress/posts/recent                 controllers.api.WordPressService.recentPosts
+GET     /api/wordpress/category/:id/posts           controllers.api.WordPressService.categoryPosts(id: Long , count: Option[Int] )
+GET     /api/wordpress/tag/:id/posts                controllers.api.WordPressService.tagPosts(id: Long , count: Option[Int] )
+GET     /api/wordpress/author/:id/posts             controllers.api.WordPressService.authorPosts(id: Long , count: Option[Int]  )
+GET     /api/wordpress/posts/recent                 controllers.api.WordPressService.recentPosts( count: Option[Int] )
 GET     /api/wordpress/post/:id                     controllers.api.WordPressService.showPost(id: Long)
 
 GET     /api/github/repositories                    controllers.api.GitHubService.repositories

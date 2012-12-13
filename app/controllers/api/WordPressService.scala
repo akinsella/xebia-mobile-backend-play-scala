@@ -46,25 +46,25 @@ object WordPressService extends Controller {
    * @param id id of the post
    * @return tags of the post
    */
-  def tagPosts(id: Long) = posts("tag", Some(id))
+  def tagPosts(id: Long, count: Option[Int] = None) = posts("tag", Some(id), count)
 
   /**
    * @param id id of the post
    * @return category of the post
    */
-  def categoryPosts(id: Long) = posts("category", Some(id))
+  def categoryPosts(id: Long, count: Option[Int] = None) = posts("category", Some(id), count)
 
   /**
    * @param id id of the post
    * @return author of the post
    */
-  def authorPosts(id: Long) = posts("author", Some(id))
+  def authorPosts(id: Long, count: Option[Int] = None) = posts("author", Some(id), count)
 
   /**
    * @return recent posts
    */
-  def recentPosts = Action {
-    posts("recent")
+  def recentPosts(count: Option[Int] = None) = Action {
+    posts("recent", None, count)
   }
 
   /**
@@ -73,9 +73,9 @@ object WordPressService extends Controller {
    * @param count number of elements fetched
    * @return _type element from a post identified by id or all posts limited by count
    */
-  def posts(_type: String, id: Option[Long] = None, count: Long = 100) = Action {
+  def posts(_type: String, id: Option[Long] = None, count: Option[Int] = None) = Action {
     val wpPostsUrl = "http://blog.xebia.fr/wp-json-api/get_%1$s_posts/".format(_type)
-    var queryStringParams = Seq("count" -> count.toString)
+    var queryStringParams = count.map(x => Seq("count" -> x.toString)).getOrElse(Seq())
 
     if (id.isDefined) {
       queryStringParams = queryStringParams.:+("id" -> id.get.toString)
@@ -87,7 +87,7 @@ object WordPressService extends Controller {
 
     val cacheKey = buildRequestUrl(wpPostsRequestHolder)
 
-    Connectivity.getJsonWithCache(cacheKey, wpPostsRequestHolder) {
+    Connectivity.getJsonWithCache(cacheKey, wpPostsRequestHolder, Some(60)) {
       jsonFetched => (jsonFetched \ "posts").as[Seq[JsValue]] map (_.as[WPPost])
     }
   }
