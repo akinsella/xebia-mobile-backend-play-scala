@@ -1,14 +1,14 @@
-package controllers.api
+package controllers.api.ios
 
-import models.notification._
-import play.api.mvc.{Action, Controller}
-import play.api.libs.json._
 import com.notnoop.apns._
-import play.Play
-import java.io.{FileInputStream, InputStream}
-import javax.net.ssl.{TrustManager, SSLContext}
 import controllers.Utilities
+import java.io.{FileInputStream, InputStream}
 import java.security.SecureRandom
+import javax.net.ssl.{TrustManager, SSLContext}
+import models.notification._
+import play.Play
+import play.api.libs.json._
+import play.api.mvc.{Action, Controller}
 
 object NotificationService extends Controller  {
 

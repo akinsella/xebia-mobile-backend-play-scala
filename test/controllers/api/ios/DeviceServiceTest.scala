@@ -1,15 +1,16 @@
-package controllers.api
+package controllers.api.ios
 
-import org.specs2.mutable.Specification
-
-import play.api.libs.ws.{Response, WS}
-import play.api.test._
-import play.api.test.Helpers.{running, await, inMemoryDatabase}
-import play.api.test.Helpers.{OK, CREATED, NOT_FOUND, NOT_MODIFIED}
-import play.api.http.HeaderNames.{CONTENT_TYPE, IF_MODIFIED_SINCE, LOCATION}
+import controllers.api.routes
 import org.joda.time.DateTime
-import utils.RestHelper
+import org.specs2.mutable.Specification
 import play.api.http.ContentTypes.JSON
+import play.api.http.HeaderNames.{CONTENT_TYPE, IF_MODIFIED_SINCE, LOCATION}
+import play.api.libs.ws.{Response, WS}
+import play.api.test.Helpers.{OK, CREATED, NOT_FOUND, NOT_MODIFIED}
+import play.api.test.Helpers.{running, await, inMemoryDatabase}
+import play.api.test._
+import utils.RestHelper
+
 
 class DeviceServiceTest extends Specification with RestHelper {
 

@@ -1,4 +1,4 @@
-package controllers.api
+package controllers.api.ios
 
 import models.notification.Device
 import play.api.libs.json.Json.toJson
