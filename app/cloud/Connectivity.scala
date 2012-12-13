@@ -2,10 +2,11 @@ package cloud
 
 import play.api.http.ContentTypes.JSON
 import play.api.libs.json.{Writes, Json, JsValue}
-import play.api.libs.ws.WS
+import play.api.libs.ws.{Response, WS}
 import play.api.mvc.PlainResult
 import play.api.mvc.Results.Ok
 import com.redis.RedisClient
+import play.api.libs.concurrent.Promise
 
 
 /**
@@ -71,7 +72,8 @@ object Connectivity {
   def getJsonWithCache[T](cacheKey: String, wsRequest: => WS.WSRequestHolder, expiration: Option[Int] = None)(body: JsValue => T)(implicit jsonFormatter: Writes[T]): PlainResult = {
     Ok(withCache(cacheKey, expiration) {
 
-      val jsonFetched = Json.parse(wsRequest.get().value.get.body)
+      val promise: Promise[Response] = wsRequest.get()
+      val jsonFetched = Json.parse(promise.await(10000).get.body)
       Json.toJson(body.apply(jsonFetched)).toString()
 
     }).as(JSON)

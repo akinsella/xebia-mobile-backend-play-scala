@@ -87,39 +87,43 @@ object TwitterService extends Controller {
 
   def authenticate = Action {
     request =>
+      val twitterUrl: String = "%s/api/twitter/authenticate".format(appBasePath)
+      play.Logger.info("Twitter url : %s".format(twitterUrl));
       request.queryString.get("oauth_verifier").flatMap(_.headOption).map {
-        verifier =>
-      val tokenPair = getTokenFromRedis(request) match {
-        case Right(requestToken) => requestToken
-        case Left(e) => throw e
-      }
-
-      // We got the verifier; now get the access token, store it and back to index
-      TWITTER.retrieveAccessToken(tokenPair, verifier) match {
-        case Right(t) => {
-          Connectivity.withRedisClient {
-            redisClient => {
-              redisClient.set(oauthInfosKey, Json.toJson(Map("token" -> t.token, "secret" -> t.secret)).toString())
-              Redirect(controllers.routes.Home.index())
+              verifier =>
+            val tokenPair = getTokenFromRedis(request) match {
+              case Right(requestToken) => requestToken
+              case Left(e) => throw e
             }
-          }
-        }
-        case Left(e) => throw e
-      }
-    }.getOrElse(
-      TWITTER.retrieveRequestToken("%s/api/twitter/authenticate".format(appBasePath)) match {
-        case Right(t) => {
-          // We received the unauthorized tokens in the OAuth object - store it before we proceed
-          Connectivity.withRedisClient {
-            redisClient => {
-              redisClient.set(oauthInfosKey, Json.toJson(Map("token" -> t.token, "secret" -> t.secret)).toString())
-              Redirect(TWITTER.redirectUrl(t.token))
-            }
-          }
 
-        }
-        case Left(e) => throw e
-      })
+            // We got the verifier; now get the access token, store it and back to index
+            TWITTER.retrieveAccessToken(tokenPair, verifier) match {
+              case Right(t) => {
+                Connectivity.withRedisClient {
+                  redisClient => {
+                    redisClient.set(oauthInfosKey, Json.toJson(Map("token" -> t.token, "secret" -> t.secret)).toString())
+                    Redirect(controllers.routes.Home.index())
+                  }
+                }
+              }
+              case Left(e) => throw e
+            }
+          }.getOrElse(
+            TWITTER.retrieveRequestToken(twitterUrl) match {
+              case Right(t) => {
+                // We received the unauthorized tokens in the OAuth object - store it before we proceed
+                Connectivity.withRedisClient {
+                  redisClient => {
+                    redisClient.set(oauthInfosKey, Json.toJson(Map("token" -> t.token, "secret" -> t.secret)).toString())
+                    Redirect(TWITTER.redirectUrl(t.token))
+                  }
+                }
+
+              }
+              case Left(e) => {
+                throw e
+              }
+            })
   }
 
 
