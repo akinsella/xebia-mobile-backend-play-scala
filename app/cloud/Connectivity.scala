@@ -71,11 +71,8 @@ object Connectivity {
    */
   def getJsonWithCache[T](cacheKey: String, wsRequest: => WS.WSRequestHolder, expiration: Option[Int] = None)(body: JsValue => T)(implicit jsonFormatter: Writes[T]): PlainResult = {
     Ok(withCache(cacheKey, expiration) {
-
-      val promise: Promise[Response] = wsRequest.get()
-      val jsonFetched = Json.parse(promise.await(10000).get.body)
+      val jsonFetched = Json.parse(wsRequest.get().await(10000).get.body)
       Json.toJson(body.apply(jsonFetched)).toString()
-
     }).as(JSON)
   }
 
