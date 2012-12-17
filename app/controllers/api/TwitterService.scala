@@ -1,8 +1,10 @@
 package controllers.api
 
-import cloud.Connectivity
+import cloud.{CachedWSCall, Connectivity}
 import models.twitter.TTTweet
 import play.Play
+import play.api.Play.current
+import play.api.cache.Cache
 import play.api.libs.json._
 import play.api.libs.oauth.ConsumerKey
 import play.api.libs.oauth.OAuth
@@ -37,16 +39,51 @@ object TwitterService extends Controller {
     false)
 
 
+  /**
+   * @return twitter timeline of XebiaFR User
+   */
   def timeline = Action {
     request => {
-        val wsRequestHolder: WSRequestHolder = createUserTimelineUrl(request)
-        val cacheKey = buildRequestUrl(wsRequestHolder)
+      val wsRequestHolder: WSRequestHolder = createUserTimelineUrl(request)
+      val cacheKey = buildRequestUrl(wsRequestHolder)
 
-      Connectivity.getJsonWithCache(cacheKey, wsRequestHolder) {
+      CachedWSCall(cacheKey, wsRequestHolder) {
         jsonFetched => jsonFetched.as[Seq[JsObject]] map (_.as[TTTweet])
-        }
-      }
+      }.okAsJson
     }
+  }
+
+  /**
+   * @return authenticate to oauth twitter service
+   */
+  def authenticate = Action {
+    request =>
+      request.queryString.get("oauth_verifier").flatMap(_.headOption).map {
+        verifier =>
+          val tokenPair = getTokenFromRedis(request) match {
+            case Right(requestToken) => requestToken
+            case Left(e) => throw e
+          }
+
+          // We got the verifier; now get the access token, store it and back to index
+          TWITTER.retrieveAccessToken(tokenPair, verifier) match {
+            case Right(t) => {
+              Cache.set(oauthInfosKey, Json.toJson(Map("token" -> t.token, "secret" -> t.secret)).toString())
+              Redirect(controllers.routes.Home.index())
+            }
+            case Left(e) => throw e
+          }
+      }.getOrElse(
+        TWITTER.retrieveRequestToken("%s/api/twitter/authenticate".format(appBasePath)) match {
+          case Right(t) => {
+            // We received the unauthorized tokens in the OAuth object - store it before we proceed
+            Cache.set(oauthInfosKey, Json.toJson(Map("token" -> t.token, "secret" -> t.secret)).toString())
+            Redirect(TWITTER.redirectUrl(t.token))
+          }
+          case Left(e) => throw e
+        }
+      )
+  }
 
   private def buildRequestUrl(wpPostsRequestHolder: WS.WSRequestHolder): String = {
     "%1$s?%2$s".format(wpPostsRequestHolder.url, wpPostsRequestHolder.queryString.toSeq.sorted map {
@@ -54,72 +91,30 @@ object TwitterService extends Controller {
     } mkString ("&"))
   }
 
-  def createUserTimelineUrl(request:RequestHeader): WSRequestHolder = {
+  private def createUserTimelineUrl(request: RequestHeader): WSRequestHolder = {
     getTokenFromRedis(request) match {
       case Right(requestToken) => WS.url(wpTweetsUrl)
         .withQueryString(
-          "screen_name" -> "XebiaFR",
-          "contributor_details" -> "false",
-          "include_entities" -> "true",
-          "include_rts" -> "true",
-          "exclude_replies" -> "false",
-          "count" -> "50"
-        )
-        .sign(OAuthCalculator(KEY, requestToken))
+        "screen_name" -> "XebiaFR",
+        "contributor_details" -> "false",
+        "include_entities" -> "true",
+        "include_rts" -> "true",
+        "exclude_replies" -> "false",
+        "count" -> "50"
+      ).sign(OAuthCalculator(KEY, requestToken))
       case Left(e) => throw e
     }
   }
 
-  def getTokenFromRedis(request: RequestHeader): Either[Exception, RequestToken] = {
-    Connectivity.withRedisClient {
-      redisClient => {
-        val result: Either[Exception, RequestToken] = try {
-          val json = Json.parse(redisClient.get(oauthInfosKey).getOrElse("")).as[JsObject]
-          val token: RequestToken = RequestToken((json \ "token").as[String], (json \ "secret").as[String])
-          Right(token)
-        } catch {
-          case ex: Exception => Left(ex)
-  }
-        result
-      }
+  private def getTokenFromRedis(request: RequestHeader): Either[Exception, RequestToken] = {
+    val result: Either[Exception, RequestToken] = try {
+      val json = Json.parse(Cache.getOrElse(oauthInfosKey)("")).as[JsObject]
+      val token: RequestToken = RequestToken((json \ "token").as[String], (json \ "secret").as[String])
+      Right(token)
+    } catch {
+      case ex: Exception => Left(ex)
     }
-  }
-
-  def authenticate = Action {
-    request =>
-      request.queryString.get("oauth_verifier").flatMap(_.headOption).map {
-        verifier =>
-      val tokenPair = getTokenFromRedis(request) match {
-        case Right(requestToken) => requestToken
-        case Left(e) => throw e
-      }
-
-      // We got the verifier; now get the access token, store it and back to index
-      TWITTER.retrieveAccessToken(tokenPair, verifier) match {
-        case Right(t) => {
-          Connectivity.withRedisClient {
-            redisClient => {
-              redisClient.set(oauthInfosKey, Json.toJson(Map("token" -> t.token, "secret" -> t.secret)).toString())
-              Redirect(controllers.routes.Home.index())
-            }
-          }
-        }
-        case Left(e) => throw e
-      }
-    }.getOrElse(
-      TWITTER.retrieveRequestToken("%s/api/twitter/authenticate".format(appBasePath)) match {
-        case Right(t) => {
-          // We received the unauthorized tokens in the OAuth object - store it before we proceed
-          Connectivity.withRedisClient {
-            redisClient => {
-              redisClient.set(oauthInfosKey, Json.toJson(Map("token" -> t.token, "secret" -> t.secret)).toString())
-              Redirect(TWITTER.redirectUrl(t.token))
-            }
-          }
-
-        }
-        case Left(e) => throw e
-      })
+    result
   }
 
 

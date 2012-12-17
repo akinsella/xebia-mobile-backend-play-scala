@@ -18,18 +18,18 @@ object WordPressService extends Controller {
    * @return authors from Xebia blogs
    */
   def authors = Action {
-    Connectivity.getJsonWithCache("http://blog.xebia.fr/wp-json-api/get_author_index/") {
+    CachedWSCall("http://blog.xebia.fr/wp-json-api/get_author_index/") {
       jsonFetched => (jsonFetched \ "authors").as[Seq[JsValue]] map (_.as[WPAuthor])
-    }
+    }.okAsJson
   }
 
   /**
    * @return tags from Xebia blogs
    */
   def tags = Action {
-    Connectivity.getJsonWithCache("http://blog.xebia.fr/wp-json-api/get_tag_index/") {
+    CachedWSCall("http://blog.xebia.fr/wp-json-api/get_tag_index/") {
       jsonFetched => (jsonFetched \ "tags").as[Seq[JsValue]] map (_.as[WPTag])
-    }
+    }.okAsJson
   }
 
 
@@ -37,9 +37,9 @@ object WordPressService extends Controller {
    * @return categories of posts from Xebia blogs
    */
   def categories = Action {
-    Connectivity.getJsonWithCache("http://blog.xebia.fr/wp-json-api/get_category_index/") {
+    CachedWSCall("http://blog.xebia.fr/wp-json-api/get_category_index/") {
       jsonFetched => (jsonFetched \ "categories").as[Seq[JsValue]] map (_.as[WPCategory])
-    }
+    }.okAsJson
   }
 
   /**
@@ -87,9 +87,9 @@ object WordPressService extends Controller {
 
     val cacheKey = buildRequestUrl(wpPostsRequestHolder)
 
-    Connectivity.getJsonWithCache(cacheKey, wpPostsRequestHolder, Some(60)) {
+    CachedWSCall(cacheKey, wpPostsRequestHolder, Some(60)) {
       jsonFetched => (jsonFetched \ "posts").as[Seq[JsValue]] map (_.as[WPPost])
-    }
+    }.okAsJson
   }
 
   /**
@@ -101,13 +101,13 @@ object WordPressService extends Controller {
     val url: String = "http://blog.xebia.fr/wp-json-api/get_post"
     val cacheKey: String = url + "?post_id=%s".format(id)
 
-    WS
+    val ws = WS
       .url(url)
       .withQueryString(("post_id" -> id.toString))
 
-    Connectivity.getJsonWithCache(cacheKey) {
+    CachedWSCall(cacheKey, ws) {
       jsonFetched => (jsonFetched \ "post").as[WPPost]
-    }
+    }.okAsJson
   }
 
   private def buildRequestUrl(wpPostsRequestHolder: WS.WSRequestHolder): String = {
