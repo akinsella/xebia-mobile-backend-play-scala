@@ -1,6 +1,6 @@
 package controllers.api
 
-import cloud.Connectivity
+import cloud.{CachedWSCall, Connectivity}
 import models.eventbrite.EBEvent
 import play.Play
 import play.api.libs.json._
@@ -24,13 +24,13 @@ object EventBriteService extends Controller {
 
     val wsRequestHolder = WS
       .url(wpEventsUrl)
-            .withQueryString("id" -> xebiaOrganizationId, "app_key" -> appKey)
+      .withQueryString("id" -> xebiaOrganizationId, "app_key" -> appKey)
 
-    Connectivity.getJsonWithCache(cacheKey, wsRequestHolder) {
+    CachedWSCall(cacheKey, wsRequestHolder) {
       jsonFetched => (jsonFetched \\ "events").head.as[Seq[JsObject]]
         .filter(jsonEvent => List("Live").contains(jsonEvent.\("event").\("status").as[String]))
         .map(_.\("event").as[EBEvent])
-    }
+    }.okAsJson
   }
 
 }

@@ -1,10 +1,6 @@
 package controllers.api.ios
 
 import com.notnoop.apns._
-import controllers.Utilities
-import java.io.{FileInputStream, InputStream}
-import java.security.SecureRandom
-import javax.net.ssl.{TrustManager, SSLContext}
 import models.notification._
 import play.Play
 import play.api.libs.json._
