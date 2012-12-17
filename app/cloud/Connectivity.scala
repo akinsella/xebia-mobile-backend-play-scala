@@ -2,11 +2,10 @@ package cloud
 
 import play.api.http.ContentTypes.JSON
 import play.api.libs.json.{Writes, Json, JsValue}
-import play.api.libs.ws.{Response, WS}
+import play.api.libs.ws.WS
 import play.api.mvc.PlainResult
 import play.api.mvc.Results.Ok
 import com.redis.RedisClient
-import play.api.libs.concurrent.Promise
 
 
 /**
@@ -18,7 +17,13 @@ object Connectivity {
   val standalone = new Standalone //("localhost", 6379, Some("Some Password"))
 
   def env: Environment = {
-    if (cloudFoundry.isActive) cloudFoundry else standalone
+    if (cloudFoundry.isActive) {
+      play.Logger.info("Running on cloud[CloudFoundry]")
+      cloudFoundry
+    } else {
+      play.Logger.info("Running as Standalone application")
+      standalone
+    }
   }
 
 

@@ -18,6 +18,9 @@ private [redis] class RedisClientFactory(host: String, port: Int, password:Optio
       if (!cl.auth(password.get)) {
         throw new RedisConnectionException("Wrong password")
       }
+      else {
+        play.Logger.info("Authenticated against Redis")
+      }
     }
 
     cl

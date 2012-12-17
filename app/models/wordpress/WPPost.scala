@@ -6,6 +6,7 @@ import play.api.libs.json.JsNumber
 import models.wordpress.WPCategory.WPCategoryFormat
 import models.wordpress.WPTag.WPTagFormat
 import models.wordpress.WPComment.WPCommentFormat
+import models.wordpress.WPAuthor.WPAuthorFormat
 
 case class WPPost(
                      id:Long, _type:String, slug:String, url:String, status:String, title:String, titlePlain:String,
@@ -37,7 +38,7 @@ object WPPost {
     )
 
     def writes(post: WPPost): JsValue = {
-      var jsonFields: Seq[(String, JsValue with Product with Serializable)] = Seq(
+      var jsonFields: Seq[(String, JsValue)] = Seq(
         "id" -> JsNumber(post.id),
         "type" -> JsString(post.slug),
         "slug" -> JsString(post.slug),
@@ -49,6 +50,7 @@ object WPPost {
         "excerpt" -> JsString(post.excerpt),
         "date" -> JsString(post.date),
         "modified" -> JsString(post.modified),
+        "author" -> WPAuthorFormat.writes(post.author),
         "commentCount" -> JsNumber(post.commentCount),
         "commentStatus" -> JsString(post.commentStatus)
       )
