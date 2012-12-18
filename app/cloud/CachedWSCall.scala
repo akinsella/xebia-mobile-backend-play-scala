@@ -2,52 +2,44 @@ package cloud
 
 import play.api.libs.json.{Format, Json, JsValue}
 import play.api.libs.ws.WS
-import play.api.mvc.Result
+import play.api.mvc.{AsyncResult, Result}
 import play.api.mvc.Results.Ok
+import play.api.libs.concurrent.{NotWaiting, Promise}
 
 
 case class CachedWSCall[T](cacheKey: String, wsRequest: WS.WSRequestHolder, expiration: Option[Int])(extractData: (JsValue => T))(implicit jsonFormatter: Format[T]) {
 
   private val cacheElement: CachedAsJson[T] = CachedAsJson(cacheKey, expiration)
 
-  private lazy val dataFromWS = extractData.apply(
-    Json.parse(
-      wsRequest
-        .get()
-        .await(10000)
-        .fold(onError = (e => throw e)
-        , onSuccess = {
-          b => {
-            play.Logger.debug(b.body)
-            b.body
-          }
-        }
-      )
-    )
-  )
+  private lazy val dataFromWS: Promise[T] = {
+    wsRequest
+      .get()
+      .map(response => {
+      extractData.apply(Json.parse(response.body))
+    })
+  }
 
   /**
-   * @param jsonFormatter formatter needed to parse the element to JSON string from and to the cache
    * @return the element from the cache or from the WS call (which would be set in cache)
    */
-  def get(implicit jsonFormatter: Format[T]): T = {
-    cacheElement.getOrElse(dataFromWS)
+  def get: Promise[T] = {
+    dataFromWS.map(d => cacheElement.getOrElse(d))
   }
 
   /**
-   * @param jsonFormatter formatter needed to parse the element to JSON string from and to the cache
    * @return the element as JSValue from the cache or from the WS call (which would be set in cache)
    */
-  def getAsJson(implicit jsonFormatter: Format[T]): JsValue = {
-    cacheElement.getAsJsonOrElse(dataFromWS)
+  def getAsJson: Promise[JsValue] = {
+    dataFromWS.map(d => cacheElement.getAsJsonOrElse(d))
   }
 
   /**
-   * @param jsonFormatter formatter needed to parse the element to JSON string from and to the cache
    * @return 200 OK Response which content is the element from the cache or from the WS call (which would be set in cache)
    */
-  def okAsJson(implicit jsonFormatter: Format[T]): Result = {
-    Ok(getAsJson)
+  def okAsJson: AsyncResult = {
+    AsyncResult {
+      getAsJson.map(response => Ok(response))
+    }
   }
 
 }
@@ -66,4 +58,10 @@ object CachedWSCall {
     CachedWSCall(cacheKey, wsRequest, None)(extractData)
   }
 
+  def Now[A](promise: Promise[A])(implicit timeout: Long = 5000): A = {
+    promise.await(timeout).fold(
+      e => throw e,
+      identity
+    )
+  }
 }
