@@ -4,7 +4,7 @@ import cloud._
 import models._
 import play.api.libs.json._
 import play.api.libs.ws.WS
-import play.api.mvc.{PlainResult, Action, Controller}
+import play.api.mvc.{ Action, Controller}
 import wordpress._
 
 
@@ -63,9 +63,7 @@ object WordPressService extends Controller {
   /**
    * @return recent posts
    */
-  def recentPosts(count: Option[Int] = None) = Action {
-    posts("recent", None, count)
-  }
+  def recentPosts(count: Option[Int] = None) = posts("recent", None, count)
 
   /**
    * @param _type type of entity fetched
