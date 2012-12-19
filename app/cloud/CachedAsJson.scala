@@ -37,13 +37,16 @@ case class CachedAsJson[T](cacheKey: String, expiration: Option[Int] = None)(imp
       .map(x => (Json.parse(x)))
       .getOrElse {
       Cache.set(cacheKey, toJsonString(data), expiration)
-      jsonFormatter.writes(data)
+      toJson(data)
     }
   }
 
-
   private def toJsonString(data: T): String = {
-    jsonFormatter.writes(data).toString()
+    toJsonString(data).toString
+  }
+
+  private def toJson(data: T): JsValue = {
+    jsonFormatter.writes(data)
   }
 
 }

@@ -2,6 +2,14 @@ package cloud
 
 object Cache {
 
+  def get(key: String): Option[String] = {
+    Connectivity.withRedisClient {
+      redisClient => {
+        redisClient.get(key)
+      }
+    }
+  }
+
   def set(key: String, value: String, expiration: Option[Int] = None) = {
     Connectivity.withRedisClient {
       redisClient => {
@@ -11,18 +19,6 @@ object Cache {
         }
       }
     }
-  }
-
-  def get(key: String): Option[String] = {
-    Connectivity.withRedisClient {
-      redisClient => {
-        redisClient.get(key)
-      }
-    }
-  }
-
-  def getOrElse(key: String)(orElse: => String): String = {
-    get(key).getOrElse(orElse)
   }
 
 }
