@@ -26,7 +26,7 @@ case class CachedWSCall[T](cacheKey: String, wsRequest: WS.WSRequestHolder, expi
    * @return the element from the cache or from the WS call (which would be set in cache)
    */
   def get: T = {
-    cacheElement.getOrElse(wsData)
+    wsData
   }
 
   /**

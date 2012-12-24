@@ -42,7 +42,7 @@ case class CachedAsJson[T](cacheKey: String, expiration: Option[Int] = None)(imp
   }
 
   private def toJsonString(data: T): String = {
-    toJsonString(data).toString
+    toJson(data).toString()
   }
 
   private def toJson(data: T): JsValue = {
