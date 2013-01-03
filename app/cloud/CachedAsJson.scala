@@ -31,13 +31,13 @@ case class CachedAsJson[T](cacheKey: String, expiration: Option[Int] = None)(imp
     }
   }
 
-  def getAsJsonOrElse(data: => T): JsValue = {
+  def getAsJsonOrElse(data: => JsValue): JsValue = {
     Cache
       .get(cacheKey)
       .map(x => (Json.parse(x)))
       .getOrElse {
-      Cache.set(cacheKey, toJsonString(data), expiration)
-      toJson(data)
+      Cache.set(cacheKey, Json.stringify(data), expiration)
+      data
     }
   }
 

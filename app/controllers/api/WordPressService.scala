@@ -25,18 +25,26 @@ object WordPressService extends Controller {
    * @return authors from Xebia blogs
    */
   def authors = Action {
-    CachedWSCall("http://blog.xebia.fr/wp-json-api/get_author_index/") {
-      jsonFetched => (jsonFetched \ "authors").as[Seq[JsValue]] map (_.as[WPAuthor])
-    }.okAsJson
+    Ok {
+      Json.toJson(
+        CachedWSCall("http://blog.xebia.fr/wp-json-api/get_author_index/").mapJson {
+          jsonFetched => (jsonFetched \ "authors").as[Seq[JsValue]] map (_.as[WPAuthor])
+        }
+      )
+    }
   }
 
   /**
    * @return tags from Xebia blogs
    */
   def tags = Action {
-    CachedWSCall("http://blog.xebia.fr/wp-json-api/get_tag_index/") {
-      jsonFetched => (jsonFetched \ "tags").as[Seq[JsValue]] map (_.as[WPTag])
-    }.okAsJson
+    Ok {
+      Json.toJson(
+        CachedWSCall("http://blog.xebia.fr/wp-json-api/get_tag_index/").mapJson {
+          jsonFetched => (jsonFetched \ "tags").as[Seq[JsValue]] map (_.as[WPTag])
+        }
+      )
+    }
   }
 
 
@@ -44,9 +52,13 @@ object WordPressService extends Controller {
    * @return categories of posts from Xebia blogs
    */
   def categories = Action {
-    CachedWSCall("http://blog.xebia.fr/wp-json-api/get_category_index/") {
-      jsonFetched => (jsonFetched \ "categories").as[Seq[JsValue]] map (_.as[WPCategory])
-    }.okAsJson
+    Ok {
+      Json.toJson(
+        CachedWSCall("http://blog.xebia.fr/wp-json-api/get_category_index/").mapJson {
+          jsonFetched => (jsonFetched \ "categories").as[Seq[JsValue]] map (_.as[WPCategory])
+        }
+      )
+    }
   }
 
   /**
@@ -92,11 +104,9 @@ object WordPressService extends Controller {
         .url(wpPostsUrl)
         .withQueryString(queryStringParams.toArray: _*)
 
-      val cacheKey = buildRequestUrl(wpPostsRequestHolder)
-
-      val posts = CachedWSCall(cacheKey, wpPostsRequestHolder, Some(60)) {
+      val posts = CachedWSCall(wpPostsRequestHolder, Some(60)).mapJson {
         jsonFetched => (jsonFetched \ "posts").as[Seq[JsValue]] map (_.as[WPPost])
-      }.get
+      }
 
       val numberOfPages = posts.size / pageSize
 
@@ -144,21 +154,18 @@ object WordPressService extends Controller {
    */
   def showPost(id: Long) = Action {
     val url: String = "http://blog.xebia.fr/wp-json-api/get_post"
-    val cacheKey: String = url + "?post_id=%s".format(id)
 
     val ws = WS
       .url(url)
       .withQueryString(("post_id" -> id.toString))
 
-    CachedWSCall(cacheKey, ws) {
-      jsonFetched => (jsonFetched \ "post").as[WPPost]
-    }.okAsJson
-  }
-
-  private def buildRequestUrl(wpPostsRequestHolder: WS.WSRequestHolder): String = {
-    "%1$s?%2$s".format(wpPostsRequestHolder.url, wpPostsRequestHolder.queryString.toSeq.sorted map {
-      case (key, value) => "%s=%s" format(key, value)
-    } mkString ("&"))
+    Ok {
+      Json.toJson(
+        CachedWSCall(ws).mapJson {
+          jsonFetched => (jsonFetched \ "post").as[WPPost]
+        }
+      )
+    }
   }
 
 }

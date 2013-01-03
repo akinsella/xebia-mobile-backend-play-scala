@@ -9,9 +9,9 @@ import models.wordpress.WPComment.WPCommentFormat
 import models.wordpress.WPAuthor.WPAuthorFormat
 
 case class WPPost(
-                     id:Long, _type:String, slug:String, url:String, status:String, title:String, titlePlain:String,
-                     content:String, excerpt:String, date:String, modified:String, commentCount:Long, commentStatus:String,
-                     author:WPAuthor, categories:Option[Seq[WPCategory]], tags:Option[Seq[WPTag]], comments:Option[Seq[WPComment]]) {
+                   id: Long, _type: String, slug: String, url: String, status: String, title: String, titlePlain: String,
+                   content: String, excerpt: String, date: String, modified: String, commentCount: Long, commentStatus: String,
+                   author: WPAuthor, categories: Option[Seq[WPCategory]], tags: Option[Seq[WPTag]], comments: Option[Seq[WPComment]]) {
 }
 
 object WPPost {
@@ -24,7 +24,7 @@ object WPPost {
       (json \ "url").as[String],
       (json \ "status").as[String],
       (json \ "title").as[String],
-      (json \ "title").as[String].replaceAll("""<(?!\/?a(?=>|\s.*>))\/?.*?>""", ""),
+      (json \ "title").as[String].replaceAll( """<(?!\/?a(?=>|\s.*>))\/?.*?>""", ""),
       (json \ "content").as[String],
       (json \ "excerpt").as[String],
       (json \ "date").as[String],
@@ -50,21 +50,27 @@ object WPPost {
         "excerpt" -> JsString(post.excerpt),
         "date" -> JsString(post.date),
         "modified" -> JsString(post.modified),
-        "author" -> WPAuthorFormat.writes(post.author),
         "commentCount" -> JsNumber(post.commentCount),
-        "commentStatus" -> JsString(post.commentStatus)
+        "commentStatus" -> JsString(post.commentStatus),
+        "author" -> WPAuthorFormat.writes(post.author)
       )
 
       if (post.categories.isDefined) {
-        jsonFields = jsonFields.:+("categories" -> JsArray(post.categories.get map { WPCategoryFormat.writes(_) } ))
+        jsonFields = jsonFields.:+("categories" -> JsArray(post.categories.get map {
+          WPCategoryFormat.writes(_)
+        }))
       }
 
       if (post.tags.isDefined) {
-        jsonFields = jsonFields.:+("tags" -> JsArray(post.tags.get map { WPTagFormat.writes(_) } ))
+        jsonFields = jsonFields.:+("tags" -> JsArray(post.tags.get map {
+          WPTagFormat.writes(_)
+        }))
       }
 
       if (post.comments.isDefined) {
-        jsonFields = jsonFields.:+("comments" -> JsArray(post.comments.get map { WPCommentFormat.writes(_) } ))
+        jsonFields = jsonFields.:+("comments" -> JsArray(post.comments.get map {
+          WPCommentFormat.writes(_)
+        }))
       }
 
       JsObject(jsonFields)

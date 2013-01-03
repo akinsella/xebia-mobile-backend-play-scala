@@ -45,12 +45,15 @@ object TwitterService extends Controller {
   def timeline = Action {
     request => {
       val wsRequestHolder: WSRequestHolder = createUserTimelineUrl(request)
-      val cacheKey = buildRequestUrl(wsRequestHolder)
 
       play.Logger.debug("Twitter tiemline resource url : %s".format(wsRequestHolder))
-      CachedWSCall(cacheKey, wsRequestHolder) {
-        jsonFetched => jsonFetched.as[Seq[JsObject]] map (_.as[TTTweet])
-      }.okAsJson
+      Ok {
+        Json.toJson(
+          CachedWSCall(wsRequestHolder).mapJson {
+            jsonFetched => jsonFetched.as[Seq[JsObject]] map (_.as[TTTweet])
+          }
+        )
+      }
     }
   }
 

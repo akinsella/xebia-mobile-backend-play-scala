@@ -20,17 +20,18 @@ object EventBriteService extends Controller {
    * @return get the "Live" events from Xebia Organization
    */
   def events = Action {
-    val cacheKey = wpEventsUrl + "?id=%s".format(xebiaOrganizationId)
-
-    val wsRequestHolder = WS
-      .url(wpEventsUrl)
+    val wsRequestHolder = WS.url(wpEventsUrl)
       .withQueryString("id" -> xebiaOrganizationId, "app_key" -> appKey)
 
-    CachedWSCall(cacheKey, wsRequestHolder) {
-      jsonFetched => (jsonFetched \\ "events").head.as[Seq[JsObject]]
-        .filter(jsonEvent => List("Live").contains(jsonEvent.\("event").\("status").as[String]))
-        .map(_.\("event").as[EBEvent])
-    }.okAsJson
+    Ok {
+      Json.toJson(
+        CachedWSCall(wsRequestHolder).mapJson {
+          jsonFetched => (jsonFetched \\ "events").head.as[Seq[JsObject]]
+            .filter(jsonEvent => List("Live").contains(jsonEvent.\("event").\("status").as[String]))
+            .map(_.\("event").as[EBEvent])
+        }
+      )
+    }
   }
 
 }
