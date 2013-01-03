@@ -13,7 +13,7 @@ import play.api.mvc.{Action, Controller}
 object EventBriteService extends Controller {
 
   private val appKey = Play.application().configuration().getString("api.eventbrite.app.key")
-  private val xebiaOrganizationId = "1627902102"
+  private val xebiaOrganizationId = "2957547923" //"1627902102"
   private val wpEventsUrl = "https://www.eventbrite.com/json/organizer_list_events"
 
   /**

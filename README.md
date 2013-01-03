@@ -87,4 +87,6 @@ Then publish in local the modules *swagger-play2-utils*
 
 Start the server, then go to the URL **/api**. You can parse the content of your API and try it from live!
 
+Run the application in dev mode:
 
+play debug -Djava.util.logging.config.file=logging.properties run

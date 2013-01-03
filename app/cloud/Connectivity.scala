@@ -8,7 +8,7 @@ import com.redis.RedisClient
 object Connectivity {
 
   val cloudFoundry = new CloudFoundry
-  val standalone = new Standalone //("localhost", 6379, Some("Some Password"))
+  val standalone = new Standalone("localhost", 6379, Some("Password123")) //("localhost", 6379, Some("Some Password"))
 
   def env: Environment = {
     if (cloudFoundry.isActive) {

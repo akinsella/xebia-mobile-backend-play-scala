@@ -9,7 +9,7 @@ import models.twitter.TTUrlEntity.TTUrlEntityFormat
 case class TTEntities(
                        hashtags:Option[Seq[TTHashtagEntity]],
                        urls:Option[Seq[TTUrlEntity]],
-                       url_mentions:Option[Seq[TTUserMentionEntity]]
+                       user_mentions:Option[Seq[TTUserMentionEntity]]
                     ) {
 
 }
@@ -34,8 +34,8 @@ object TTEntities {
         jsonFields = jsonFields.:+("urls" -> JsArray(tweet.urls.get map { TTUrlEntityFormat.writes(_) } ))
       }
 
-      if (tweet.url_mentions.isDefined) {
-        jsonFields = jsonFields.:+("url_mentions" -> JsArray(tweet.url_mentions.get map { TTUserMentionEntityFormat.writes(_) } ))
+      if (tweet.user_mentions.isDefined) {
+        jsonFields = jsonFields.:+("user_mentions" -> JsArray(tweet.user_mentions.get map { TTUserMentionEntityFormat.writes(_) } ))
       }
 
       JsObject(jsonFields)

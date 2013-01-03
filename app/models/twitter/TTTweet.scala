@@ -6,9 +6,12 @@ import play.api.libs.json.JsNumber
 import models.twitter.TTUser.TTUserFormat
 import models.twitter.TTRetweetedStatus.TTRetweetedStatusFormat
 import models.twitter.TTEntities.TTEntitiesFormat
+import java.text.SimpleDateFormat
+import java.util.{Date, Locale}
 
-case class TTTweet(
-                    id:Long, id_str:String, created_at:String, text:String,
+case class
+TTTweet(
+                    id:Long, id_str:String, created_at:Date, text:String,
                     favorited:Boolean, retweeted:Boolean, retweet_count: Long,
                     user:TTUser, retweetedStatus:Option[TTRetweetedStatus], entities:Option[TTEntities]
                     ) {
@@ -18,10 +21,14 @@ case class TTTweet(
 object TTTweet {
 
   implicit object TTTweetFormat extends Format[TTTweet] {
+
+    def dfTwitter = new SimpleDateFormat("EEE MMM dd HH:mm:ss Z yyyy", Locale.US)
+    def dfOutput = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
+
     def reads(json: JsValue): TTTweet = TTTweet(
       (json \ "id").as[Long],
       (json \ "id_str").as[String],
-      (json \ "created_at").as[String],
+      dfTwitter.parse((json \ "created_at").as[String]),
       (json \ "text").as[String],
       (json \ "favorited").as[Boolean],
       (json \ "retweeted").as[Boolean],
@@ -35,7 +42,7 @@ object TTTweet {
        var jsonFields:Seq[(String, JsValue)] = Seq(
         "id" -> JsNumber(tweet.id),
         "id_str" -> JsString(tweet.id_str),
-        "created_at" -> JsString(tweet.created_at),
+        "created_at" -> JsString(dfOutput.format(tweet.created_at)),
         "text" -> JsString(tweet.text),
         "favorited" -> JsBoolean(tweet.favorited),
         "retweeted" -> JsBoolean(tweet.retweeted),
@@ -53,7 +60,6 @@ object TTTweet {
 
        JsObject(jsonFields)
     }
-
 
   }
 
