@@ -57,12 +57,6 @@ object TwitterService extends Controller {
     }
   }
 
-  private def buildRequestUrl(wpPostsRequestHolder: WS.WSRequestHolder): String = {
-    "%1$s?%2$s".format(wpPostsRequestHolder.url, wpPostsRequestHolder.queryString.toSeq.sorted map {
-      case (key, value) => "%s=%s" format(key, value)
-    } mkString ("&"))
-  }
-
   private def createUserTimelineUrl(request: RequestHeader): WSRequestHolder = {
     getTokenFromRedis(request) match {
       case Right(requestToken) => WS.url(wpTweetsUrl)

@@ -4,7 +4,7 @@ import cloud._
 import models._
 import play.api.libs.json._
 import play.api.libs.ws.WS
-import play.api.mvc.{Action, Controller}
+import play.api.mvc.{Action, Call, Controller}
 import wordpress._
 
 
@@ -13,13 +13,7 @@ import wordpress._
  */
 object WordPressService extends Controller {
 
-
-  private val linkNextPage: String = """<%s>; rel="next""""
-  private val linkLastPage: String = """<%s>; rel="last"""""
-  private val linkFirstPage: String = """<%s>; rel="first""""
-  private val linkPreviousPage: String = """<%s>; rel="prev"""""
-
-  private val pageSize: Int = 2
+  private val pageSize: Int = 10
 
   /**
    * @return authors from Xebia blogs
@@ -65,33 +59,51 @@ object WordPressService extends Controller {
    * @param id id of the post
    * @return tags of the post
    */
-  def tagPosts(id: Long, count: Option[Int] = None, page: Option[Int]) = posts("tag", Some(id), count, page)
+  def tagPosts(id: Long, count: Option[Int] = None, page: Option[Int]) = {
+    posts("tag", Some(id), count, page) {
+      page => routes.WordPressService.tagPosts(id, count, Some(page))
+    }
+  }
 
   /**
    * @param id id of the post
    * @return category of the post
    */
-  def categoryPosts(id: Long, count: Option[Int] = None, page: Option[Int]) = posts("category", Some(id), count, page)
+  def categoryPosts(id: Long, count: Option[Int] = None, page: Option[Int]) = {
+    posts("category", Some(id), count, page) {
+      page => routes.WordPressService.categoryPosts(id, count, Some(page))
+    }
+  }
 
   /**
    * @param id id of the post
    * @return author of the post
    */
-  def authorPosts(id: Long, count: Option[Int] = None, page: Option[Int]) = posts("author", Some(id), count, page)
+  def authorPosts(id: Long, count: Option[Int] = None, page: Option[Int]) = {
+    posts("author", Some(id), count, page) {
+      page => routes.WordPressService.authorPosts(id, count, Some(page))
+    }
+  }
 
   /**
    * @return recent posts
    */
-  def recentPosts(count: Option[Int] = None, page: Option[Int]) = posts("recent", None, count, page)
+  def recentPosts(count: Option[Int] = None, page: Option[Int]) = {
+    posts("recent", None, count, page) {
+      page => routes.WordPressService.recentPosts(count, Some(page))
+    }
+  }
+
 
   /**
    * @param _type type of entity fetched
    * @param id optional id of a post or all posts if None
    * @param count number of elements fetched
    * @param page # of the page for pagination
+   * @param urlToPage function that generate the URL of the requested page with the page number as a function
    * @return _type element from a post identified by id or all posts limited by count
    */
-  def posts(_type: String, id: Option[Long] = None, count: Option[Int] = None, page: Option[Int]) = Action {
+  def posts(_type: String, id: Option[Long] = None, count: Option[Int] = None, page: Option[Int])(urlToPage: (Int => Call)) = Action {
     implicit Request => {
       val wpPostsUrl = "http://blog.xebia.fr/wp-json-api/get_%1$s_posts/".format(_type)
       var queryStringParams = count.map(x => Seq("count" -> x.toString)).getOrElse(Seq())
@@ -100,50 +112,14 @@ object WordPressService extends Controller {
         queryStringParams = queryStringParams.:+("id" -> id.get.toString)
       }
 
-      val wpPostsRequestHolder = WS
-        .url(wpPostsUrl)
+      val wpPostsRequestHolder = WS.url(wpPostsUrl)
         .withQueryString(queryStringParams.toArray: _*)
 
-      val posts = CachedWSCall(wpPostsRequestHolder, Some(60)).mapJson {
+      val posts = CachedWSCall(wpPostsRequestHolder, 60).mapJson {
         jsonFetched => (jsonFetched \ "posts").as[Seq[JsValue]] map (_.as[WPPost])
       }
 
-      val numberOfPages = posts.size / pageSize
-
-      page match {
-        case None | Some(1) => {
-          if (numberOfPages != 1) {
-
-            val pageLinkHeader = List(
-              linkNextPage.format(routes.WordPressService.recentPosts(count, Some(2)).absoluteURL(false)),
-              linkLastPage.format(routes.WordPressService.recentPosts(count, Some(numberOfPages)).absoluteURL(false)))
-
-            Ok(Json.toJson(posts.take(pageSize))).withHeaders(("Link", pageLinkHeader.mkString(",")))
-          }
-          else {
-            Ok(Json.toJson(posts))
-          }
-        }
-        case Some(`numberOfPages`) => {
-          val pageLinkHeader = List(
-            linkFirstPage.format(routes.WordPressService.recentPosts(count, Some(1)).absoluteURL(false)),
-            linkPreviousPage.format(routes.WordPressService.recentPosts(count, Some(numberOfPages - 1)).absoluteURL(false))
-          )
-
-          Ok(Json.toJson(posts.takeRight(pageSize))).withHeaders(("Link", pageLinkHeader.mkString(",")))
-        }
-        case Some(x) if (x < numberOfPages) => {
-          val pageLinkHeader = List(
-            linkFirstPage.format(routes.WordPressService.recentPosts(count, Some(1)).absoluteURL(false)),
-            linkPreviousPage.format(routes.WordPressService.recentPosts(count, Some(x - 1)).absoluteURL(false)),
-            linkNextPage.format(routes.WordPressService.recentPosts(count, Some(x + 1)).absoluteURL(false)),
-            linkLastPage.format(routes.WordPressService.recentPosts(count, Some(numberOfPages)).absoluteURL(false))
-          )
-
-          Ok(Json.toJson(posts.slice((x - 1) * pageSize, x * pageSize))).withHeaders(("Link", pageLinkHeader.mkString(",")))
-        }
-        case _ => NotFound
-      }
+      PagedContent(posts, pageSize)(urlToPage).getPage(page.getOrElse(1))
     }
   }
 

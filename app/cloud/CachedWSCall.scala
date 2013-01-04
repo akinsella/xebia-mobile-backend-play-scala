@@ -42,6 +42,10 @@ case class CachedWSCall(wsRequest: WS.WSRequestHolder, expiration: Option[Int] =
 
 object CachedWSCall {
 
+  def apply[T](wsRequest: WS.WSRequestHolder, expiration: Int): CachedWSCall = {
+    CachedWSCall(wsRequest, Some(expiration))
+  }
+
   def apply[T](url: String, expiration: Int): CachedWSCall = {
     CachedWSCall(WS.url(url), Some(expiration))
   }
