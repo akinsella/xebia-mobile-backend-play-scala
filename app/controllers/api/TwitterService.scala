@@ -79,14 +79,18 @@ object TwitterService extends Controller {
   }
 
   private def getTokenFromRedis(request: RequestHeader): Either[Exception, RequestToken] = {
-    val result: Either[Exception, RequestToken] = try {
-      val json = Json.parse(Cache.getOrElse(oauthInfosKey)("")).as[JsObject]
-      val token: RequestToken = RequestToken((json \ "token").as[String], (json \ "secret").as[String])
-      Right(token)
-    } catch {
-      case ex: Exception => Left(ex)
+    Connectivity.withRedisClient {
+      redisClient => {
+        val result: Either[Exception, RequestToken] = try {
+          val json = Json.parse(redisClient.get(oauthInfosKey).getOrElse("")).as[JsObject]
+          val token: RequestToken = RequestToken((json \ "token").as[String], (json \ "secret").as[String])
+          Right(token)
+        } catch {
+          case ex: Exception => Left(ex)
+        }
+        result
+      }
     }
-    result
   }
 
   def authenticate = Action {
@@ -122,13 +126,11 @@ object TwitterService extends Controller {
                 Redirect(TWITTER.redirectUrl(t.token))
               }
             }
-
           }
           case Left(e) => {
             throw e
           }
         })
   }
-
 
 }
