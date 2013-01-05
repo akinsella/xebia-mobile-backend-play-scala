@@ -1,5 +1,6 @@
 package utils
 
+import java.util.Locale
 import java.util.Date
 import org.joda.time.{DateTime, DateTimeZone}
 import org.joda.time.format.{DateTimeFormatter, DateTimeFormat}
@@ -17,7 +18,7 @@ trait RestHelper {
    * Formatter for HTTP Headers
    */
   private val df: DateTimeFormatter =
-    DateTimeFormat.forPattern("EEE, dd MMM yyyy HH:mm:ss '" + timeZoneCode + "'").withLocale(java.util.Locale.ENGLISH).withZone(DateTimeZone.forID(timeZoneCode))
+    DateTimeFormat.forPattern("EEE, dd MMM yyyy HH:mm:ss '" + timeZoneCode + "'").withLocale(Locale.ENGLISH).withZone(DateTimeZone.forID(timeZoneCode))
 
   /**
    * add LAST_MODIFIED header to a response

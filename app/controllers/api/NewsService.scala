@@ -1,15 +1,15 @@
-package controllers.api.ios
+package controllers.api
 
-import models.notification.Device
 import play.api.libs.json.Json.toJson
 import play.api.mvc.{Action, Controller}
 import utils.RestHelper
+import models.news.News
 
 
 /**
- * CRUD Service for devices registred in the API (Android or iOS)
+ * CRUD Service for news
  */
-object DeviceService extends Controller with RestHelper {
+object NewsService extends Controller with RestHelper {
 
   /**
    *
@@ -23,31 +23,31 @@ object DeviceService extends Controller with RestHelper {
   )
 
   /**
-   * @return all registered device
+   * @return all news
    */
-  def all = Action(Ok(toJson(Device.all)))
+  def all = Action(Ok(toJson(News.all)))
 
 
   /**
    * This call manages the IF_MODIFIED_SINCE and LAST_MODIFIED http headers
-   * @param id unique identifier of a device
-   * @return a device identified by its id
+   * @param id unique identifier of a news
+   * @return a news identified by its id
    */
   def show(id: Long) = Action {
     request => {
-      Device.findById(id).map(device => {
-        withLastModified(device.lastModified)(
+      News.findById(id).map(news => {
+        withLastModified(news.lastModified)(
           request.headers.get(IF_MODIFIED_SINCE).map(h => {
 
             val lastModifiedFromClient = fromHttpDate(h)
-            val clientOutdated: Boolean = lastModifiedFromClient.isBefore(device.lastModified.getTime)
+            val clientOutdated: Boolean = lastModifiedFromClient.isBefore(news.lastModified.getTime)
 
             if (clientOutdated)
-              Ok(toJson(device))
+              Ok(toJson(news))
             else
               NotModified
 
-          }).getOrElse(Ok(toJson(device)))
+          }).getOrElse(Ok(toJson(news)))
         )
 
       }).getOrElse(NotFound)
@@ -56,14 +56,14 @@ object DeviceService extends Controller with RestHelper {
 
   /**
    *
-   * @return create a device and give LOCATION to the resource
+   * @return create a news and give LOCATION to the resource
    */
   def create() = Action {
     request => {
       request.body.asJson.map(query => {
-        Device.create(query.as[Device]).map(newId => {
+        News.create(query.as[News]).map(newId => {
 
-          CachedEntityCreated(routes.DeviceService.show(newId), request)
+          CachedEntityCreated(routes.NewsService.show(newId), request)
         }
         ).getOrElse(NotAcceptable)
       }
@@ -72,17 +72,17 @@ object DeviceService extends Controller with RestHelper {
   }
 
   /**
-   *  update a device
-   * @param id identifier of the device
+   *  update a news
+   * @param id identifier of the news
    * @return status of the delete process (OK, NOT_FOUND, NOT_MODIFIED or NOT_ACCEPTABLE)
    */
   def save(id: Long) = Action {
     request => {
       request.body.asJson.map(query => {
 
-        if (Device.findById(id).isDefined) {
-          val device = query.as[Device]
-          if (Device.update(id, device)) lastModifiedNow(Ok) else NotModified
+        if (News.findById(id).isDefined) {
+          val news = query.as[News]
+          if (News.update(id, news)) lastModifiedNow(Ok) else NotModified
         }
         else {
           NotFound
@@ -92,13 +92,13 @@ object DeviceService extends Controller with RestHelper {
   }
 
   /**
-   *  delete a device
-   * @param id identifier of the device
+   *  delete a news
+   * @param id identifier of the news
    * @return status of the delete OK, NOT_FOUND or NOT_MODIFIED)
    */
   def delete(id: Long) = Action {
-    if (Device.findById(id).isDefined) {
-      if (Device.delete(id)) {
+    if (News.findById(id).isDefined) {
+      if (News.delete(id)) {
         Ok
       } else {
         NotModified

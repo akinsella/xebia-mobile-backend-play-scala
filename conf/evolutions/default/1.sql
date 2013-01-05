@@ -1,6 +1,6 @@
 # --- !Ups
 
-CREATE TABLE Device (
+CREATE TABLE device (
     id SERIAL PRIMARY KEY,
     udid varchar(40) NOT NULL,
 	  token varchar(64) NOT NULL,
@@ -9,4 +9,4 @@ CREATE TABLE Device (
 
 # --- !Downs
 
-DROP TABLE Device;
+DROP TABLE device;
