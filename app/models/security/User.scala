@@ -6,7 +6,9 @@ import play.api.Play.current
 import anorm._
 import anorm.SqlParser._
 
-case class User(email: String, name: String, password: String)
+case class User(email: String, name: String, password: String) {
+
+}
 
 object User {
 
@@ -30,7 +32,7 @@ object User {
    */
   def findByEmail(email: String): Option[User] = {
     DB.withConnection { implicit connection =>
-      SQL("select * from user where email = {email}").on(
+      SQL("""select * from "user" where email = {email}""").on(
         'email -> email
       ).as(User.simple.singleOpt)
     }
@@ -41,7 +43,7 @@ object User {
    */
   def findAll: Seq[User] = {
     DB.withConnection { implicit connection =>
-      SQL("select * from user").as(User.simple *)
+      SQL("""select * from "user"""").as(User.simple *)
     }
   }
 
@@ -52,7 +54,7 @@ object User {
     DB.withConnection { implicit connection =>
       SQL(
         """
-         select * from user where
+         select * from "user" where
          email = {email} and password = {password}
         """
       ).on(
@@ -69,7 +71,7 @@ object User {
     DB.withConnection { implicit connection =>
       SQL(
         """
-          insert into user values (
+          insert into "user" values (
             {email}, {name}, {password}
           )
         """

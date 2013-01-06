@@ -103,7 +103,7 @@ object TwitterService extends Controller {
               Connectivity.withRedisClient {
                 redisClient => {
                   redisClient.set(oauthInfosKey, Json.toJson(Map("token" -> t.token, "secret" -> t.secret)).toString())
-                  Redirect(controllers.routes.Home.index())
+                  Redirect(controllers.routes.Application.index())
                 }
               }
             }

@@ -1,16 +1,19 @@
 package controllers
 
 import play.api.mvc._
-
-import play.api._
-import play.api.mvc._
 import play.api.data._
 import play.api.data.Forms._
+import models.security.User
 
-import models._
 import views._
+import models.notification.Device
 
-class Application extends Controller {
+object Application extends Controller {
+
+  def index = Action { request =>
+    val user = User("jdoe@example.org", "John Does", "Password123")
+    Ok(views.html.Application.index("Your new application is ready.", user))
+  }
 
   // -- Authentication
 
@@ -27,7 +30,7 @@ class Application extends Controller {
    * Login page.
    */
   def login = Action { implicit request =>
-    Ok(html.login(loginForm))
+    Ok(views.html.Application.login(loginForm))
   }
 
   /**
@@ -35,8 +38,8 @@ class Application extends Controller {
    */
   def authenticate = Action { implicit request =>
     loginForm.bindFromRequest.fold(
-      formWithErrors => BadRequest(html.login(formWithErrors)),
-      user => Redirect(routes.Projects.index).withSession("email" -> user._1)
+      formWithErrors => BadRequest(views.html.Application.login(formWithErrors)),
+      user => Redirect(routes.Application.index()).withSession("email" -> user._1)
     )
   }
 
@@ -44,7 +47,7 @@ class Application extends Controller {
    * Logout and clean the session.
    */
   def logout = Action {
-    Redirect(routes.Application.login).withNewSession.flashing(
+    Redirect(routes.Application.login()).withNewSession.flashing(
       "success" -> "You've been logged out"
     )
   }
@@ -61,7 +64,7 @@ class Application extends Controller {
     /**
      * Redirect to login if the user in not authorized.
      */
-    private def onUnauthorized(request: RequestHeader) = Results.Redirect(routes.Application.login)
+    private def onUnauthorized(request: RequestHeader) = Results.Redirect(routes.Application.login())
 
     // --
 
