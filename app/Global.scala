@@ -3,6 +3,7 @@ import play.api._
 import play.api.Play.current
 
 import anorm._
+import security.User
 
 object Global extends GlobalSettings {
 
@@ -22,6 +23,13 @@ object InitialData {
   def date(str: String) = new java.text.SimpleDateFormat("yyyy-MM-dd").parse(str)
 
   def insert() {
+
+    if(User.findAll.isEmpty) {
+
+      Seq(
+        User("jdoe@example.com", "John Doe", "Password123")
+      ).foreach(User.create)
+    }
 //
 //    if (Device.count() == 0) {
 //
