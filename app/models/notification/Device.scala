@@ -3,7 +3,6 @@ package models.notification
 import java.util.Date
 
 import play.api.db._
-import play.api.Play.current
 
 import anorm._
 import anorm.SqlParser._
@@ -11,40 +10,11 @@ import anorm.SqlParser._
 import play.api.libs.json._
 import anorm.~
 import play.api.libs.json.JsString
-import scala.Some
 import play.api.libs.json.JsNumber
 
+import play.api.Play.current
+
 case class Device(id: Pk[Long] = NotAssigned, udid: String, token: String, createdAt: Date = new Date(), lastModified: Date = new Date()) {
-
-  def prevNext: (Option[Device], Option[Device]) = {
-    DB.withConnection {
-      implicit connection =>
-        val result = SQL(
-          """
-                (
-                    select d.*, 'next' as pos from device d
-                    where created_at < {date} order by created_at desc limit 1
-                )
-                    union
-                (
-                    select d.*, 'prev' as pos from device d
-                    where created_at > {date} order by created_at asc limit 1
-                )
-
-                order by postedAt desc
-
-          """).on("date" -> createdAt).as(Device.withPrevNext *).partition(_._2 == "prev")
-
-        (result._1 match {
-          case List((device, "prev")) => Some(device)
-          case _ => None
-        },
-          result._2 match {
-            case List((device, "next")) => Some(device)
-            case _ => None
-          })
-    }
-  }
 
 }
 
@@ -52,10 +22,12 @@ object Device {
 
   def apply(udid: String, token: String) = new Device(udid = udid, token = token)
 
-
   //JSON
   implicit object DeviceFormat extends Format[Device] {
-    def reads(json: JsValue): Device = Device(udid = (json \ "udid").as[String], token = (json \ "token").as[String])
+    def reads(json: JsValue): Device = Device(
+      udid = (json \ "udid").as[String],
+      token = (json \ "token").as[String]
+    )
 
     def writes(device: Device): JsValue = JsObject(Seq(
       "id" -> JsNumber(device.id.get),
@@ -66,7 +38,7 @@ object Device {
   }
 
   /**
-   * Parse a Device from a ResultSet
+   * Parse a device from a ResultSet
    */
   val simple = {
     get[Pk[Long]]("device.id") ~
@@ -76,13 +48,6 @@ object Device {
       get[Date]("device.last_modified") map {
       case id ~ udid ~ token ~ createdAt ~ last_modified =>
         Device(id, udid, token, createdAt, last_modified)
-    }
-  }
-
-  lazy val withPrevNext = {
-    get[Pk[Long]]("id") ~ get[String]("udid") ~ get[String]("token") ~ get[Date]("created_at") ~ get[Date]("last_modified") ~ get[String]("pos") map {
-      case id ~ udid ~ token ~ createdAt ~ lastModified ~ pos =>
-        (Device(id, udid, token, createdAt,lastModified), pos)
     }
   }
 
@@ -106,7 +71,7 @@ object Device {
     implicit connection =>
       SQL(
         """
-          select * from Device d
+          select * from device d
           order by d.created_at desc
         """
       ).as(Device.simple *)
@@ -145,7 +110,7 @@ object Device {
   }
 
   /**
-   * Insert a new device.
+   * Insert a device.
    *
    * @param device The device values.
    */
@@ -154,8 +119,8 @@ object Device {
       implicit connection => {
         SQL(
           """
-          insert into device(udid, token, created_at,last_modified)
-          values ({udid}, {token}, {createdAt},{lastModified})
+          insert into device(udid, token, created_at, last_modified)
+          values ({udid}, {token}, {createdAt}, {lastModified})
           """
         ).on(
           'udid -> device.udid,

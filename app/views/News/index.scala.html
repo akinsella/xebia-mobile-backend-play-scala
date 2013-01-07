@@ -1,0 +1,17 @@
+@(message: String, news: Seq[News])
+@import models.news.News
+
+@main("News list") {
+    <ul>
+    @news.map { n =>
+        <li>
+            <div>@n.title</div>
+            <div>n.content</div>
+            <div>n.imageUrl</div>
+        </li>
+    }
+    </ul>
+}
+
+
+

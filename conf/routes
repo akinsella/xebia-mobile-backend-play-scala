@@ -12,11 +12,19 @@ GET     /logout                                     controllers.Application.logo
 
 #Device
 OPTIONS /api/ios/device                             controllers.api.ios.DeviceService.options
-GET     /api/ios/device                             controllers.api.ios.DeviceService.devices
+GET     /api/ios/device                             controllers.api.ios.DeviceService.all
 GET     /api/ios/device/:id                         controllers.api.ios.DeviceService.show(id: Long)
 POST    /api/ios/device                             controllers.api.ios.DeviceService.create
 PUT     /api/ios/device/:id                         controllers.api.ios.DeviceService.save(id: Long)
 DELETE  /api/ios/device/:id                         controllers.api.ios.DeviceService.delete(id: Long)
+
+#News
+OPTIONS /api/news                                   controllers.api.NewsService.options
+GET     /api/news                                   controllers.api.NewsService.all
+GET     /api/news/:id                               controllers.api.NewsService.show(id: Long)
+POST    /api/news                                   controllers.api.NewsService.create
+PUT     /api/news/:id                               controllers.api.NewsService.save(id: Long)
+DELETE  /api/news/:id                               controllers.api.NewsService.delete(id: Long)
 
 #Notification
 POST    /api/ios/notification/register              controllers.api.ios.NotificationService.register
