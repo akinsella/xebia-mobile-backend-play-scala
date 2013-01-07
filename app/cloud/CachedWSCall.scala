@@ -3,36 +3,50 @@ package cloud
 import play.api.libs.concurrent.Promise
 import play.api.libs.ws.WS
 import play.api.libs.json.{Json, JsValue}
+import play.api.mvc.Results.{Status, Ok}
 
 
 case class CachedWSCall(wsRequest: WS.WSRequestHolder, expiration: Option[Int] = None) {
 
   private lazy val cacheResponse: CachedString = CachedString(wsRequest.hashCode().toString, expiration)
 
-  private lazy val wsCall: Promise[String] = {
+  private lazy val wsCall: Promise[Either[String, String]] = {
     wsRequest
       .get()
-      .map(_.body)
+      .map(response => {
+      Status(response.getAHCResponse.getStatusCode) match {
+        case Ok => Right(response.body)
+        case _ => Left(response.body)
+      }
+    })
   }
 
-  private lazy val wsData: String = getNow(wsCall)
+  private lazy val wsData: Either[String, String] = getNow(wsCall)
 
   /**
    * @return the element from the cache or from the WS call (which would be set in cache)
    */
-  def get(): String = {
-    cacheResponse.getOrElse(wsData)
+  def get(): Either[String, String] = {
+    val responseFromCache = cacheResponse.get()
+
+    responseFromCache.map(x => Right(x)).getOrElse({
+      wsData.right.map(x => {
+        cacheResponse.set(x)
+      })
+      wsData
+    })
+
   }
 
-  def getAsJson(): JsValue = {
-    Json.parse(get())
+  def getAsJson(): Either[String, JsValue] = {
+    get().right.map(x => Json.parse(x))
   }
 
-  def mapJson[T](extractData: (JsValue => T)): T = {
-    extractData.apply(getAsJson())
+  def mapJson[T](extractData: (JsValue => T)): Either[String, T] = {
+    getAsJson().right.map(x => extractData.apply(x))
   }
 
-  private def getNow(promise: Promise[String])(implicit timeout: Long = 5000): String = {
+  private def getNow(promise: Promise[Either[String, String]])(implicit timeout: Long = 5000): Either[String, String] = {
     promise.await(timeout).fold(
       e => throw e,
       identity

@@ -27,4 +27,12 @@ case class CachedString(cacheKey: String, expiration: Option[Int] = None) {
     }
   }
 
+  /**
+   * set a value in the cache for the current key and expiration parameter
+   * @param value value to be put in the cache
+   */
+  def set(value: String) = {
+    Cache.set(cacheKey, value, expiration)
+  }
+
 }

@@ -19,26 +19,32 @@ object WordPressService extends Controller {
    * @return authors from Xebia blogs
    */
   def authors = Action {
-    Ok {
-      Json.toJson(
-        CachedWSCall("http://blog.xebia.fr/wp-json-api/get_author_index/").mapJson {
-          jsonFetched => (jsonFetched \ "authors").as[Seq[JsValue]] map (_.as[WPAuthor])
-        }
-      )
-    }
+    CachedWSCall("http://blog.xebia.fr/wp-json-api/get_author_index/").mapJson {
+      jsonFetched => (jsonFetched \ "authors").as[Seq[JsValue]] map (_.as[WPAuthor])
+    }.fold(
+      errorMessage => {
+        InternalServerError(errorMessage)
+      },
+      response => {
+        Ok(Json.toJson(response))
+      }
+    )
   }
 
   /**
    * @return tags from Xebia blogs
    */
   def tags = Action {
-    Ok {
-      Json.toJson(
-        CachedWSCall("http://blog.xebia.fr/wp-json-api/get_tag_index/").mapJson {
-          jsonFetched => (jsonFetched \ "tags").as[Seq[JsValue]] map (_.as[WPTag])
-        }
-      )
-    }
+    CachedWSCall("http://blog.xebia.fr/wp-json-api/get_tag_index/").mapJson {
+      jsonFetched => (jsonFetched \ "tags").as[Seq[JsValue]] map (_.as[WPTag])
+    }.fold(
+      errorMessage => {
+        InternalServerError(errorMessage)
+      },
+      response => {
+        Ok(Json.toJson(response))
+      }
+    )
   }
 
 
@@ -46,13 +52,16 @@ object WordPressService extends Controller {
    * @return categories of posts from Xebia blogs
    */
   def categories = Action {
-    Ok {
-      Json.toJson(
-        CachedWSCall("http://blog.xebia.fr/wp-json-api/get_category_index/").mapJson {
-          jsonFetched => (jsonFetched \ "categories").as[Seq[JsValue]] map (_.as[WPCategory])
-        }
-      )
-    }
+    CachedWSCall("http://blog.xebia.fr/wp-json-api/get_category_index/").mapJson {
+      jsonFetched => (jsonFetched \ "categories").as[Seq[JsValue]] map (_.as[WPCategory])
+    }.fold(
+      errorMessage => {
+        InternalServerError(errorMessage)
+      },
+      response => {
+        Ok(Json.toJson(response))
+      }
+    )
   }
 
   /**
@@ -115,11 +124,18 @@ object WordPressService extends Controller {
       val wpPostsRequestHolder = WS.url(wpPostsUrl)
         .withQueryString(queryStringParams.toArray: _*)
 
-      val posts = CachedWSCall(wpPostsRequestHolder, 60).mapJson {
+      val responsePost = CachedWSCall(wpPostsRequestHolder, 60).mapJson {
         jsonFetched => (jsonFetched \ "posts").as[Seq[JsValue]] map (_.as[WPPost])
       }
 
-      PagedContent(posts, pageSize)(urlToPage).getPage(page.getOrElse(1))
+      responsePost match {
+        case Left(errorMessage) => {
+          InternalServerError(errorMessage)
+        }
+        case Right(posts) => {
+          PagedContent(posts, pageSize)(urlToPage).getPage(page.getOrElse(1))
+        }
+      }
     }
   }
 
@@ -135,13 +151,16 @@ object WordPressService extends Controller {
       .url(url)
       .withQueryString(("post_id" -> id.toString))
 
-    Ok {
-      Json.toJson(
-        CachedWSCall(ws).mapJson {
-          jsonFetched => (jsonFetched \ "post").as[WPPost]
-        }
-      )
-    }
+    CachedWSCall(ws).mapJson {
+      jsonFetched => (jsonFetched \ "post").as[WPPost]
+    }.fold(
+      errorMessage => {
+        InternalServerError(errorMessage)
+      },
+      response => {
+        Ok(Json.toJson(response))
+      }
+    )
   }
 
 }

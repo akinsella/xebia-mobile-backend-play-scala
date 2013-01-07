@@ -13,7 +13,8 @@ import play.api.mvc.{Action, Controller}
 object EventBriteService extends Controller {
 
   private val appKey = Play.application().configuration().getString("api.eventbrite.app.key")
-  private val xebiaOrganizationId = "2957547923" //"1627902102"
+  private val xebiaOrganizationId = "2957547923"
+  //"1627902102"
   private val wpEventsUrl = "https://www.eventbrite.com/json/organizer_list_events"
 
   /**
@@ -23,15 +24,18 @@ object EventBriteService extends Controller {
     val wsRequestHolder = WS.url(wpEventsUrl)
       .withQueryString("id" -> xebiaOrganizationId, "app_key" -> appKey)
 
-    Ok {
-      Json.toJson(
-        CachedWSCall(wsRequestHolder).mapJson {
-          jsonFetched => (jsonFetched \\ "events").head.as[Seq[JsObject]]
-            .filter(jsonEvent => List("Live").contains(jsonEvent.\("event").\("status").as[String]))
-            .map(_.\("event").as[EBEvent])
-        }
-      )
-    }
+    CachedWSCall(wsRequestHolder).mapJson {
+      jsonFetched => (jsonFetched \\ "events").head.as[Seq[JsObject]]
+        .filter(jsonEvent => List("Live").contains(jsonEvent.\("event").\("status").as[String]))
+        .map(_.\("event").as[EBEvent])
+    }.fold(
+      errorMessage => {
+        InternalServerError(errorMessage)
+      },
+      response => {
+        Ok(Json.toJson(response))
+      }
+    )
   }
 
 }
