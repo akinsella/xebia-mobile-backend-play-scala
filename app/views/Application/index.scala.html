@@ -2,7 +2,31 @@
 
 @main("Welcome to Play 2.0", user) {
 
-    @play20.welcome(message)
+    <article>
+        <h1>My Blog Post</h1>
+        <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do
+            eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
+        <aside>
+        <!-- Since this aside is contained within an article, a parser
+      should understand that the content of this aside is directly related
+      to the article itself. -->
+            <h1>Glossary</h1>
+            <dl>
+                <dt>Lorem</dt>
+                <dd>ipsum dolor sit amet</dd>
+            </dl>
+        </aside>
+    </article>
+    <aside>
+    <!-- This aside is outside of the article. Its content is related
+    to the page, but not as closely related to the above article -->
+        <h2>Blogroll</h2>
+        <ul>
+            <li><a href="#">My Friend</a></li>
+            <li><a href="#">My Other Friend</a></li>
+            <li><a href="#">My Best Friend</a></li>
+        </ul>
+    </aside>
 
 }
 
