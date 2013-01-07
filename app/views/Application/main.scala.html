@@ -1,10 +1,16 @@
-@(title: String, user: models.security.User)(content: Html)
+@(title: String, user: Option[models.security.User])(content: Html)
+
 
 <!DOCTYPE html>
 
 <html>
     <head>
+
         <title>@title</title>
+
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
         <link rel="stylesheet" media="screen" href="@routes.Assets.at("stylesheets/styles.css")">
         <link rel="shortcut icon" type="image/png" href="@routes.Assets.at("images/favicon.png")">
         <script src="@routes.Assets.at("public/javascripts/jquery-1.8.3.min.js")"></script>
@@ -12,7 +18,12 @@
     <body>
         <header>
             <div id="user">
-                <span>@user.name <span>(@user.email)</span> <a href="@routes.Application.logout()">Logout</a></span>
+                @if(user.isEmpty) {
+                    <span>@user.get.name <span>(@user.get.email)</span> <a href="@routes.Application.logout()">Logout</a></span>
+                } else {
+                    <span><a href="@routes.Application.login()">Login</a></span>
+                }
+
             </div>
         </header>
         <section id="main">
@@ -21,5 +32,20 @@
         <footer>
 
         </footer>
+
+        <script type="text/javascript">
+
+            var _gaq = _gaq || [];
+            _gaq.push(['_setAccount', 'UA-1889791-20']);
+            _gaq.push(['_trackPageview']);
+
+            (function() {
+            var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+            ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+            })();
+
+        </script>
+
     </body>
 </html>

@@ -1,6 +1,6 @@
 @(message: String, user: models.security.User)
 
-@main("Welcome to Play 2.0", user) {
+@views.html.Application.main("Welcome to Play 2.0", Some(user)) {
 
     <article>
         <h1>My Blog Post</h1>

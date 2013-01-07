@@ -3,7 +3,7 @@
 # ~~~~
 
 # Home page
-GET     /                                           controllers.Application.index
+GET     /                                           controllers.HomeController.index
 
 # Authentication
 GET     /login                                      controllers.Application.login
@@ -25,6 +25,9 @@ GET     /api/news/:id                               controllers.api.NewsService.
 POST    /api/news                                   controllers.api.NewsService.create
 PUT     /api/news/:id                               controllers.api.NewsService.save(id: Long)
 DELETE  /api/news/:id                               controllers.api.NewsService.delete(id: Long)
+
+GET /news                                           controllers.NewsController.index
+
 
 #Notification
 POST    /api/ios/notification/register              controllers.api.ios.NotificationService.register

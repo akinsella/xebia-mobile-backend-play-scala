@@ -1,9 +1,8 @@
-@(message: String, news: Seq[News])
-@import models.news.News
+@(message: String, news: Seq[models.news.News], user: models.security.User)
 
-@main("News list") {
+@views.html.Application.main("News list", Some(user)) {
     <ul>
-    @news.map { n =>
+    @news.map { n =>,
         <li>
             <div>@n.title</div>
             <div>n.content</div>

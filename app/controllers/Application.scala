@@ -6,14 +6,9 @@ import play.api.data.Forms._
 import models.security.User
 
 import views._
-import models.notification.Device
+import controllers.Application.Secured
 
 object Application extends Controller {
-
-  def index = Action { request =>
-    val user = User("jdoe@example.org", "John Does", "Password123")
-    Ok(views.html.Application.index("Your new application is ready.", user))
-  }
 
   // -- Authentication
 
@@ -30,7 +25,7 @@ object Application extends Controller {
    * Login page.
    */
   def login = Action { implicit request =>
-    Ok(views.html.Application.login(loginForm))
+    Ok(html.Application.login(loginForm))
   }
 
   /**
@@ -38,8 +33,8 @@ object Application extends Controller {
    */
   def authenticate = Action { implicit request =>
     loginForm.bindFromRequest.fold(
-      formWithErrors => BadRequest(views.html.Application.login(formWithErrors)),
-      user => Redirect(routes.Application.index()).withSession("email" -> user._1)
+      formWithErrors => BadRequest(html.Application.login(formWithErrors)),
+      user => Redirect(routes.HomeController.index()).withSession("email" -> user._1)
     )
   }
 
