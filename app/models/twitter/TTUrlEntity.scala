@@ -1,8 +1,6 @@
 package models.twitter
 
 import play.api.libs.json._
-import play.api.libs.json.JsNumber
-import models.twitter.TTIndices
 import models.twitter.TTIndices.TTIndicesFormat
 
 case class TTUrlEntity(

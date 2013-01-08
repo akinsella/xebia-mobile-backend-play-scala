@@ -45,19 +45,16 @@ object TwitterService extends Controller {
   def timeline = Action {
     request => {
       val wsRequestHolder: WSRequestHolder = createUserTimelineUrl(request)
-      val cacheKey = buildRequestUrl(wsRequestHolder)
 
       play.Logger.debug("Twitter tiemline resource url : %s".format(wsRequestHolder))
-      CachedWSCall(cacheKey, wsRequestHolder) {
-        jsonFetched => jsonFetched.as[Seq[JsObject]] map (_.as[TTTweet])
-      }.okAsJson
+      Ok {
+        Json.toJson(
+          CachedWSCall(wsRequestHolder).mapJson {
+            jsonFetched => jsonFetched.as[Seq[JsObject]] map (_.as[TTTweet])
+          }
+        )
+      }
     }
-  }
-
-  private def buildRequestUrl(wpPostsRequestHolder: WS.WSRequestHolder): String = {
-    "%1$s?%2$s".format(wpPostsRequestHolder.url, wpPostsRequestHolder.queryString.toSeq.sorted map {
-      case (key, value) => "%s=%s" format(key, value)
-    } mkString ("&"))
   }
 
   private def createUserTimelineUrl(request: RequestHeader): WSRequestHolder = {
@@ -76,14 +73,18 @@ object TwitterService extends Controller {
   }
 
   private def getTokenFromRedis(request: RequestHeader): Either[Exception, RequestToken] = {
-    val result: Either[Exception, RequestToken] = try {
-      val json = Json.parse(Cache.getOrElse(oauthInfosKey)("")).as[JsObject]
-      val token: RequestToken = RequestToken((json \ "token").as[String], (json \ "secret").as[String])
-      Right(token)
-    } catch {
-      case ex: Exception => Left(ex)
+    Connectivity.withRedisClient {
+      redisClient => {
+        val result: Either[Exception, RequestToken] = try {
+          val json = Json.parse(redisClient.get(oauthInfosKey).getOrElse("")).as[JsObject]
+          val token: RequestToken = RequestToken((json \ "token").as[String], (json \ "secret").as[String])
+          Right(token)
+        } catch {
+          case ex: Exception => Left(ex)
+        }
+        result
+      }
     }
-    result
   }
 
   def authenticate = Action {
@@ -119,13 +120,11 @@ object TwitterService extends Controller {
                 Redirect(TWITTER.redirectUrl(t.token))
               }
             }
-
           }
           case Left(e) => {
             throw e
           }
         })
   }
-
 
 }

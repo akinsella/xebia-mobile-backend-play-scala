@@ -1,11 +1,9 @@
 package controllers.api
 
-import cloud.{CachedWSCall, Connectivity}
+import cloud.CachedWSCall
 import models.github._
 import play.api.libs.json._
-import play.api.libs.ws.WS
 import play.api.mvc.{Action, Controller}
-import play.api.libs.ws.WS.WSRequestHolder
 
 
 /**
@@ -16,28 +14,40 @@ object GitHubService extends Controller {
   /**
    * @return all members of xebia-france github account
    */
-  def users = Action{
-    CachedWSCall("https://api.github.com/orgs/xebia-france/public_members")(
-      jsonFetched => jsonFetched.as[Seq[JsValue]] map (_.as[GHUser])
-    ).okAsJson
+  def users = Action {
+    Ok {
+      Json.toJson(
+        CachedWSCall("https://api.github.com/orgs/xebia-france/public_members").mapJson {
+          jsonFetched => jsonFetched.as[Seq[JsValue]] map (_.as[GHUser])
+        }
+      )
+    }
   }
 
   /**
    * @return all repos of xebia-france github account
    */
-  def repositories = Action{
-    CachedWSCall("https://api.github.com/orgs/xebia-france/repos")(
-      jsonFetched => jsonFetched.as[Seq[JsValue]] map (_.as[GHRepository])
-    ).okAsJson
+  def repositories = Action {
+    Ok {
+      Json.toJson(
+        CachedWSCall("https://api.github.com/orgs/xebia-france/repos").mapJson {
+          jsonFetched => jsonFetched.as[Seq[JsValue]] map (_.as[GHRepository])
+        }
+      )
+    }
   }
 
   /**
    * @return all owners of xebia-france github account
    */
-  def owners = Action{
-    CachedWSCall("https://api.github.com/orgs/xebia-france/public_members")(
-      jsonFetched => jsonFetched.as[Seq[JsValue]] map (_.as[GHOwner])
-    ).okAsJson
+  def owners = Action {
+    Ok {
+      Json.toJson(
+        CachedWSCall("https://api.github.com/orgs/xebia-france/public_members").mapJson {
+          jsonFetched => jsonFetched.as[Seq[JsValue]] map (_.as[GHOwner])
+        }
+      )
+    }
   }
 
 }

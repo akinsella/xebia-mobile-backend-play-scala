@@ -21,4 +21,11 @@ object Cache {
     }
   }
 
+  def getOrElse(key: String, expiration: Option[Int] = None)(liveValue: => String): String = {
+    get(key).getOrElse {
+      set(key, liveValue, expiration)
+      liveValue
+    }
+  }
+
 }
