@@ -9,7 +9,7 @@ object Global extends GlobalSettings {
   override def onStart(app: Application) {
     if (!Play.isTest) {
       println("inserting seed data...")
-//      InitialData.insert()
+      InitialData.insert()
     }
   }
 }
@@ -19,8 +19,6 @@ object Global extends GlobalSettings {
  */
 object InitialData {
 
-  def date(str: String) = new java.text.SimpleDateFormat("yyyy-MM-dd").parse(str)
-
   def insert() {
 
     if(User.findAll.isEmpty) {
@@ -28,6 +26,9 @@ object InitialData {
         User("jdoe@example.com", "John Doe", "Password123")
       ).foreach(User.create)
     }
+
+
+//  def date(str: String) = new java.text.SimpleDateFormat("yyyy-MM-dd").parse(str)
 //
 //    if (Device.count() == 0) {
 //

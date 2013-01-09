@@ -1,11 +1,10 @@
-@(title: String, user: Option[models.security.User])(content: Html)
+@(title: String, user: Option[models.security.User], sidebar: Html)(content: Html)
 
 
 <!DOCTYPE html>
 
 <html>
     <head>
-
         <title>@title</title>
 
         <meta charset="utf-8">
@@ -17,24 +16,87 @@
     </head>
     <body>
         <header>
-            <div id="user">
-                @if(user.isEmpty) {
-                    <span>@user.get.name <span>(@user.get.email)</span> <a href="@routes.Application.logout()">Logout</a></span>
+            <div>
+                <nav id="menu">
+                    <ul>
+                        <li><a href="/">Home</a></li>
+                        <li><a href="/news">News</a></li>
+                    </ul>
+                </nav>
+                <div id="user">
+                @if(user.isDefined) {
+                    <span>@user.get.name <span>(@user.get.email)</span> | <a href="@routes.Application.logout()">Logout</a></span>
                 } else {
                     <span><a href="@routes.Application.login()">Login</a></span>
                 }
-
+                </div>
+            </div>
+             <div>
+                 <nav id="submenu">
+                     <ul>
+                         <li><a href="/">Sub Menu 1</a></li>
+                         <li><a href="/news">Sub Menu 2</a></li>
+                     </ul>
+                 </nav>
             </div>
         </header>
         <section id="main">
-            @content
+
+            @if(!sidebar.body.isEmpty) {
+                <aside id="sidebar">
+                    @sidebar
+                </aside>
+            }
+            <section id="content @if(sidebar.body.isEmpty) { nosidebar }">
+                @content
+            </section>
+            <br style="clear: both;" />
         </section>
         <footer>
+            <ul>
+                <li>
+                    <h1>XEBIA FRANCE</h1>
+                    <section>
+                        <address>
+                            156 boulevard Haussmann<br />
+                        <br />
+                            75008 PARIS<br />
+                            +33 1 53 89 99 99<br />
+                        </address>
+                        <a href="mailto:info@@xebia.fr">info@@xebia.fr</a>
+                    </section>
+                </li><!--
+             --><li>
+                    <h1>XEBIA</h1>
 
+                    <section>
+                        <ul id="websites">
+                            <li><a href="#">Site Xebia France</a></li>
+                            <li><a href="#">Blog Xebia France</a></li>
+                            <li><a href="#">Xebia Studio France</a></li>
+                            <li><a href="#">Xebia Training Nederlands</a></li>
+                            <li><a href="#">Xebia Training UK</a></li>
+                            <li><a href="#">Xebia Labs</a></li>
+                            <li><a href="#">Xebia Inde</a></li>
+                        </ul>
+                    </section>
+                </li><!--
+             --><li>
+                    <h1>SUIVEZ-NOUS !</h1>
+
+                    <section>
+                        <ul>
+                            <li><a href="">Suivez-nous sur le blog xebia</a></li>
+                        </ul>
+                    </section>
+                </li>
+            </ul>
+
+            <div id="copyright"> Copyright 2013 - <a href="http://blog.xebia.fr">Xebia.fr</a></div>
         </footer>
 
         <script type="text/javascript">
-
+/*
             var _gaq = _gaq || [];
             _gaq.push(['_setAccount', 'UA-1889791-20']);
             _gaq.push(['_trackPageview']);
@@ -44,7 +106,7 @@
             ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
             var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
             })();
-
+*/
         </script>
 
     </body>

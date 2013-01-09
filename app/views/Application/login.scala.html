@@ -1,21 +1,14 @@
 @(form: Form[(String,String)])(implicit flash: Flash)
 
-<html>
-    <head>
-        <title>Xebia Mobile Backend</title>
-        <link rel="shortcut icon" type="image/png" href="@routes.Assets.at("images/favicon.png")">
-        <link rel="stylesheet" type="text/css" media="screen" href="@routes.Assets.at("stylesheets/login.css")">
-    </head>
-    <body>
+
+@views.html.Application.main("Xebia Mobile Backend", None, Html.empty) {
 
     @helper.form(routes.Application.authenticate()) {
 
         <h1>Sign in</h1>
 
         @form.globalError.map { error =>
-            <p class="error">
-            @error.message
-            </p>
+            <p class="error">@error.message</p>
         }
 
         @flash.get("success").map { message =>
@@ -34,5 +27,9 @@
 
     }
 
-    </body>
-</html>
+}
+
+
+
+
+

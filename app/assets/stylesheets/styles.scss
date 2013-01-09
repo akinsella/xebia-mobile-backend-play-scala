@@ -1,3 +1,25 @@
+/* Mixins */
+
+@mixin border-radius($radius){
+  -webkit-border-radius: $radius;
+  -moz-border-radius: $radius;
+  -ms-border-radius: $radius;
+  -o-border-radius: $radius;
+  border-radius: $radius;
+}
+
+@mixin linear-gradient($light, $dark) {
+  background-color: $light;
+  background-image: -khtml-gradient(linear,left top,left bottom,from($light),to($dark));
+  background-image: -webkit-gradient(linear, left top, left bottom, from($light), to($dark)); /* Saf4+, Chrome */
+  background-image: -webkit-linear-gradient($light , $dark); /* Chrome 10+, Saf5.1+ */
+  background-image: -moz-linear-gradient($light , $dark); /* FF3.6 */
+  background-image: -ms-linear-gradient($light , $dark); /* IE10 */
+  background-image: -o-linear-gradient($light , $dark); /* Opera 11.10+ */
+  background-image: linear-gradient($light , $dark);
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='$light',endColorstr='$dark');
+}
+
 /* Styles Reset */
 
 html, body, div, span, applet, object, iframe,
@@ -47,8 +69,204 @@ table {
 
 /* Application styles */
 
-header div#user {
-  position: absolute;
-  right: 0;
-  margin: 10px;
+html {
+  font-family: "Myriad Pro", Lucida, Arial;
+  background: url("../images/background.jpg");
+}
+
+header {
+
+  position: relative;
+  border: 20px 0;
+  background: #682c5f;
+  background-image: url("../images/header-background.png");
+  background-repeat: repeat-x;
+
+  a {
+    color: #fff;
+    text-decoration: none;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+
+  >div:first-child {
+    background-image: url("../images/logo.png");
+    background-repeat: no-repeat;
+    background-position: 10px 12px;
+
+    box-sizing: border-box;
+    width: 100%;
+    height: 84px;
+    padding-left: 230px;
+    padding-top: 34px;
+
+    nav#menu {
+      ul {
+        display: inline;
+
+        li {
+          padding-left: 20px;
+          display: inline;
+        }
+
+        li:first-child {
+          padding-left: 0;
+        }
+      }
+    }
+  }
+
+  >div:last-child {
+    background: red;
+    nav#submenu {
+      ul {
+        border-top: 1px solid #000;
+        padding: 10px;
+        background: #323338;
+        li {
+          padding: 10px;
+          display: inline;
+        }
+      }
+    }
+  }
+
+  div#user {
+    @include border-radius(3px);
+    position: absolute;
+    top: 24px;
+    right: 10px;
+    padding: 10px;
+    margin-right: 15px;
+    background: #333;
+
+    color: #eee;
+  }
+
+}
+
+section#main {
+  min-height: 450px;
+  margin: 20px;
+}
+
+aside#sidebar {
+  float:left;
+  background: #ddd;
+  @include border-radius(3px);
+  margin-right: 20px;
+  padding: 10px;
+  width: 240px;
+
+  a {
+    color: #bbb;
+    text-decoration: none;
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+
+  section {
+    h1 {
+      font-size: 18px;
+      font-weight: bold;
+      color: #888;
+
+      padding-left: 5px;
+      border-bottom: 2px solid #bbb;
+      padding-bottom: 5px;
+      margin-bottom: 10px;
+    }
+    ul {
+      padding: 5px;
+      li {
+        margin-left: 25px;
+        list-style: disc;
+        color: #bbb;
+        padding-bottom: 5px;
+        padding-left: 10px;
+      }
+    }
+  }
+}
+
+section#content {
+  padding-left: 300px;
+
+  &.nosidebar {
+    padding-left: 0px;
+  }
+}
+
+footer {
+  border-top: 10px solid #757577;
+  background: #323338;
+  postion: relative;
+  color: #999;
+  font-size: 13px;
+  font-family: "Myriad Pro", Lucida, Arial;
+  text-align: center;
+
+  a {
+    color: #999;
+    text-decoration: none;
+  }
+
+  >ul {
+    padding-top: 50px;
+    margin: 0 auto;
+    box-sizing: border-box;
+    width: 880px;
+    text-align: left;
+
+    >li {
+      vertical-align: top;
+      display: inline-block;
+      box-sizing: border-box;
+      width: 280px;
+      margin: 10px;
+
+      h1 {
+        font-size: 150%;
+        font-weight: bold;
+        text-transform: uppercase;
+        font-size: 16px;
+        font-weight: bold;
+        color: #fff;
+        padding-bottom: 10px;
+      }
+
+      section {
+        padding-left: 10px
+      }
+    }
+
+    >li:first-child {
+      margin-left: 0;
+    }
+
+
+    >li:last-child {
+      margin-right: 0;
+    }
+
+    ul#websites {
+      padding-left: 25px;
+      li {
+        list-style: disc;
+        padding: 3px;
+      }
+    }
+
+  }
+
+  div#copyright {
+    margin: 0 auto;
+    width: 400px;
+    padding: 20px;
+    padding-top: 60px;
+  }
+
 }

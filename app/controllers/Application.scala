@@ -66,7 +66,7 @@ object Application extends Controller {
     /**
      * Action for authenticated users.
      */
-    def IsAuthenticated(f: => String => Request[AnyContent] => Result) = Security.Authenticated(username, onUnauthorized) { user =>
+    def IsAuthenticated(f: => (String => (Request[AnyContent] => Result))) = Security.Authenticated(username, onUnauthorized) { user =>
       Action(request => f(user)(request))
     }
 
