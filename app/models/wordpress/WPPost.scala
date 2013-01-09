@@ -1,12 +1,15 @@
 package models.wordpress
 
 import play.api.libs.json._
-import play.api.libs.json.JsObject
-import play.api.libs.json.JsNumber
 import models.wordpress.WPCategory.WPCategoryFormat
 import models.wordpress.WPTag.WPTagFormat
 import models.wordpress.WPComment.WPCommentFormat
 import models.wordpress.WPAuthor.WPAuthorFormat
+import scala.Predef._
+import play.api.libs.json.JsArray
+import play.api.libs.json.JsObject
+import play.api.libs.json.JsString
+import play.api.libs.json.JsNumber
 
 case class WPPost(
                    id: Long, _type: String, slug: String, url: String, status: String, title: String, titlePlain: String,
@@ -77,5 +80,10 @@ object WPPost {
     }
 
   }
+
+  object WPPostIdsWrites extends Writes[WPPost] {
+
+    def writes(post: WPPost): JsValue = JsNumber(post.id)
+}
 
 }

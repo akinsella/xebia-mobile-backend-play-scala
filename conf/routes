@@ -38,9 +38,13 @@ GET     /api/wordpress/authors                      controllers.api.WordPressSer
 GET     /api/wordpress/tags                         controllers.api.WordPressService.tags
 GET     /api/wordpress/categories                   controllers.api.WordPressService.categories
 GET     /api/wordpress/category/:id/posts           controllers.api.WordPressService.categoryPosts(id: Long , count: Option[Int] , page: Option[Int] )
+GET     /api/wordpress/category/:id/posts/ids       controllers.api.WordPressService.categoryPostsIds(id: Long , count: Option[Int] , page: Option[Int] )
 GET     /api/wordpress/tag/:id/posts                controllers.api.WordPressService.tagPosts(id: Long , count: Option[Int] , page: Option[Int] )
+GET     /api/wordpress/tag/:id/posts/ids            controllers.api.WordPressService.tagPostsIds(id: Long , count: Option[Int] , page: Option[Int] )
 GET     /api/wordpress/author/:id/posts             controllers.api.WordPressService.authorPosts(id: Long , count: Option[Int] , page: Option[Int] )
+GET     /api/wordpress/author/:id/posts/ids         controllers.api.WordPressService.authorPostsIds(id: Long , count: Option[Int] , page: Option[Int] )
 GET     /api/wordpress/posts/recent                 controllers.api.WordPressService.recentPosts( count: Option[Int] , page: Option[Int] )
+GET     /api/wordpress/posts/recent/ids             controllers.api.WordPressService.recentPostsIds( count: Option[Int] , page: Option[Int] )
 GET     /api/wordpress/post/:id                     controllers.api.WordPressService.showPost(id: Long)
 
 #GitHub

@@ -5,7 +5,7 @@ import play.api.libs.ws.WS
 import play.api.libs.json.{Json, JsValue}
 
 
-case class CachedWSCall(wsRequest: WS.WSRequestHolder, expiration: Option[Int] = None) {
+case class CachedWSCall(wsRequest: WS.WSRequestHolder, expiration: Option[Int] = None)(implicit timeout: Long = 5000) {
 
   private lazy val cacheResponse: CachedString = CachedString(wsRequest.toString(), expiration)
 
@@ -49,7 +49,7 @@ case class CachedWSCall(wsRequest: WS.WSRequestHolder, expiration: Option[Int] =
     getAsJson().right.map(x => extractData.apply(x))
   }
 
-  private def getNow(promise: Promise[Either[String, String]])(implicit timeout: Long = 5000): Either[String, String] = {
+  private def getNow(promise: Promise[Either[String, String]]): Either[String, String] = {
     promise.await(timeout).fold(
       e => throw e,
       identity

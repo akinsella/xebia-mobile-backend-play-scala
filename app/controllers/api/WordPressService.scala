@@ -1,17 +1,18 @@
 package controllers.api
 
-import cloud._
-import models._
-import play.api.libs.json._
+import cloud.{CachedWSCall, PagedContent}
 import play.api.libs.ws.WS
 import play.api.mvc.{Action, Call, Controller}
-import wordpress._
+import models.wordpress.{WPPosts, WPPost, WPCategory, WPTag, WPAuthor}
+import play.api.libs.json.{Json, JsValue, Writes}
 
 
 /**
  * Adapters for Wordpress Webservices API
  */
 object WordPressService extends Controller {
+
+  implicit val timeout: Long = 15000
 
   /**
    * @return authors from Xebia blogs
@@ -67,8 +68,18 @@ object WordPressService extends Controller {
    * @return tags of the post
    */
   def tagPosts(id: Long, count: Option[Int] = None, page: Option[Int]) = {
-    posts("tag", Some(id), count, page) {
+    posts("tag", Some(id), count, page, WPPosts.WPPostsFormat) {
       page => routes.WordPressService.tagPosts(id, count, Some(page))
+    }
+  }
+
+  /**
+   * @param id id of the post
+   * @return tags of the post
+   */
+  def tagPostsIds(id: Long, count: Option[Int] = None, page: Option[Int]) = {
+    posts("tag", Some(id), count, page, WPPosts.WPPostsIdsWrites) {
+      page => routes.WordPressService.tagPostsIds(id, count, Some(page))
     }
   }
 
@@ -77,8 +88,18 @@ object WordPressService extends Controller {
    * @return category of the post
    */
   def categoryPosts(id: Long, count: Option[Int] = None, page: Option[Int]) = {
-    posts("category", Some(id), count, page) {
+    posts("category", Some(id), count, page, WPPosts.WPPostsFormat) {
       page => routes.WordPressService.categoryPosts(id, count, Some(page))
+    }
+  }
+
+  /**
+   * @param id id of the post
+   * @return category of the post
+   */
+  def categoryPostsIds(id: Long, count: Option[Int] = None, page: Option[Int]) = {
+    posts("category", Some(id), count, page, WPPosts.WPPostsIdsWrites) {
+      page => routes.WordPressService.categoryPostsIds(id, count, Some(page))
     }
   }
 
@@ -87,8 +108,18 @@ object WordPressService extends Controller {
    * @return author of the post
    */
   def authorPosts(id: Long, count: Option[Int] = None, page: Option[Int]) = {
-    posts("author", Some(id), count, page) {
+    posts("author", Some(id), count, page, WPPosts.WPPostsFormat) {
       page => routes.WordPressService.authorPosts(id, count, Some(page))
+    }
+  }
+
+  /**
+   * @param id id of the post
+   * @return author of the post
+   */
+  def authorPostsIds(id: Long, count: Option[Int] = None, page: Option[Int]) = {
+    posts("author", Some(id), count, page, WPPosts.WPPostsIdsWrites) {
+      page => routes.WordPressService.authorPostsIds(id, count, Some(page))
     }
   }
 
@@ -96,8 +127,18 @@ object WordPressService extends Controller {
    * @return recent posts
    */
   def recentPosts(count: Option[Int] = None, page: Option[Int]) = {
-    posts("recent", None, count, page) {
+    posts("recent", None, count, page, WPPosts.WPPostsFormat) {
       page => routes.WordPressService.recentPosts(count, Some(page))
+    }
+
+  }
+
+  /**
+   * @return recent posts ids
+   */
+  def recentPostsIds(count: Option[Int] = None, page: Option[Int]) = {
+    posts("recent", None, count, page, WPPosts.WPPostsIdsWrites) {
+      page => routes.WordPressService.recentPostsIds(count, Some(page))
     }
   }
 
@@ -107,10 +148,11 @@ object WordPressService extends Controller {
    * @param id optional id of a post or all posts if None
    * @param count number of elements fetched
    * @param page # of the page for pagination
+   * @param postWriter how to transform the wp post to JSON format for output
    * @param urlToPage function that generate the URL of the requested page with the page number as a function
    * @return _type element from a post identified by id or all posts limited by count
    */
-  def posts(_type: String, id: Option[Long] = None, count: Option[Int] = None, page: Option[Int])(urlToPage: (Int => Call)) = Action {
+  def posts(_type: String, id: Option[Long] = None, count: Option[Int] = None, page: Option[Int], postWriter: Writes[WPPosts])(urlToPage: (Int => Call)) = Action {
     implicit Request => {
       val wpPostsUrl = "http://blog.xebia.fr/wp-json-api/get_%1$s_posts/".format(_type)
       var queryStringParams = count.map(x => Seq("count" -> x.toString)).getOrElse(Seq())
@@ -132,8 +174,8 @@ object WordPressService extends Controller {
       responsePost.fold(
         message => InternalServerError(message),
         response => {
-          val links = PagedContent(response.count, response.pages, currentPage)(urlToPage).getLinks.mkString(",")
-          Ok(Json.toJson(response.posts)).withHeaders(("Links", links))
+          val links = PagedContent(response.count, response.pages, currentPage)(urlToPage).getHeader
+          Ok(Json.toJson(response)(postWriter)).withHeaders(links)
 
         }
       )
@@ -159,7 +201,7 @@ object WordPressService extends Controller {
         InternalServerError(errorMessage)
       },
       response => {
-        Ok(Json.toJson(response))
+        Ok(Json.toJson(response)(WPPost.WPPostFormat))
       }
     )
   }
