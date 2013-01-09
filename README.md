@@ -25,6 +25,9 @@ It also aims at publishing notifications for registered users for Apple and Andr
 ##Install me
 This software needs : 
 
+# Sass for CSS
+gem install sass 
+
 
 ### Play! Framework 2.0 and Scala compiler
 Check and download the last version of 2.0 Play Framework version [here](http://download.playframework.org/releases/play-2.0.4.zip)
