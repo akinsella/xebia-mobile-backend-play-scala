@@ -14,15 +14,6 @@ private [redis] class RedisClientFactory(host: String, port: Int, database: Int 
       cl.select(database)
     }
 
-//    if (password.isDefined) {
-//      if (!cl.auth(password.get)) {
-//        throw new RedisConnectionException("Wrong password")
-//      }
-//      else {
-//        play.Logger.info("Authenticated against Redis")
-//      }
-//    }
-
     cl
   }
 
@@ -51,7 +42,7 @@ class RedisClientAuthenticatedPool(host: String, port: Int, password:Option[Stri
         throw new RedisConnectionException("Wrong password")
       }
       else {
-        play.Logger.info("Authenticated against Redis")
+        play.Logger.debug("Authenticated against Redis")
       }
     }
 
