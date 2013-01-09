@@ -13,8 +13,6 @@ import wordpress._
  */
 object WordPressService extends Controller {
 
-  private val pageSize: Int = 10
-
   /**
    * @return authors from Xebia blogs
    */
@@ -121,21 +119,24 @@ object WordPressService extends Controller {
         queryStringParams = queryStringParams.:+("id" -> id.get.toString)
       }
 
+      val currentPage: Int = page.getOrElse(1)
+      queryStringParams = queryStringParams.:+("page" -> currentPage.toString)
+
       val wpPostsRequestHolder = WS.url(wpPostsUrl)
         .withQueryString(queryStringParams.toArray: _*)
 
       val responsePost = CachedWSCall(wpPostsRequestHolder, 60).mapJson {
-        jsonFetched => (jsonFetched \ "posts").as[Seq[JsValue]] map (_.as[WPPost])
+        jsonFetched => (jsonFetched).as[WPPosts]
       }
 
-      responsePost match {
-        case Left(errorMessage) => {
-          InternalServerError(errorMessage)
+      responsePost.fold(
+        message => InternalServerError(message),
+        response => {
+          val links = PagedContent(response.count, response.pages, currentPage)(urlToPage).getLinks.mkString(",")
+          Ok(Json.toJson(response.posts)).withHeaders(("Links", links))
+
         }
-        case Right(posts) => {
-          PagedContent(posts, pageSize)(urlToPage).getPage(page.getOrElse(1))
-        }
-      }
+      )
     }
   }
 

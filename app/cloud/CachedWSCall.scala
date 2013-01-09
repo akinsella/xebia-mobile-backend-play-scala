@@ -3,19 +3,18 @@ package cloud
 import play.api.libs.concurrent.Promise
 import play.api.libs.ws.WS
 import play.api.libs.json.{Json, JsValue}
-import play.api.mvc.Results.{Status, Ok}
 
 
 case class CachedWSCall(wsRequest: WS.WSRequestHolder, expiration: Option[Int] = None) {
 
-  private lazy val cacheResponse: CachedString = CachedString(wsRequest.hashCode().toString, expiration)
+  private lazy val cacheResponse: CachedString = CachedString(wsRequest.toString(), expiration)
 
   private lazy val wsCall: Promise[Either[String, String]] = {
     wsRequest
       .get()
       .map(response => {
-      Status(response.getAHCResponse.getStatusCode) match {
-        case Ok => Right(response.body)
+      response.getAHCResponse.getStatusText match {
+        case "OK" => Right(response.body)
         case _ => Left(response.body)
       }
     })
@@ -29,7 +28,11 @@ case class CachedWSCall(wsRequest: WS.WSRequestHolder, expiration: Option[Int] =
   def get(): Either[String, String] = {
     val responseFromCache = cacheResponse.get()
 
-    responseFromCache.map(x => Right(x)).getOrElse({
+    responseFromCache.map(x => {
+      play.Logger.debug("Response found in cache for %s".format(wsRequest.toString()))
+      Right(x)
+    }).getOrElse({
+      play.Logger.debug("Response not found in cache for %s".format(wsRequest.toString()) + " call the external source")
       wsData.right.map(x => {
         cacheResponse.set(x)
       })
