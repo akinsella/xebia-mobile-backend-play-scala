@@ -2,8 +2,6 @@ import models._
 import play.api._
 import play.api.Play.current
 
-import security.User
-
 object Global extends GlobalSettings {
 
   override def onStart(app: Application) {
@@ -20,13 +18,6 @@ object Global extends GlobalSettings {
 object InitialData {
 
   def insert() {
-
-    if(User.findAll.isEmpty) {
-      Seq(
-        User("jdoe@example.com", "John Doe", "Password123")
-      ).foreach(User.create)
-    }
-
 
 //  def date(str: String) = new java.text.SimpleDateFormat("yyyy-MM-dd").parse(str)
 //

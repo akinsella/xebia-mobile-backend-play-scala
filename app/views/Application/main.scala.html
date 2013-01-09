@@ -1,5 +1,5 @@
-@(title: String, user: Option[models.security.User], sidebar: Html)(content: Html)
-
+@(title: String, user: securesocial.core.Identity, sidebar: Html)(content: Html)
+@import securesocial.core.IdentityProvider
 
 <!DOCTYPE html>
 
@@ -24,10 +24,12 @@
                     </ul>
                 </nav>
                 <div id="user">
-                @if(user.isDefined) {
-                    <span>@user.get.name <span>(@user.get.email)</span> | <a href="@routes.Application.logout()">Logout</a></span>
+
+                    <img src="@user.avatarUrl" alt="@user.firstName" width="40px" height="40px"/>
+                @if(user != null) {
+                    <span>@user.fullName <span>( @user.email )</span> | <a href="@securesocial.controllers.routes.LoginPage.logout()">Logout</a></span>
                 } else {
-                    <span><a href="@routes.Application.login()">Login</a></span>
+                    <span><a href="@securesocial.controllers.routes.LoginPage.login()">Login</a></span>
                 }
                 </div>
             </div>

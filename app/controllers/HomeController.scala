@@ -1,19 +1,19 @@
 package controllers
 
 import play.api.mvc._
-import models.security.User
-
 import views._
-import controllers.Application.Secured
+import securesocial.core._
 
-object HomeController extends Controller with Secured {
+object HomeController extends Controller with SecureSocial {
 
-  def index = IsAuthenticated { username => _ =>
-    User.findByEmail(username).map { user =>
-      Ok(
-        html.Application.index("Your new application is ready.", user)
+  def index = SecuredAction { implicit request =>
+    Ok(
+      html.Application.index(
+        "Your new application is ready.",
+        request.user
       )
-    }.getOrElse(Redirect("/login"))
+    )
   }
+
 
 }

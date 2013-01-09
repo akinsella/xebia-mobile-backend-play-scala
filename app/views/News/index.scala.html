@@ -1,6 +1,6 @@
-@(message: String, news: Seq[models.news.News], user: models.security.User)
+@(message: String, news: Seq[models.news.News], user: securesocial.core.Identity)
 
-@views.html.Application.main("News list", Some(user), views.html.News.sidebar.apply()) {
+@views.html.Application.main("News list", user, views.html.News.sidebar.apply()) {
     <ul>
     @news.map { n =>,
         <li>

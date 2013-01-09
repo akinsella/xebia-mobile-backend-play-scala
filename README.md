@@ -98,3 +98,12 @@ Start the server, then go to the URL **/api**. You can parse the content of your
 Run the application in dev mode:
 
 play debug -Djava.util.logging.config.file=logging.properties run
+
+
+## Social Secure
+
+Add this env variables to your profile:
+
+	export GMAIL_XEBIA_MOBILE_BACKEND_USER="<user>@xebia.fr"
+	export GMAIL_XEBIA_MOBILE_BACKEND_PASSWORD="<some_two_step_generated_revokable_password>"
+

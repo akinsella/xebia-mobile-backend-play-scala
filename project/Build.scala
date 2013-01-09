@@ -16,7 +16,8 @@ object ApplicationBuild extends Build {
       "org.fusesource.scalate" % "scalate-core" % "1.5.3",
       "net.debasishg" % "redisclient_2.9.2" % "2.7",
       /*,"eu.teamon" %% "play-navigator" % "0.4.0"*/
-      "org.cloudfoundry" % "cloudfoundry-runtime" % "0.8.2"
+      "org.cloudfoundry" % "cloudfoundry-runtime" % "0.8.2",
+      "securesocial" % "securesocial_2.9.1" % "2.0.8"
     )
 
     val main = PlayProject(appName, appVersion, appDependencies, mainLang = SCALA).settings(
@@ -25,7 +26,8 @@ object ApplicationBuild extends Build {
       resolvers += "Twitter repo" at "http://maven.twttr.com/" ,
       resolvers += "DevJava repo" at "http://download.java.net/maven/2/",
       /*, resolvers += "scalajars.org repo" at "http://scalajars.org/repository"*/
-      resolvers += "SpringSource Milestones" at "http://repo.springsource.org/milestone/"
+      resolvers += "SpringSource Milestones" at "http://repo.springsource.org/milestone/",
+      resolvers += Resolver.url("SecureSocial Repository", url("http://securesocial.ws/repository/releases/"))(Resolver.ivyStylePatterns)
     )
 
 }
