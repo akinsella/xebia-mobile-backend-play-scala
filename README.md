@@ -40,9 +40,14 @@ HINT: On MacOS, think about installing XCode and Command line tools in order to 
 
 ```
 
+Create a file in ~/.redis/redis.conf with the following content
+	requirepass Password123
+
+
+
 Then you can launch the Redis server with 
 
-	src/redis-server
+	src/redis-server ~/.redis/redis.conf
 
 
 ### Postgres
