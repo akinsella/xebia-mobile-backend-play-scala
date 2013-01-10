@@ -1,0 +1,47 @@
+@(contactForm: Form[models.news.News])
+
+@import helper._
+@import helper.twitterBootstrap._
+
+@title = {
+    Create a news <small><a href="@routes.NewsController.edit()">or edit an existing news</a></small>
+}
+
+@main(title, nav = "news") {
+
+    @if(newsForm.hasErrors) {
+        <div class="alert-message error">
+            <p><strong>Oops</strong> Please fix all errors</p>
+        </div>
+    }
+
+    @helper.form(action = routes.NewsController.submit()) {
+
+        <fieldset>
+            <legend>General informations</legend>
+
+            @inputText(
+                contactForm("firstname"),
+                '_label -> "First name"
+            )
+
+            @inputText(
+                contactForm("lastname"),
+                '_label -> "Last name"
+            )
+
+            @inputText(
+                contactForm("company"),
+                '_label -> "Company"
+            )
+
+        </fieldset>
+
+        <div class="actions">
+            <input type="submit" class="btn primary" value="Insert">
+            <a href="@routes.NewsController.index" class="btn">Cancel</a>
+        </div>
+
+    }
+
+}

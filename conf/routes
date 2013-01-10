@@ -44,7 +44,11 @@ POST    /api/news                                   controllers.api.NewsService.
 PUT     /api/news/:id                               controllers.api.NewsService.save(id: Long)
 DELETE  /api/news/:id                               controllers.api.NewsService.delete(id: Long)
 
-GET /news                                           controllers.NewsController.index
+# News
+GET     /news                                       controllers.NewsController.index
+GET     /contacts/create                            controllers.NewsController.create
+GET     /contacts/edit                              controllers.NewsController.edit
+POST    /contacts/submit                            controllers.NewsController.submit
 
 
 #Notification

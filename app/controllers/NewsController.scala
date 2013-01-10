@@ -27,4 +27,44 @@ object NewsController extends Controller with SecureSocial {
     )
   }
 
+  /**
+   * News Form definition.
+   */
+  val newsForm: Form[News] = Form(
+
+    // Defines a mapping that will handle News
+    mapping(
+      "title" -> nonEmptyText,
+      "content" -> nonEmptyText,
+      "imageUrl" -> nonEmptyText
+
+
+    )(News.apply)(News.unapply)
+  )
+
+  /**
+   * Display an empty form.
+   */
+  def create = Action {
+    Ok(html.news.form(newsForm))
+  }
+
+  /**
+   * Display a form pre-filled with an existing News.
+   */
+  def edit = Action {
+    val existingNews = News("Some Title", "Some Content", "Some Url")
+    Ok(html.news.form(newsForm.fill(existingNews)))
+  }
+
+  /**
+   * Handle form submission.
+   */
+  def submit = Action { implicit request =>
+    newsForm.bindFromRequest.fold(
+      errors => BadRequest(html.news.form(errors)),
+      contact => Ok(html.news.summary(news))
+    )
+  }
+
 }
