@@ -1,11 +1,9 @@
 # --- !Ups
 
-create table "user" (
-  email                     varchar(255) not null primary key,
-  name                      varchar(255) not null,
-  password                  varchar(255) not null
-)
+CREATE TABLE "user" (ID VARCHAR(100) NOT NULL, PROVIDER VARCHAR(100), FIRST_NAME VARCHAR(200), LAST_NAME VARCHAR(200), EMAIL VARCHAR(100), "password" VARCHAR(100));
+CREATE TABLE TOKEN (UUID VARCHAR(100) NOT NULL PRIMARY KEY, EMAIL VARCHAR(100), CREATION_TIME TIMESTAMP, EXPIRATION_TIME TIMESTAMP, IS_SIGN_UP BOOLEAN);
 
 # --- !Downs
 
-drop table if exists "user";
+DROP TABLE TOKEN;
+DROP TABLE "USER";
