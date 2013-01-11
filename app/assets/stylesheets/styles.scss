@@ -198,11 +198,69 @@ section#content {
   &.nosidebar {
     padding-left: 0px;
   }
+
+  form {
+    color: #999;
+    padding: 5px;
+    background: #323338;
+    @include border-radius(5px);
+    width: 400px;
+    margin: 0 auto;
+
+    h1 {
+      text-transform: uppercase;
+      color: #fff;
+      font-weight: bold;
+      border-bottom: 2px solid #44474C;
+      margin:  5px;
+      padding: 5px 0 10px 0;
+    }
+
+    fieldset {
+      padding: 0px 10px 20px 10px;;
+
+      label {
+        color: #ddd;
+        display: block;
+        padding: 10px 0 3px 0;
+        &:after {
+          content: ":";
+        }
+      }
+
+
+      div.input {
+        padding: 0 10px;
+      }
+
+    }
+
+    div.actions {
+      text-align: right;
+      background: #44474C;
+      padding: 5px;
+      @include border-radius(4px);
+     }
+
+    input[type=text] {
+      border: 2px solid #a9a9a9;
+      padding: 5px;
+      width: 280px;
+      @include border-radius(4px);
+    }
+
+    span.help-block {
+      color: #ccc;
+      font-size: 0.9em;
+      font-style: italic;
+    }
+
+  }
 }
 
 footer {
   border-top: 10px solid #757577;
-  background: #323338;
+  background: #44474c;
   postion: relative;
   color: #999;
   font-size: 13px;

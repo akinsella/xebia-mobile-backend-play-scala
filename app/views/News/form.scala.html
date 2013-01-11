@@ -1,4 +1,4 @@
-@(contactForm: Form[models.news.News])
+@(user: securesocial.core.Identity, newsForm: Form[models.news.News])
 
 @import helper._
 @import helper.twitterBootstrap._
@@ -7,7 +7,7 @@
     Create a news <small><a href="@routes.NewsController.edit()">or edit an existing news</a></small>
 }
 
-@main(title, nav = "news") {
+@views.html.Application.main("Création d'une news", user, Html.empty) {
 
     @if(newsForm.hasErrors) {
         <div class="alert-message error">
@@ -15,31 +15,29 @@
         </div>
     }
 
-    @helper.form(action = routes.NewsController.submit()) {
+    @helper.form(action = routes.NewsController.submit(), 'id -> "createNewsForm") {
+        <h1>General informations</h1>
 
         <fieldset>
-            <legend>General informations</legend>
-
             @inputText(
-                contactForm("firstname"),
-                '_label -> "First name"
+                newsForm("title"),
+                '_label -> "Title"
             )
 
             @inputText(
-                contactForm("lastname"),
-                '_label -> "Last name"
+                newsForm("content"),
+                '_label -> "Content"
             )
 
             @inputText(
-                contactForm("company"),
-                '_label -> "Company"
+                newsForm("imageUrl"),
+                '_label -> "Image URL"
             )
-
         </fieldset>
 
         <div class="actions">
-            <input type="submit" class="btn primary" value="Insert">
-            <a href="@routes.NewsController.index" class="btn">Cancel</a>
+            <a href="@routes.NewsController.index()" class="button">Cancel</a>
+            <input type="submit" class="button primary" class="btn primary" value="Insert" />
         </div>
 
     }

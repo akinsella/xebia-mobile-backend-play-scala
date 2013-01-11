@@ -46,9 +46,9 @@ DELETE  /api/news/:id                               controllers.api.NewsService.
 
 # News
 GET     /news                                       controllers.NewsController.index
-GET     /contacts/create                            controllers.NewsController.create
-GET     /contacts/edit                              controllers.NewsController.edit
-POST    /contacts/submit                            controllers.NewsController.submit
+GET     /news/create                                controllers.NewsController.create
+GET     /news/edit                                  controllers.NewsController.edit
+POST    /news/submit                                controllers.NewsController.submit
 
 
 #Notification

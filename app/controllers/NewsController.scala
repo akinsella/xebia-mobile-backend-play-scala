@@ -35,22 +35,14 @@ object NewsController extends Controller with SecureSocial {
       "title" -> nonEmptyText,
       "content" -> nonEmptyText,
       "imageUrl" -> nonEmptyText
-    )(News.apply)(News.unapply)
-    {
-      // Binding: Create a News from the mapping result
-      (title, content, imageUrl) => News(title, content, imageUrl)
-    }
-    {
-      // Unbinding: Create the mapping values from an existing News value
-      news => Some(news.title, news.content, news.imageUrl)
-    }
+    )(News.apply) { news => Some(news.title, news.content, news.imageUrl) }
   )
 
   /**
    * Display an empty form.
    */
   def create = SecuredAction { implicit request =>
-    Ok(html.News.form(newsForm))
+    Ok(html.News.form(request.user, newsForm))
   }
 
   /**
@@ -58,7 +50,7 @@ object NewsController extends Controller with SecureSocial {
    */
   def edit = SecuredAction { implicit request =>
     val existingNews = News("Some Title", "Some Content", "Some Url")
-    Ok(html.News.form(newsForm.fill(existingNews)))
+    Ok(html.News.form(request.user, newsForm.fill(existingNews)))
   }
 
   /**
@@ -66,8 +58,8 @@ object NewsController extends Controller with SecureSocial {
    */
   def submit = SecuredAction { implicit request =>
     newsForm.bindFromRequest.fold(
-      errors => BadRequest(html.News.form(errors)),
-      contact => Ok(html.News.index("Some Title", News.all, request.user))
+      errors => BadRequest(html.News.form(request.user, errors)),
+      news => Ok(html.News.index("Some Title", News.all, request.user))
     )
   }
 

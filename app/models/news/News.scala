@@ -34,8 +34,6 @@ object News {
 
   def apply(title: String, content: String, imageUrl: String) = new News(title = title, content = content, imageUrl = imageUrl)
 
-  def unapply(news: News):(String, String, String) = (news.title, news.content, news.imageUrl)
-
   //JSON
   implicit object NewsFormat extends Format[News] {
     def reads(json: JsValue): News = News(
