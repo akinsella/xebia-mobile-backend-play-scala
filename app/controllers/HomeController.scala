@@ -9,8 +9,7 @@ object HomeController extends Controller with SecureSocial {
   def index = SecuredAction { implicit request =>
     Ok(
       html.Application.index(
-        "Your new application is ready.",
-        request.user
+        "Your new application is ready.", request.user
       )
     )
   }

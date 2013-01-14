@@ -1,6 +1,8 @@
-@(message: String, news: Seq[models.news.News], user: securesocial.core.Identity)
+@(message: String, user: securesocial.core.Identity, news: Seq[models.news.News])(implicit request: RequestHeader)
 
-@views.html.Application.main("News list", user, views.html.News.sidebar.apply()) {
+@import views._
+
+@views.html.Application.main("News list", Some(user), html.News.sidebar.apply()) {
     <ul>
     @news.map { n =>,
         <li>

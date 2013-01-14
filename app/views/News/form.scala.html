@@ -1,4 +1,4 @@
-@(user: securesocial.core.Identity, newsForm: Form[models.news.News])
+@(user: securesocial.core.Identity, newsForm: Form[models.news.News])(implicit request: RequestHeader)
 
 @import helper._
 @import helper.twitterBootstrap._
@@ -7,7 +7,7 @@
     Create a news <small><a href="@routes.NewsController.edit()">or edit an existing news</a></small>
 }
 
-@views.html.Application.main("Création d'une news", user, Html.empty) {
+@views.html.Application.main("Création d'une news", Some(user), Html.empty) {
 
     @if(newsForm.hasErrors) {
         <div class="alert-message error">

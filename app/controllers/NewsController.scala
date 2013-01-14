@@ -1,12 +1,9 @@
 package controllers
 
-import play.api._
 import play.api.mvc._
 import play.api.data._
 import play.api.data.Forms._
 
-import anorm._
-import models._
 import models.news.News
 import views._
 
@@ -21,8 +18,8 @@ object NewsController extends Controller with SecureSocial {
     Ok(
       html.News.index(
         "Index of News controller",
-        News.all,
-        request.user
+        request.user,
+        News.all
       )
     )
   }
@@ -59,7 +56,7 @@ object NewsController extends Controller with SecureSocial {
   def submit = SecuredAction { implicit request =>
     newsForm.bindFromRequest.fold(
       errors => BadRequest(html.News.form(request.user, errors)),
-      news => Ok(html.News.index("Some Title", News.all, request.user))
+      news => Ok(html.News.index("Some Title", request.user, News.all))
     )
   }
 

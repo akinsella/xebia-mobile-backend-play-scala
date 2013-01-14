@@ -1,7 +1,7 @@
 @(message: String, user: securesocial.core.Identity)(implicit request: RequestHeader)
 @import securesocial.core.IdentityProvider
 
-@views.html.Application.main("Xebia Mobile Backend", user, Html.empty) {
+@views.html.Application.main("Xebia Mobile Backend", Some(user), Html.empty) {
     <div class="page-header">
         <h2><img src="@user.avatarUrl" alt="@user.firstName" width="40px" height="40px"/> Welcome @user.firstName</h2>
     </div>
