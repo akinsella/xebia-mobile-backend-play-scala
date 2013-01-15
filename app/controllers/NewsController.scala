@@ -8,6 +8,7 @@ import models.news.News
 import views._
 
 import securesocial.core._
+import anorm.{NotAssigned, Id}
 
 object NewsController extends Controller with SecureSocial {
 
@@ -32,22 +33,29 @@ object NewsController extends Controller with SecureSocial {
       "title" -> nonEmptyText,
       "content" -> nonEmptyText,
       "imageUrl" -> nonEmptyText
-    )(News.apply) { news => Some(news.title, news.content, news.imageUrl) }
+    )
+    {
+      (title, content, imageUrl) => News.apply(title, content, imageUrl)
+    }
+    {
+      news =>  Some(news.title, news.content, news.imageUrl)
+    }
   )
 
   /**
    * Display an empty form.
    */
   def create = SecuredAction { implicit request =>
-    Ok(html.News.form(request.user, newsForm))
+    Ok(html.News.form(request.user, None, newsForm))
   }
 
   /**
    * Display a form pre-filled with an existing News.
    */
-  def edit = SecuredAction { implicit request =>
-    val existingNews = News("Some Title", "Some Content", "Some Url")
-    Ok(html.News.form(request.user, newsForm.fill(existingNews)))
+  def edit(newsId: Long) = SecuredAction { implicit request =>
+    News.findById(newsId).map { news =>
+      Ok(html.News.form(request.user, Some(newsId), newsForm.fill(news)))
+    }.getOrElse( Redirect(routes.NewsController.index()) )
   }
 
   /**
@@ -55,9 +63,20 @@ object NewsController extends Controller with SecureSocial {
    */
   def submit = SecuredAction { implicit request =>
     newsForm.bindFromRequest.fold(
-      errors => BadRequest(html.News.form(request.user, errors)),
-      news => Ok(html.News.index("Some Title", request.user, News.all))
+      errors => BadRequest(html.News.form(request.user, None, errors)),
+      news => {
+        News.create(news)
+        Redirect(routes.NewsController.index())
+      }
     )
+  }
+
+  /**
+   * Delete a task
+   */
+  def delete(newsId: Long) = SecuredAction { implicit request =>
+    News.delete(newsId)
+    Redirect(routes.NewsController.index())
   }
 
 }

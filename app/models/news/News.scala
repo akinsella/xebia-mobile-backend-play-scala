@@ -5,7 +5,6 @@ import java.util.Date
 import play.api.libs.json._
 import anorm.SqlParser._
 import play.api.db.DB
-import anorm.~
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsString
 import play.api.libs.json.JsNumber
@@ -14,8 +13,12 @@ import play.api.Play.current
 import play.api.data._
 import play.api.data.Forms._
 import play.api.data.validation.Constraints._
+import anorm.~
+import play.api.libs.json.JsObject
+import play.api.libs.json.JsString
+import play.api.libs.json.JsNumber
 
-case class News( id: Pk[Long] = NotAssigned, title:String, content:String, imageUrl:String,
+case class News( id: Pk[Long], title:String, content:String, imageUrl:String,
             createdAt: Date = new Date(), lastModified: Date = new Date() ) {
 
 /*
@@ -32,11 +35,13 @@ case class News( id: Pk[Long] = NotAssigned, title:String, content:String, image
 
 object News {
 
-  def apply(title: String, content: String, imageUrl: String) = new News(title = title, content = content, imageUrl = imageUrl)
+  def apply( id: Pk[Long], title: String, content: String, imageUrl: String) = new News(id, title, content, imageUrl)
+  def apply( title: String, content: String, imageUrl: String) = new News(NotAssigned, title, content, imageUrl)
 
   //JSON
   implicit object NewsFormat extends Format[News] {
     def reads(json: JsValue): News = News(
+      id = Id((json \ "id").as[Long]),
       title = (json \ "title").as[String],
       content = (json \ "content").as[String],
       imageUrl = (json \ "imageUrl").as[String]
@@ -142,8 +147,7 @@ object News {
           values ({title}, {content}, {imageUrl}, {createdAt}, {lastModified})
           """
         ).on(
-          'title -> news.title,
-          'content -> news.content,
+          'title -> news.title,          'content -> news.content,
           'imageUrl -> news.imageUrl,
           'createdAt -> news.createdAt,
           'lastModified -> news.lastModified

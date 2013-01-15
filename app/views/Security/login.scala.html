@@ -50,7 +50,7 @@
                 <p>@Messages("securesocial.login.useEmailAndPasswordOnly")</p>
             }
 
-            @provider("userpass", Some(loginForm))
+            @html.Security.provider("userpass", Some(loginForm))
         </div>
         }
     }

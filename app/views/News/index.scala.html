@@ -3,15 +3,28 @@
 @import views._
 
 @views.html.Application.main("News list", Some(user), html.News.sidebar.apply()) {
-    <ul>
-    @news.map { n =>,
-        <li>
-            <div>@n.title</div>
-            <div>n.content</div>
-            <div>n.imageUrl</div>
-        </li>
-    }
-    </ul>
+    <table>
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Title</th>
+                <th>Content</th>
+                <th>Image Url</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @news.map { n =>
+                <tr>
+                    <td>@n.id</td>
+                    <td>@n.title</td>
+                    <td>@n.content</td>
+                    <td>@n.imageUrl</td>
+                    <td><a href="@routes.NewsController.edit(n.id.get)"></a></td>
+                </tr>
+            }
+        </tbody>
+    </table>
 }
 
 

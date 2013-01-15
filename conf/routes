@@ -47,7 +47,7 @@ DELETE  /api/news/:id                               controllers.api.NewsService.
 # News
 GET     /news                                       controllers.NewsController.index
 GET     /news/create                                controllers.NewsController.create
-GET     /news/edit                                  controllers.NewsController.edit
+GET     /news/edit                                  controllers.NewsController.edit(id: Long)
 POST    /news/submit                                controllers.NewsController.submit
 
 

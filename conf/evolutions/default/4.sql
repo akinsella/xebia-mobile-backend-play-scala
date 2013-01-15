@@ -2,8 +2,9 @@
 
 CREATE TABLE news (
     id SERIAL PRIMARY KEY,
-    udid varchar(40) NOT NULL,
-	  token varchar(64) NOT NULL,
+    title varchar(128) NOT NULL,
+    content varchar(4096) NOT NULL,
+    imageUrl varchar(256) NOT NULL,
 	  created_at timestamp NOT NULL,
     last_modified TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL
 );
