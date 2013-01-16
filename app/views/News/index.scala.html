@@ -20,7 +20,10 @@
                     <td>@n.title</td>
                     <td>@n.content</td>
                     <td>@n.imageUrl</td>
-                    <td><a href="@routes.NewsController.edit(n.id.get)"></a></td>
+                    <td>
+                        <a href="/news/@n.id.get/update">Edit</a> -
+                        <a href="/news/@n.id.get/delete">Delete</a>
+                    </td>
                 </tr>
             }
         </tbody>

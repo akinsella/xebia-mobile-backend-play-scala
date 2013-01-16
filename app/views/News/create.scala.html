@@ -21,20 +21,10 @@
         </div>
     }
 
-    @helper.form(
-        action =
-                if(!id.isDefined)
-                    routes.NewsController.submit()
-                else
-                    routes.NewsController.edit(id.get),
-        'id -> "createNewsForm"
-    ) {
+    @helper.form(action = routes.NewsController.createForm(), 'id -> "createNewsForm") {
         <h1>General informations</h1>
 
         <fieldset>
-
-            <input type="hidden" name="id" value='field("id").value' >
-
             @inputText(
                 newsForm("title"),
                 '_label -> "Title"
@@ -53,7 +43,7 @@
 
         <div class="actions">
             <a href="@routes.NewsController.index()" class="button">Cancel</a>
-            <input type="submit" class="button primary" class="btn primary" value="Insert" />
+            <input type="submit" class="button primary" value="Insert" />
         </div>
 
     }

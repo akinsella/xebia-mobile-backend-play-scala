@@ -1,0 +1,51 @@
+@(user: securesocial.core.Identity, id:Option[Long], newsForm: Form[models.news.News])(implicit request: RequestHeader)
+
+@import helper._
+@import helper.twitterBootstrap._
+
+@title = {
+    Create a news <small>or edit an existing news</small>
+}
+
+@views.html.Application.main("Création d'une news", Some(user), Html.empty) {
+
+    @if(newsForm.hasErrors) {
+        <div class="alert-message error">
+            <p><strong>Oops</strong> Please fix all errors</p>
+
+            <ul>
+            @newsForm.errors.map { error:FormError =>
+                <li> @error</li>
+            }
+            </ul>
+        </div>
+    }
+
+    @helper.form(action = routes.NewsController.update(id.get), 'id -> "updateNewsForm") {
+        <h1>General informations</h1>
+
+        <fieldset>
+            @inputText(
+                newsForm("title"),
+                '_label -> "Title"
+            )
+
+            @inputText(
+                newsForm("content"),
+                '_label -> "Content"
+            )
+
+            @inputText(
+                newsForm("imageUrl"),
+                '_label -> "Image URL"
+            )
+        </fieldset>
+
+        <div class="actions">
+            <a href="@routes.NewsController.index()" class="button">Cancel</a>
+        <input type="submit" class="button primary" value="Update" />
+        </div>
+
+    }
+
+}
