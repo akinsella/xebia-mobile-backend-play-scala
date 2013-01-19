@@ -40,12 +40,12 @@ object News {
 
   //JSON
   implicit object NewsFormat extends Format[News] {
-    def reads(json: JsValue): News = News(
+    def reads(json: JsValue) = JsSuccess(News(
       id = Id((json \ "id").as[Long]),
       title = (json \ "title").as[String],
       content = (json \ "content").as[String],
       imageUrl = (json \ "imageUrl").as[String]
-    )
+    ))
 
 
     def writes(news: News): JsValue = JsObject(Seq(

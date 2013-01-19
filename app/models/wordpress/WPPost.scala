@@ -20,7 +20,7 @@ case class WPPost(
 object WPPost {
 
   implicit object WPPostFormat extends Format[WPPost] {
-    def reads(json: JsValue): WPPost = WPPost(
+    def reads(json: JsValue) = JsSuccess(WPPost(
       (json \ "id").as[Long],
       (json \ "type").as[String],
       (json \ "slug").as[String],
@@ -38,7 +38,7 @@ object WPPost {
       (json \ "categories").asOpt[Seq[WPCategory]],
       (json \ "tags").asOpt[Seq[WPTag]],
       (json \ "comments").asOpt[Seq[WPComment]]
-    )
+    ))
 
     def writes(post: WPPost): JsValue = {
       var jsonFields: Seq[(String, JsValue)] = Seq(

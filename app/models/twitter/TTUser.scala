@@ -23,7 +23,7 @@ object TTUser {
     def dfTwitter = new SimpleDateFormat("EEE MMM dd HH:mm:ss Z yyyy", Locale.US)
     def dfOutput = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
 
-    def reads(json: JsValue): TTUser = TTUser(
+    def reads(json: JsValue) = JsSuccess(TTUser(
       (json \ "id").as[Long],
       (json \ "id_str").as[String],
       (json \ "name").as[String],
@@ -42,7 +42,7 @@ object TTUser {
       (json \ "utc_offset").as[Long],
       (json \ "time_zone").as[String],
       (json \ "lang").as[String]
-    )
+    ))
 
     def writes(user: TTUser): JsValue = JsObject(Seq(
       "id" -> JsNumber(user.id),

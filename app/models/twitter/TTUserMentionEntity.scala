@@ -1,8 +1,6 @@
 package models.twitter
 
 import play.api.libs.json._
-import play.api.libs.json.JsNumber
-import models.twitter.TTIndices
 import models.twitter.TTIndices.TTIndicesFormat
 
 case class TTUserMentionEntity(
@@ -18,13 +16,13 @@ case class TTUserMentionEntity(
 object TTUserMentionEntity {
 
   implicit object TTUserMentionEntityFormat extends Format[TTUserMentionEntity] {
-    def reads(json: JsValue): TTUserMentionEntity = TTUserMentionEntity(
+    def reads(json: JsValue) = JsSuccess(TTUserMentionEntity(
       (json \ "id").as[Long],
       (json \ "id_str").as[String],
       (json \ "name").as[String],
       (json \ "screen_name").as[String],
       (json \ "indices").as[TTIndices]
-    )
+    ))
 
     def writes(userMentionEntity: TTUserMentionEntity): JsValue = JsObject(Seq(
       "id" -> JsNumber(userMentionEntity.id),

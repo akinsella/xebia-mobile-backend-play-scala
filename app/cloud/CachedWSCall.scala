@@ -1,15 +1,16 @@
 package cloud
 
-import play.api.libs.concurrent.Promise
+import play.api.libs.concurrent._
 import play.api.libs.ws.WS
-import play.api.libs.json.{Json, JsValue}
-
+import play.api.libs.json._
+import scala.concurrent._
+import ExecutionContext.Implicits.global
 
 case class CachedWSCall(wsRequest: WS.WSRequestHolder, expiration: Option[Int] = None)(implicit timeout: Long = 5000) {
 
   private lazy val cacheResponse: CachedString = CachedString(wsRequest.toString(), expiration)
 
-  private lazy val wsCall: Promise[Either[String, String]] = {
+  private lazy val wsCall: Future[Either[String, String]] = {
     wsRequest
       .get()
       .map(response => {
@@ -49,7 +50,7 @@ case class CachedWSCall(wsRequest: WS.WSRequestHolder, expiration: Option[Int] =
     getAsJson().right.map(x => extractData.apply(x))
   }
 
-  private def getNow(promise: Promise[Either[String, String]]): Either[String, String] = {
+  private def getNow(promise: Future[Either[String, String]]): Either[String, String] = {
     promise.await(timeout).fold(
       e => throw e,
       identity

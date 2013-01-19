@@ -18,7 +18,7 @@ case class EBEvent(
 object EBEvent {
 
   implicit object EBEventFormat extends Format[EBEvent] {
-    def reads(json: JsValue): EBEvent = EBEvent(
+    def reads(json: JsValue) = JsSuccess(EBEvent(
       (json \ "id").as[Long],
       (json \ "category").as[String],
       (json \ "capacity").as[Long],
@@ -35,7 +35,7 @@ object EBEvent {
       (json \ "description").as[String].replaceAll("""<(?!\/?a(?=>|\s.*>))\/?.*?>""", ""),
       (json \ "organizer").as[EBOrganizer],
       (json \ "venue").as[EBVenue]
-    )
+    ))
 
     def writes(tag: EBEvent): JsValue = JsObject(Seq(
       "id" -> JsNumber(tag.id),

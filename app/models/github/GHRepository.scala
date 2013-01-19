@@ -18,7 +18,7 @@ case class GHRepository(
 object GHRepository {
 
   implicit object GHRepositoryFormat extends Format[GHRepository] {
-    def reads(json: JsValue): GHRepository = GHRepository(
+    def reads(json: JsValue) = JsSuccess(GHRepository(
       (json \ "id").as[Long],
       (json \ "name").as[String],
       (json \ "full_name").as[String],
@@ -38,7 +38,7 @@ object GHRepository {
       (json \ "pushed_at").as[String],
       (json \ "created_at").as[String],
       (json \ "updated_at").as[String]
-    )
+    ))
 
     def writes(repository: GHRepository): JsValue = JsObject(Seq(
       "id" -> JsNumber(repository.id),

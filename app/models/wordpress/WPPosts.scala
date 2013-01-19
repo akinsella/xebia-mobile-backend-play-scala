@@ -13,12 +13,12 @@ case class WPPosts(
 object WPPosts {
 
   implicit object WPPostsFormat extends Format[WPPosts] {
-    def reads(json: JsValue): WPPosts = WPPosts(
+    def reads(json: JsValue) = JsSuccess(WPPosts(
       (json \ "count").as[Int],
       (json \ "count_total").asOpt[Int],
       (json \ "pages").as[Int],
       (json \ "posts").as[Seq[WPPost]]
-    )
+    ))
 
     def writes(postsResponse: WPPosts): JsValue = {
       var jsonFields: Seq[(String, JsValue)] = Seq(

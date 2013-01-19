@@ -14,12 +14,12 @@ case class GHOwner(
 object GHOwner {
 
   implicit object GHOwnerFormat extends Format[GHOwner] {
-    def reads(json: JsValue): GHOwner = GHOwner(
+    def reads(json: JsValue) = JsSuccess(GHOwner(
       (json \ "id").as[Long],
       (json \ "login").as[String],
       (json \ "gravatar_id").asOpt[String].getOrElse(""),
       (json \ "avatar_url").asOpt[String].getOrElse("")
-    )
+    ))
 
     def writes(owner: GHOwner): JsValue = JsObject(Seq(
       "id" -> JsNumber(owner.id),

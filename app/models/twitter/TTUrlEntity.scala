@@ -15,12 +15,12 @@ case class TTUrlEntity(
 object TTUrlEntity {
 
   implicit object TTUrlEntityFormat extends Format[TTUrlEntity] {
-    def reads(json: JsValue): TTUrlEntity = TTUrlEntity(
+    def reads(json: JsValue) = JsSuccess(TTUrlEntity(
       (json \ "url").as[String],
       (json \ "expanded_url").as[String],
       (json \ "display_url").as[String],
       (json \ "indices").as[TTIndices]
-    )
+    ))
 
     def writes(urlEntity: TTUrlEntity): JsValue = JsObject(Seq(
       "url" -> JsString(urlEntity.url),

@@ -11,13 +11,13 @@ case class WPTag(id:Long, slug:String, title:String, description:String, postCou
 object WPTag {
 
   implicit object WPTagFormat extends Format[WPTag] {
-    def reads(json: JsValue): WPTag = WPTag(
+    def reads(json: JsValue) = JsSuccess(WPTag(
       (json \ "id").as[Long],
       (json \ "slug").as[String],
       (json \ "title").as[String],
       (json \ "description").as[String],
       (json \ "post_count").as[Long]
-    )
+    ))
 
     def writes(tag: WPTag): JsValue = JsObject(Seq(
       "id" -> JsNumber(tag.id),

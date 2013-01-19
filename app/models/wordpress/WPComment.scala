@@ -11,14 +11,14 @@ case class WPComment(
 object WPComment {
 
   implicit object WPCommentFormat extends Format[WPComment] {
-    def reads(json: JsValue): WPComment = WPComment(
+    def reads(json: JsValue) = JsSuccess(WPComment(
       (json \ "id").as[Long],
       (json \ "name").as[String],
       (json \ "url").as[String],
       (json \ "date").as[String],
       (json \ "content").as[String],
       (json \ "parent").as[Long]
-    )
+    ))
 
     def writes(post: WPComment): JsValue = JsObject(Seq(
       "id" -> JsNumber(post.id),

@@ -11,14 +11,14 @@ case class WPCategory(id:Long, slug:String, title:String, parent:Long, descripti
 object WPCategory {
 
   implicit object WPCategoryFormat extends Format[WPCategory] {
-    def reads(json: JsValue): WPCategory = WPCategory(
+    def reads(json: JsValue) = JsSuccess(WPCategory(
       (json \ "id").as[Long],
       (json \ "slug").as[String],
       (json \ "title").as[String],
       (json \ "parent").as[Long],
       (json \ "description").as[String],
       (json \ "post_count").as[Long]
-    )
+    ))
 
     def writes(category: WPCategory): JsValue = JsObject(Seq(
       "id" -> JsNumber(category.id),
