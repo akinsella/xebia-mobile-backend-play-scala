@@ -23,10 +23,12 @@
                         <li><a href="/">Home</a></li>
                         <li><a href="/news">News</a></li>
                     </ul>
-                </nav
+                </nav>
                 <div id="user">
                     @if(user != None) {
-                        <img src="@user.get.avatarUrl" alt="@user.get.firstName" width="40px" height="40px"/>
+                        @if(!user.get.avatarUrl.isEmpty) {
+                            <img src="@user.get.avatarUrl" alt="@user.get.firstName" width="40px" height="40px"/>
+                        }
                         <span>@user.get.fullName <span>( @user.get.email )</span> | <a href="@securesocial.controllers.routes.LoginPage.logout()">Logout</a></span>
                     } else {
                         <span><a href="@securesocial.controllers.routes.LoginPage.login()">Login</a></span>

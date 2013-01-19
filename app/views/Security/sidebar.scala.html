@@ -1,0 +1,13 @@
+@(user: securesocial.core.Identity)(implicit request: RequestHeader)
+@import securesocial.core.IdentityProvider
+
+<section id="sb-actions">
+    <h1>Actions</h1>
+    <ul>
+        <li>
+            @user.passwordInfo.map { info =>
+                <a class="btn" href="@securesocial.core.providers.utils.RoutesHelper.changePasswordPage.absoluteURL(IdentityProvider.sslEnabled)">Change Password</a>
+            }
+        </li>
+    </ul>
+</section>

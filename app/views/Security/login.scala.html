@@ -31,6 +31,7 @@
 
     @defining( Registry.providers.all.values.filter( _.id != UsernamePassword) ) { externalProviders =>
 
+<!--
         @if( externalProviders.size > 0 ) {
             <div class="clearfix">
                 <p>@Messages("securesocial.login.instructions")</p>
@@ -41,14 +42,17 @@
                 </p>
             </div>
         }
+-->
 
         @Registry.providers.get(UsernamePassword).map { up =>
             <div class="clearfix">
+<!--
             @if( externalProviders.size > 0 ) {
                 <p>@Messages("securesocial.login.useEmailAndPassword")</p>
             } else {
                 <p>@Messages("securesocial.login.useEmailAndPasswordOnly")</p>
             }
+-->
 
             @html.Security.provider("userpass", Some(loginForm))
         </div>

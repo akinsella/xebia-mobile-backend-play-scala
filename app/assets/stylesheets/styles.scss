@@ -193,10 +193,29 @@ aside#sidebar {
 }
 
 section#content {
+
   padding-left: 300px;
 
   &.nosidebar {
     padding-left: 0px;
+  }
+
+  div.content-header {
+    h1 {
+      background: #ddd;
+      text-transform: uppercase;
+      color: #444;
+      font-weight: bold;
+      border-bottom: 2px solid #ccc;
+      margin:  5px;
+      padding: 10px 5px 5px 8px;
+      @include border-radius(2px);
+    }
+  }
+
+  div.content-body {
+    margin: 10px;
+    padding: 10px;
   }
 
   form {
@@ -206,6 +225,38 @@ section#content {
     @include border-radius(5px);
     width: 400px;
     margin: 0 auto;
+
+    a {
+      color: #bbb;
+      text-decoration: none;
+      &:hover {
+        text-decoration: underline;
+      }
+
+      &.small {
+        font-size: 0.8em;
+      }
+    }
+
+    div.control-group {
+      div.controls {
+        span.help-block {
+          display: none;
+        }
+      }
+    }
+
+    div.control-group.error {
+      div.controls {
+        text-align: right;
+        span.help-inline {
+          font-style: italic;
+          white-space: nowrap;
+          font-size: 0.8em;
+          color: #B00;
+        }
+      }
+    }
 
     h1 {
       text-transform: uppercase;
@@ -228,7 +279,6 @@ section#content {
         }
       }
 
-
       div.input {
         padding: 0 10px;
       }
@@ -238,14 +288,16 @@ section#content {
     div.actions {
       text-align: right;
       background: #44474C;
+      margin: 5px;
       padding: 5px;
       @include border-radius(4px);
      }
 
     input[type=text], input[type=password] {
+      box-sizing: border-box;
       border: 2px solid #a9a9a9;
       padding: 5px;
-      width: 280px;
+      width: 100%;
       @include border-radius(4px);
     }
 

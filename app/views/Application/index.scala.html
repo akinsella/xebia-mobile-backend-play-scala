@@ -1,12 +1,18 @@
 @(message: String, user: securesocial.core.Identity)(implicit request: RequestHeader)
 @import securesocial.core.IdentityProvider
+@import views._
 
-@views.html.Application.main("Xebia Mobile Backend", Some(user), Html.empty) {
-    <div class="page-header">
-        <h2><img src="@user.avatarUrl" alt="@user.firstName" width="40px" height="40px"/> Welcome @user.firstName</h2>
+@views.html.Application.main("Xebia Mobile Backend", Some(user), html.Security.sidebar.apply(user)) {
+    <div class="content-header">
+        <h1>
+            @if(!user.avatarUrl.isEmpty) {
+                <img src="@user.avatarUrl" alt="@user.firstName" width="40px" height="40px"/>
+            }
+            Welcome @user.firstName
+        </h1>
     </div>
 
-    <div class="clearfix">
+    <div class="content-body clearfix">
         <h2>User Details</h2>
 
         <ul>
@@ -39,10 +45,7 @@
             </ul>
         }
         <hr>
-        @user.passwordInfo.map { info =>
-            <a class="btn" href="@securesocial.core.providers.utils.RoutesHelper.changePasswordPage.absoluteURL(IdentityProvider.sslEnabled)">Change Password</a>
-        }
-        <a class="btn" href="@securesocial.controllers.routes.LoginPage.logout()">Logout</a>
+
     </div>
 }
 
