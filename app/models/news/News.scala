@@ -66,8 +66,8 @@ object News {
       get[String]("news.title") ~
       get[String]("news.content") ~
       get[String]("news.imageUrl") ~
-      get[Date]("news.created_at") ~
-      get[Date]("news.last_modified") map {
+      get[Date]("news.createdAt") ~
+      get[Date]("news.updatedAt") map {
       case id ~ title ~ content ~imageUrl ~ createdAt ~ last_modified =>
         News(id, title, content, imageUrl, createdAt, last_modified)
     }
@@ -76,7 +76,7 @@ object News {
   def find(field: String, value: String): Seq[News] = {
     DB.withConnection {
       implicit connection =>
-        SQL("select * from news where " + field + " = {" + field + "}")
+        SQL("SELECT * FROM news WHERE " + field + " = {" + field + "}")
           .on(Symbol(field) -> value).as(News.simple *)
     }
   }
@@ -84,7 +84,7 @@ object News {
   def findById(id: Long): Option[News] = {
     DB.withConnection {
       implicit connection =>
-        SQL("select * from news where id = {id}")
+        SQL("SELECT * FROM news WHERE id = {id}")
           .on("id" -> id).using(simple).singleOpt()
     }
   }
@@ -93,8 +93,8 @@ object News {
     implicit connection =>
       SQL(
         """
-          select * from news n
-          order by n.created_at desc
+          SELECT * FROM news n
+          ORDER BY n.createdAt DESC
         """
       ).as(News.simple *)
   }
@@ -102,7 +102,7 @@ object News {
   def count(): Long = {
     DB.withConnection {
       implicit connection =>
-        SQL("select count(*) from news").as(scalar[Long].single)
+        SQL("SELECT COUNT(*) FROM news").as(scalar[Long].single)
     }
   }
 
@@ -116,19 +116,19 @@ object News {
       implicit connection =>
         SQL(
           """
-          update news
-          set title = {title}
+          UPDATE news
+          SET title = {title}
           , content = {content}
           , imageUrl = {imageUrl}
-          , last_modified = {lastModified}
-          where id = {id}
+          , updatedAt = {updatedAt}
+          WHERE id = {id}
           """
         ).on(
           'id -> id,
           'title -> news.title,
           'content -> news.content,
           'imageUrl -> news.imageUrl,
-          'lastModified -> new Date()
+          'updatedAt -> new Date()
         ).executeUpdate() == 1
     }
   }
@@ -143,14 +143,14 @@ object News {
       implicit connection => {
         SQL(
           """
-          insert into news(title, content, imageUrl, created_at, last_modified)
-          values ({title}, {content}, {imageUrl}, {createdAt}, {lastModified})
+          INSERT INTO news(title, content, imageUrl, createdAt, updatedAt)
+          VALUES ({title}, {content}, {imageUrl}, {createdAt}, {updatedAt})
           """
         ).on(
           'title -> news.title,          'content -> news.content,
           'imageUrl -> news.imageUrl,
           'createdAt -> news.createdAt,
-          'lastModified -> news.lastModified
+          'updatedAt -> news.lastModified
         ).executeInsert()
 
       }
@@ -165,7 +165,7 @@ object News {
   def delete(id: Long): Boolean = {
     DB.withConnection {
       implicit connection =>
-        SQL("delete from news where id = {id}").on('id -> id).executeUpdate() == 1
+        SQL("DELETE FROM news WHERE id = {id}").on('id -> id).executeUpdate() == 1
     }
   }
 

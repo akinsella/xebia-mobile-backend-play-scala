@@ -54,7 +54,7 @@ object Device {
   def find(field: String, value: String): Seq[Device] = {
     DB.withConnection {
       implicit connection =>
-        SQL("select * from device where " + field + " = {" + field + "}")
+        SQL("SELECT * FROM device WHERE " + field + " = {" + field + "}")
           .on(Symbol(field) -> value).as(Device.simple *)
     }
   }
@@ -62,7 +62,7 @@ object Device {
   def findById(id: Long): Option[Device] = {
     DB.withConnection {
       implicit connection =>
-        SQL("select * from device where id = {id}")
+        SQL("SELECT * FROM device WHERE id = {id}")
           .on("id" -> id).using(simple).singleOpt()
     }
   }
@@ -71,8 +71,8 @@ object Device {
     implicit connection =>
       SQL(
         """
-          select * from device d
-          order by d.created_at desc
+          SELECT * FROM device d
+          ORDER BY d.created_at DESC
         """
       ).as(Device.simple *)
   }
@@ -80,7 +80,7 @@ object Device {
   def count(): Long = {
     DB.withConnection {
       implicit connection =>
-        SQL("select count(*) from device").as(scalar[Long].single)
+        SQL("SELECT COUNT(*) FROM device").as(scalar[Long].single)
     }
   }
 
@@ -94,11 +94,11 @@ object Device {
       implicit connection =>
         SQL(
           """
-          update device
-          set udid = {udid}
+          UPDATE device
+          SET udid = {udid}
           , token = {token}
           , last_modified = {lastModified}
-          where id = {id}
+          WHERE id = {id}
           """
         ).on(
           'id -> id,
@@ -119,8 +119,8 @@ object Device {
       implicit connection => {
         SQL(
           """
-          insert into device(udid, token, created_at, last_modified)
-          values ({udid}, {token}, {createdAt}, {lastModified})
+          INSERT INTO device(udid, token, created_at, last_modified)
+          VALUES ({udid}, {token}, {createdAt}, {lastModified})
           """
         ).on(
           'udid -> device.udid,
@@ -141,7 +141,7 @@ object Device {
   def delete(id: Long): Boolean = {
     DB.withConnection {
       implicit connection =>
-        SQL("delete from device where id = {id}").on('id -> id).executeUpdate() == 1
+        SQL("DELETE FROM device WHERE id = {id}").on('id -> id).executeUpdate() == 1
     }
   }
 

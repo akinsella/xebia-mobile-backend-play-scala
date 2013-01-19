@@ -59,17 +59,16 @@ class DbUserService(application: Application) extends UserServicePlugin(applicat
 
       val sqlQuery = SQL(
         """
-		    select * from "user"
-		    where id = {id};
-        		  """).on("id" -> id.id)
+          SELECT * FROM "user" WHERE id = {id};
+        """).on("id" -> id.id)
 
       // Transform the resulting Stream[Row] to a List[SocialUser]
       val users = sqlQuery().map(row =>
         SocialUser(
           UserId(row[String]("id"), row[String]("provider")),
-          row[String]("first_name"),
-          row[String]("last_name"),
-          row[String]("first_name") + " " + row[String]("last_name"),
+          row[String]("firstName"),
+          row[String]("lastName"),
+          row[String]("firstName") + " " + row[String]("lastName"),
           row[Option[String]]("email"),
           None,
           AuthenticationMethod("userPassword"),
@@ -107,21 +106,19 @@ class DbUserService(application: Application) extends UserServicePlugin(applicat
 
       val sqlQuery = SQL(
         """
-		    select * from "user"
-		    where email = {email}
-              and provider = {provider}
-        		  """).on(
-        'email -> email,
-        'provider -> providerId
+		      SELECT * FROM "user" WHERE email = {email} AND provider = {provider}
+        """).on(
+          'email -> email,
+          'provider -> providerId
       )
 
       // Transform the resulting Stream[Row] to a List[SocialUser]
       val users = sqlQuery().map(row =>
         SocialUser(
           UserId(row[String]("id"), row[String]("provider")),
-          row[String]("first_name"),
-          row[String]("last_name"),
-          row[String]("first_name") + " " + row[String]("last_name"),
+          row[String]("firstName"),
+          row[String]("lastName"),
+          row[String]("firstName") + " " + row[String]("lastName"),
           row[Option[String]]("email"),
           None,
           AuthenticationMethod("userPassword"),
@@ -159,16 +156,15 @@ class DbUserService(application: Application) extends UserServicePlugin(applicat
 
       val sqlSelectQuery = SQL(
         """
-		    select * from "user"
-		    where id = {id};
-        		  """).on("id" -> user.id.id)
+          SELECT * FROM "user" WHERE id = {id};
+        """).on("id" -> user.id.id)
 
       val users = sqlSelectQuery().map(row =>
         SocialUser(
           UserId(row[String]("id"), row[String]("provider")),
-          row[String]("first_name"),
-          row[String]("last_name"),
-          row[String]("first_name") + " " + row[String]("last_name"),
+          row[String]("firstName"),
+          row[String]("lastName"),
+          row[String]("firstName") + " " + row[String]("lastName"),
           row[Option[String]]("email"),
           None,
           AuthenticationMethod("userPassword"),
@@ -192,17 +188,16 @@ class DbUserService(application: Application) extends UserServicePlugin(applicat
         // create a new user
         val sqlQuery = SQL(
           """
-		    insert into "user"
-    		  (id, provider, first_name, last_name, email, "password")
-    		values
-    		  ({id}, {provider}, {first_name}, {last_name}, {email}, {password})
-          		  """).on(
-          'id -> user.id.id,
-          'provider -> user.id.providerId,
-          'first_name -> user.firstName,
-          'last_name -> user.lastName,
-          'email -> user.email,
-          'password -> user.passwordInfo.get.password)
+            INSERT INTO "user" (id, provider, firstName, lastName, email, "password")
+            VALUES ({id}, {provider}, {firstName}, {lastName}, {email}, {password})
+          """).on(
+            'id -> user.id.id,
+            'provider -> user.id.providerId,
+            'firstName -> user.firstName,
+            'lastName -> user.lastName,
+            'email -> user.email,
+            'password -> user.passwordInfo.get.password
+        )
 
         val result: Int = sqlQuery.executeUpdate()
 
@@ -219,21 +214,22 @@ class DbUserService(application: Application) extends UserServicePlugin(applicat
         // update the user
         val sqlQuery = SQL(
           """
-		    update "user"
-    		  set id = {id}, 
-                  provider = {provider},
-        		  first_name = {first_name}, 
-        		  last_name = {last_name}, 
-                  email = {email}, 
-                  "password" = {password}
-              where id = {id}
-          		  """).on(
-          'id -> user.id.id,
-          'provider -> user.id.providerId,
-          'first_name -> user.firstName,
-          'last_name -> user.lastName,
-          'email -> user.email,
-          'password -> user.passwordInfo.get.password)
+            UPDATE "user"
+            SET id = {id}, 
+                provider = {provider},
+                firstName = {firstName}, 
+                lastName = {lastName}, 
+                email = {email}, 
+                "password" = {password}
+            WHERE id = {id}
+          """).on(
+            'id -> user.id.id,
+            'provider -> user.id.providerId,
+            'firstName -> user.firstName,
+            'lastName -> user.lastName,
+            'email -> user.email,
+            'password -> user.passwordInfo.get.password
+        )
 
         val result: Int = sqlQuery.executeUpdate()
 
@@ -268,16 +264,14 @@ class DbUserService(application: Application) extends UserServicePlugin(applicat
       // create a new token
       val sqlQuery = SQL(
         """
-		    insert into TOKEN 
-			  (uuid, email, creation_time, expiration_time, is_sign_up)
-			values
-			  ({uuid}, {email}, to_timestamp({creation_time}, 'YYYY-MM-DD HH24:MI:SS'), to_timestamp({expiration_time}, 'YYYY-MM-DD HH24:MI:SS'), {is_sign_up})
-        		  """).on(
-        'uuid -> token.uuid,
-        'email -> token.email,
-        'creation_time -> token.creationTime.toString("yyyy-MM-dd HH:mm:ss"),
-        'expiration_time -> token.expirationTime.toString("yyyy-MM-dd HH:mm:ss"),
-        'is_sign_up -> token.isSignUp
+          INSERT INTO token  (uuid, email, createdAt, expireAt, isSignUp)
+          VALUES ({uuid}, {email}, to_timestamp({createdAt}, 'YYYY-MM-DD HH24:MI:SS'), to_timestamp({expireAt}, 'YYYY-MM-DD HH24:MI:SS'), {isSignUp})
+        """).on(
+          'uuid -> token.uuid,
+          'email -> token.email,
+          'createdAt -> token.creationTime.toString("yyyy-MM-dd HH:mm:ss"),
+          'expireAt -> token.expirationTime.toString("yyyy-MM-dd HH:mm:ss"),
+          'isSignUp -> token.isSignUp
       )
 
       val result: Int = sqlQuery.executeUpdate()
@@ -306,13 +300,13 @@ class DbUserService(application: Application) extends UserServicePlugin(applicat
 
       val sqlSelectQuery = SQL(
         """
-		    select * from TOKEN
-		    where uuid = {uuid};
+		    SELECT * FROM token
+		    WHERE uuid = {uuid};
         		  """).on("uuid" -> token)
 
       val tokens = sqlSelectQuery().map(row => {
-        val creationTime = row[Date]("creation_time")
-        val expirationTime = row[Date]("expiration_time")
+        val creationTime = row[Date]("createdAt")
+        val expirationTime = row[Date]("expireAt")
         if (Logger.isDebugEnabled) {
           Logger.debug("creationTime = %s".format(creationTime))
           Logger.debug("expirationTime = %s".format(expirationTime))
@@ -322,7 +316,7 @@ class DbUserService(application: Application) extends UserServicePlugin(applicat
           row[String]("email"),
           new DateTime(creationTime),
           new DateTime(expirationTime),
-          row[Boolean]("is_sign_up")
+          row[Boolean]("isSignUp")
         )
       }).toList
 
@@ -355,9 +349,8 @@ class DbUserService(application: Application) extends UserServicePlugin(applicat
     // delete token
       val sqlQuery = SQL(
         """
-		  delete from TOKEN 
-		  where uuid = {uuid};
-        		""").on("uuid" -> uuid)
+		      DELETE FROM token  WHERE uuid = {uuid};
+        """).on("uuid" -> uuid)
 
       val result: Int = sqlQuery.executeUpdate()
 
@@ -385,7 +378,7 @@ class DbUserService(application: Application) extends UserServicePlugin(applicat
     // delete all tokens
       val sqlQuery = SQL(
         """
-		  delete from TOKEN;
+		  DELETE FROM token;
         		""")
 
       val result: Int = sqlQuery.executeUpdate()
@@ -414,8 +407,8 @@ class DbUserService(application: Application) extends UserServicePlugin(applicat
     // delete expired tokens
       val sqlQuery = SQL(
         """
-		  delete from TOKEN 
-		  where EXPIRATION_TIME < current_timestamp;
+		  DELETE FROM token 
+		  WHERE EXPIRATION_TIME < current_timestamp;
         		""")
 
       val result: Int = sqlQuery.executeUpdate()
