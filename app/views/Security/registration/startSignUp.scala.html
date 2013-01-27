@@ -16,21 +16,20 @@
     }
 
     <form action="@securesocial.core.providers.utils.RoutesHelper.handleStartSignUp().absoluteURL(IdentityProvider.sslEnabled)"
-        class="form-horizontal"
-        autocomplete="off" method="post"
-        >
-    <fieldset>
-    @helper.inputText(
-        startForm("email"),
-        '_label -> Messages("securesocial.signup.email1"),
-        'class -> "input-xlarge"
-    )
+        class="form-horizontal" method="post">
 
-    <div class="form-actions">
-        <button type="submit" class="button primary">@Messages("securesocial.signup.createAccount")</button>
-        <a class="btn" href="@securesocial.core.providers.utils.RoutesHelper.login()">@Messages("securesocial.signup.cancel")</a>
-    </div>
+        <fieldset>
+        @helper.inputText(
+            startForm("email"),
+            '_label -> Messages("securesocial.signup.email1"),
+            'class -> "input-xlarge"
+        )
 
-    </fieldset>
+        </fieldset>
+
+        <div class="actions">
+            <a class="button" href="@securesocial.core.providers.utils.RoutesHelper.login()">@Messages("securesocial.signup.cancel")</a>
+            <button type="submit" class="button primary">@Messages("securesocial.signup.createAccount")</button>
+        </div>
     </form>
 }

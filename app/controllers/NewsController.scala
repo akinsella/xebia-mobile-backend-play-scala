@@ -1,5 +1,6 @@
 package controllers
 
+import _root_.java.text.SimpleDateFormat
 import play.api.mvc._
 import play.api.data._
 import play.api.data.Forms._
@@ -32,10 +33,16 @@ object NewsController extends Controller with SecureSocial {
     mapping(
       "title" -> nonEmptyText,
       "content" -> nonEmptyText,
-      "imageUrl" -> nonEmptyText
+      "imageUrl" -> nonEmptyText,
+      "targetUrl" -> nonEmptyText,
+      "draft" -> boolean,
+      "publicationDate" -> nonEmptyText
     )
-    { (title, content, imageUrl) => News.apply(title, content, imageUrl) }
-    { news =>  Some(news.title, news.content, news.imageUrl) }
+    {
+      (title, content, imageUrl, targetUrl, draft, publicationDate) =>
+        News.apply(title, content, imageUrl, targetUrl, draft, new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(publicationDate))
+    }
+    { news =>  Some(news.title, news.content, news.imageUrl, news.targetUrl, news.draft, new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(news.publicationDate)) }
   )
 
   /**

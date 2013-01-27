@@ -12,6 +12,9 @@ GET     /login                      securesocial.controllers.LoginPage.login
 GET     /logout                     securesocial.controllers.LoginPage.logout
 
 
+# Account
+GET     /account                                    controllers.Application.account
+
 
 # User Registration and password handling
 GET     /signup                                     securesocial.controllers.Registration.startSignUp

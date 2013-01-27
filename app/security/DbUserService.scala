@@ -408,7 +408,7 @@ class DbUserService(application: Application) extends UserServicePlugin(applicat
       val sqlQuery = SQL(
         """
 		  DELETE FROM token 
-		  WHERE EXPIRATION_TIME < current_timestamp;
+		  WHERE expireAt < current_timestamp;
         		""")
 
       val result: Int = sqlQuery.executeUpdate()

@@ -39,6 +39,23 @@
                 newsForm("imageUrl"),
                 '_label -> "Image URL"
             )
+
+            @inputText(
+                newsForm("targetUrl"),
+                '_label -> "Target URL"
+            )
+
+            @checkbox(
+                newsForm("draft"),
+                '_label -> "Draft",
+                '_text -> "Draft",
+                'value -> "true"
+            )
+
+            @inputText(
+                newsForm("publicationDate"),
+                '_label -> "Date de publication"
+            )
         </fieldset>
 
         <div class="actions">
@@ -46,6 +63,12 @@
             <input type="submit" class="button primary" value="Insert" />
         </div>
 
+        <script>
+            $('#publicationDate').datetimepicker({
+                dateFormat: "yy-mm-dd",
+                timeFormat: "HH:mm:ss"
+            });
+        </script>
     }
 
 }

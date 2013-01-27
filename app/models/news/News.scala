@@ -5,21 +5,17 @@ import java.util.Date
 import play.api.libs.json._
 import anorm.SqlParser._
 import play.api.db.DB
-import play.api.libs.json.JsObject
-import play.api.libs.json.JsString
-import play.api.libs.json.JsNumber
 import play.api.Play.current
 
-import play.api.data._
-import play.api.data.Forms._
-import play.api.data.validation.Constraints._
 import anorm.~
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsString
 import play.api.libs.json.JsNumber
+import java.text.SimpleDateFormat
 
-case class News( id: Pk[Long], title:String, content:String, imageUrl:String,
-            createdAt: Date = new Date(), lastModified: Date = new Date() ) {
+case class News( id: Pk[Long], title: String, content: String, imageUrl: String, targetUrl: String,
+                 draft: Boolean, publicationDate:Date,
+                 createdAt:Date = new Date(), lastModified:Date = new Date() ) {
 
 /*
   val newsForm = Form(
@@ -35,8 +31,13 @@ case class News( id: Pk[Long], title:String, content:String, imageUrl:String,
 
 object News {
 
-  def apply( id: Pk[Long], title: String, content: String, imageUrl: String) = new News(id, title, content, imageUrl)
-  def apply( title: String, content: String, imageUrl: String) = new News(NotAssigned, title, content, imageUrl)
+  def apply( id: Pk[Long], title: String, content: String, imageUrl: String,
+             targetUrl: String, draft: Boolean, publicationDate: Date ) =
+    new News(id, title, content, imageUrl, targetUrl, draft, publicationDate)
+
+  def apply( title: String, content: String, imageUrl: String,
+             targetUrl: String, draft: Boolean, publicationDate: Date ) =
+    new News(NotAssigned, title, content, imageUrl, targetUrl, draft, publicationDate)
 
   //JSON
   implicit object NewsFormat extends Format[News] {
@@ -44,9 +45,11 @@ object News {
       id = Id((json \ "id").as[Long]),
       title = (json \ "title").as[String],
       content = (json \ "content").as[String],
-      imageUrl = (json \ "imageUrl").as[String]
+      imageUrl = (json \ "imageUrl").as[String],
+      targetUrl = (json \ "targetUrl").as[String],
+      draft = (json \ "draft").as[Boolean],
+      publicationDate = new SimpleDateFormat("yyyy-MM-dd, HH:mm:ss").parse((json \ "publicationDate").as[String])
     )
-
 
     def writes(news: News): JsValue = JsObject(Seq(
       "id" -> JsNumber(news.id.get),
@@ -54,7 +57,9 @@ object News {
       "content" -> JsString(news.content),
       "imageUrl" -> JsString(news.imageUrl),
       "createdAt" -> JsNumber(news.createdAt.getTime),
-      "lastModified" -> JsNumber(news.lastModified.getTime)
+      "lastModified" -> JsNumber(news.lastModified.getTime),
+      "draft" -> JsBoolean(news.draft),
+      "publicationDate" -> JsString(new SimpleDateFormat("yyyy-MM-dd, HH:mm:ss").format(news.publicationDate))
     ))
   }
 
@@ -66,10 +71,13 @@ object News {
       get[String]("news.title") ~
       get[String]("news.content") ~
       get[String]("news.imageUrl") ~
+      get[String]("news.targetUrl") ~
+      get[Boolean]("news.draft") ~
+      get[Date]("news.publicationDate") ~
       get[Date]("news.createdAt") ~
       get[Date]("news.updatedAt") map {
-      case id ~ title ~ content ~imageUrl ~ createdAt ~ last_modified =>
-        News(id, title, content, imageUrl, createdAt, last_modified)
+      case id ~ title ~ content ~ imageUrl ~ targetUrl ~ draft ~ publicationDate ~ createdAt ~ updatedAt =>
+        News(id, title, content, imageUrl, targetUrl, draft, publicationDate, createdAt, updatedAt)
     }
   }
 
@@ -120,6 +128,9 @@ object News {
           SET title = {title}
           , content = {content}
           , imageUrl = {imageUrl}
+          , targetUrl = {tagetUrl}
+          , draft = {draft}
+          , publicationDate = {publicationDate}
           , updatedAt = {updatedAt}
           WHERE id = {id}
           """
@@ -128,6 +139,9 @@ object News {
           'title -> news.title,
           'content -> news.content,
           'imageUrl -> news.imageUrl,
+          'targetUrl -> news.targetUrl,
+          'draft -> news.draft,
+          'publicationDate -> news.publicationDate,
           'updatedAt -> new Date()
         ).executeUpdate() == 1
     }
@@ -143,13 +157,17 @@ object News {
       implicit connection => {
         SQL(
           """
-          INSERT INTO news(title, content, imageUrl, createdAt, updatedAt)
-          VALUES ({title}, {content}, {imageUrl}, {createdAt}, {updatedAt})
+          INSERT INTO news(title, content, imageUrl, createdAt, targetUrl, draft, publicationDate, updatedAt)
+          VALUES ({title}, {content}, {imageUrl}, {createdAt}, {targetUrl}, {draft}, {publicationDate}, {updatedAt})
           """
         ).on(
-          'title -> news.title,          'content -> news.content,
+          'title -> news.title,
+          'content -> news.content,
           'imageUrl -> news.imageUrl,
           'createdAt -> news.createdAt,
+          'targetUrl -> news.targetUrl,
+          'draft -> news.draft,
+          'publicationDate -> news.publicationDate,
           'updatedAt -> news.lastModified
         ).executeInsert()
 
