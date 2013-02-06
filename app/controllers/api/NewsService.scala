@@ -4,6 +4,7 @@ import play.api.libs.json.Json.toJson
 import play.api.mvc.{Action, Controller}
 import utils.RestHelper
 import models.news.News
+import org.joda.time.{DateTime, DateMidnight}
 
 
 /**
@@ -27,14 +28,18 @@ object NewsService extends Controller with RestHelper {
    */
   def all = Action(Ok(toJson(News.all)))
 
+  def allPublished = Action { request => {
+      val now = new DateTime()
+      Ok(toJson(News.all.filter({news => !news.draft && now.isAfter(news.publicationDate.getTime) })))
+    }
+  }
 
   /**
    * This call manages the IF_MODIFIED_SINCE and LAST_MODIFIED http headers
    * @param id unique identifier of a news
    * @return a news identified by its id
    */
-  def show(id: Long) = Action {
-    request => {
+  def show(id: Long) = Action { request => {
       News.findById(id).map(news => {
         withLastModified(news.lastModified)(
           request.headers.get(IF_MODIFIED_SINCE).map(h => {
@@ -58,8 +63,7 @@ object NewsService extends Controller with RestHelper {
    *
    * @return create a news and give LOCATION to the resource
    */
-  def create() = Action {
-    request => {
+  def create() = Action { request => {
       request.body.asJson.map(query => {
         News.create(query.as[News]).map(newId => {
 
@@ -76,8 +80,7 @@ object NewsService extends Controller with RestHelper {
    * @param id identifier of the news
    * @return status of the delete process (OK, NOT_FOUND, NOT_MODIFIED or NOT_ACCEPTABLE)
    */
-  def save(id: Long) = Action {
-    request => {
+  def save(id: Long) = Action { request => {
       request.body.asJson.map(query => {
 
         if (News.findById(id).isDefined) {
