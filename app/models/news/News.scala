@@ -128,7 +128,7 @@ object News {
           SET title = {title}
           , content = {content}
           , imageUrl = {imageUrl}
-          , targetUrl = {tagetUrl}
+          , targetUrl = {targetUrl}
           , draft = {draft}
           , publicationDate = {publicationDate}
           , updatedAt = {updatedAt}
