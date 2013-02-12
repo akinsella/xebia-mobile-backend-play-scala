@@ -8,7 +8,6 @@ logLevel := Level.Warn
 
 // scalaVersion := "2.10.0"
 
-
 resolvers += "Typesafe repository" at "http://repo.typesafe.com/typesafe/releases/"
 
 // The Typesafe snapshots repository
@@ -18,9 +17,12 @@ resolvers += "Typesafe repository snapshots" at "http://repo.typesafe.com/typesa
 
 resolvers += "Patience Releases" at "http://repo.patience.io/"
 
+resolvers += "Sonatype OSS Releases" at "https://oss.sonatype.org/content/repositories/releases"
+
+
 // Use the Play sbt plugin for Play projects
 // addSbtPlugin("play" % "sbt-plugin" % "2.0.4")
-addSbtPlugin("play" % "sbt-plugin" % "2.1-RC2")
+addSbtPlugin("play" % "sbt-plugin" % "2.1")
 
 // addSbtPlugin("com.mojolly.scalate" % "xsbt-scalate-generator" % "0.2.0")
 
@@ -31,4 +33,6 @@ libraryDependencies += "com.typesafe" % "play-plugins-mailer_2.10" % "2.1-SNAPSH
 
 //addSbtPlugin("net.litola" % "play-sass" % "0.1.2" from "http://cloud.github.com/downloads/jlitola/play-sass/play-sass-0.1.2.jar")
 
-addSbtPlugin("net.litola" % "play-sass" % "0.1.3" from "https://raw.github.com/tthraine/play-sass/master/play-sass-0.1.3.jar")
+// addSbtPlugin("net.litola" % "play-sass" % "0.1.3" from "https://raw.github.com/tthraine/play-sass/master/play-sass-0.1.3.jar")
+
+addSbtPlugin("net.litola" % "play-sass" % "0.1.3")

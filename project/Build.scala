@@ -15,7 +15,7 @@ object ApplicationBuild extends Build {
     "mysql" % "mysql-connector-java" % "5.1.21",
     "postgresql" % "postgresql" % "9.1-901-1.jdbc4",
     "org.fusesource.scalate" % "scalate-core" % "1.5.3",
-    "net.debasishg" % "redisclient_2.9.2" % "2.7",
+    "net.debasishg" % "redisclient_2.10.0" % "2.9",
     /*,"eu.teamon" %% "play-navigator" % "0.4.0"*/
     "org.cloudfoundry" % "cloudfoundry-runtime" % "0.8.2",
     "securesocial" % "securesocial_2.9.1" % "2.0.8",
@@ -23,8 +23,8 @@ object ApplicationBuild extends Build {
 
   )
 
-  lazy val buildVersion = "2.1-RC2"
-  lazy val playVersion = "2.1-RC2"
+  lazy val buildVersion = "2.1"
+  lazy val playVersion = "2.1"
 
   lazy val typesafeSnapshot = "Typesafe Snapshots Repository" at "http://repo.typesafe.com/typesafe/snapshots/"
   lazy val typesafe = "Typesafe Repository" at "http://repo.typesafe.com/typesafe/releases/"
