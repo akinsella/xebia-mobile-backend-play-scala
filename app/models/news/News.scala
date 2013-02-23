@@ -56,6 +56,7 @@ object News {
       "title" -> JsString(news.title),
       "content" -> JsString(news.content),
       "imageUrl" -> JsString(news.imageUrl),
+      "targetUrl" -> JsString(news.targetUrl),
       "createdAt" -> JsNumber(news.createdAt.getTime),
       "lastModified" -> JsNumber(news.lastModified.getTime),
       "draft" -> JsBoolean(news.draft),

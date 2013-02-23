@@ -14,7 +14,7 @@
  * limitations under the License.
  *
  */
-package securesocial.core
+package securesocial.core.support.pgsql
 
 import _root_.java.util.{Date, UUID}
 

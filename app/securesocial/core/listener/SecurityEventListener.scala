@@ -1,4 +1,4 @@
-package securesocial.core
+package securesocial.core.listener
 
 import securesocial.core._
 import play.api.mvc.RequestHeader

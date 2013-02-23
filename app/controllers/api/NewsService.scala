@@ -29,8 +29,10 @@ object NewsService extends Controller with RestHelper {
   def all = Action(Ok(toJson(News.all)))
 
   def allPublished = Action { request => {
-      val now = new DateTime()
-      Ok(toJson(News.all.filter({news => !news.draft && now.isAfter(news.publicationDate.getTime) })))
+      Ok( toJson(
+          News.all filter {news => !news.draft && new DateTime().isAfter(news.publicationDate.getTime) }
+        )
+      )
     }
   }
 
@@ -40,7 +42,8 @@ object NewsService extends Controller with RestHelper {
    * @return a news identified by its id
    */
   def show(id: Long) = Action { request => {
-      News.findById(id).map(news => {
+      News.findById(id)
+        .map(news => {
         withLastModified(news.lastModified)(
           request.headers.get(IF_MODIFIED_SINCE).map(h => {
 

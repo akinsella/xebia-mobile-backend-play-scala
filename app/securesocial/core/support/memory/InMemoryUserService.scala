@@ -1,4 +1,4 @@
-package securesocial.core
+package securesocial.core.support.memory
 
 import play.api.{Logger, Application}
 import securesocial.core._

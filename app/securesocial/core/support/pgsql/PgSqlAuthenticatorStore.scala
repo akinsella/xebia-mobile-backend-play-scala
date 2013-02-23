@@ -1,4 +1,4 @@
-package securesocial.core
+package securesocial.core.support.pgsql
 
 import _root_.java.util.Date
 import play.api.db._
@@ -12,6 +12,7 @@ import scala.Error
 import scala.Some
 
 import org.joda.time.DateTime
+import securesocial.core.{UserId, Authenticator, AuthenticatorStore}
 
 class PgSqlAuthenticatorStore(app: Application) extends AuthenticatorStore(app) {
 
