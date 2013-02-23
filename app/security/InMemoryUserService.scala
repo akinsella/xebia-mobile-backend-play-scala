@@ -47,8 +47,9 @@ class InMemoryUserService(application: Application) extends UserServicePlugin(ap
    * This is your chance to save the user information in your backing store.
    * @param user
    */
-  def save(user: Identity) {
+  def save(user: Identity):Identity = {
     users = users + (user.id.id + user.id.providerId -> user)
+    user
   }
 
   /**
@@ -61,7 +62,7 @@ class InMemoryUserService(application: Application) extends UserServicePlugin(ap
    * @param token The token to save
    * @return A string with a uuid that will be embedded in the welcome email.
    */
-  def save(token: Token) = {
+  def save(token: Token) {
     tokens += (token.uuid -> token)
   }
 

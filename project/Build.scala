@@ -15,11 +15,11 @@ object ApplicationBuild extends Build {
     "mysql" % "mysql-connector-java" % "5.1.21",
     "postgresql" % "postgresql" % "9.1-901-1.jdbc4",
     "org.fusesource.scalate" % "scalate-core" % "1.5.3",
-    "net.debasishg" % "redisclient_2.10.0" % "2.9",
+    "net.debasishg" % "redisclient_2.10" % "2.9",
     /*,"eu.teamon" %% "play-navigator" % "0.4.0"*/
     "org.cloudfoundry" % "cloudfoundry-runtime" % "0.8.2",
-    "securesocial" % "securesocial_2.9.1" % "2.0.8",
-    "com.typesafe" % "play-plugins-mailer_2.10" % "2.1-SNAPSHOT"
+    "securesocial" % "securesocial_2.10" % "master-SNAPSHOT",
+    "com.typesafe" % "play-plugins-mailer_2.10" % "2.1.0"
 
   )
 
@@ -42,7 +42,8 @@ object ApplicationBuild extends Build {
     resolvers += "DevJava repo" at "http://download.java.net/maven/2/",
     /*, resolvers += "scalajars.org repo" at "http://scalajars.org/repository"*/
     resolvers += "SpringSource Milestones" at "http://repo.springsource.org/milestone/",
-    resolvers += Resolver.url("SecureSocial Repository", url("http://securesocial.ws/repository/releases/"))(Resolver.ivyStylePatterns)
+//    resolvers += Resolver.url("SecureSocial Repository", url("http://securesocial.ws/repository/releases/"))(Resolver.ivyStylePatterns),
+    resolvers += Resolver.url("SecureSocial Snapshot repository", url("http://repo.scala-sbt.org/scalasbt/sbt-plugin-snapshots/"))(Resolver.ivyStylePatterns)
   )
 
 }
