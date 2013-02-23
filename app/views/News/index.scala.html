@@ -10,6 +10,7 @@
                 <th>Title</th>
                 <th>Content</th>
                 <th>Image Url</th>
+                <th>Target Url</th>
                 <th>Actions</th>
             </tr>
         </thead>
@@ -19,7 +20,8 @@
                     <td>@n.id</td>
                     <td>@n.title</td>
                     <td>@n.content</td>
-                    <td>@n.imageUrl</td>
+                    <td><a href="@n.imageUrl    ">@n.imageUrl</a></td>
+                    <td><a href="@n.targetUrl">@n.targetUrl</a></td>
                     <td>
                         <a href="/news/@n.id.get/updateForm">Edit</a> -
                         <a href="/news/@n.id.get/delete">Delete</a>

@@ -1,4 +1,4 @@
-package security
+package securesocial.core
 
 import play.api.{Logger, Application}
 import securesocial.core._

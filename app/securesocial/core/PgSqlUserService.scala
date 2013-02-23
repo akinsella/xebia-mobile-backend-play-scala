@@ -14,7 +14,7 @@
  * limitations under the License.
  *
  */
-package security
+package securesocial.core
 
 import _root_.java.util.{Date, UUID}
 
@@ -41,7 +41,7 @@ import scala.Some
  * A Database user service in Scala
  *
  */
-class DbUserService(application: Application) extends UserServicePlugin(application) {
+class PgSqlUserService(application: Application) extends UserServicePlugin(application) {
 
 
   /**

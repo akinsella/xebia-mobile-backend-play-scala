@@ -1,6 +1,10 @@
 1500:com.typesafe.plugin.CommonsMailerPlugin
+9994:securesocial.core.PgSqlAuthenticatorStore
+9995:securesocial.core.DefaultIdGenerator
 9996:securesocial.core.providers.utils.DefaultPasswordValidator
 9997:controllers.security.SecurityTemplatesPlugin
-9998:security.DbUserService
+9998:securesocial.core.PgSqlUserService
 9999:securesocial.core.providers.utils.BCryptPasswordHasher
 10004:securesocial.core.providers.UsernamePasswordProvider
+10006:securesocial.core.SecurityEventListener
+

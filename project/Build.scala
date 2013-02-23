@@ -19,8 +19,8 @@ object ApplicationBuild extends Build {
     /*,"eu.teamon" %% "play-navigator" % "0.4.0"*/
     "org.cloudfoundry" % "cloudfoundry-runtime" % "0.8.2",
     "securesocial" % "securesocial_2.10" % "master-SNAPSHOT",
-    "com.typesafe" % "play-plugins-mailer_2.10" % "2.1.0"
-
+    "com.typesafe" % "play-plugins-mailer_2.10" % "2.1.0",
+    "joda-time" % "joda-time" % "1.6.2"
   )
 
   lazy val buildVersion = "2.1"
