@@ -41,7 +41,7 @@ object News {
 
   //JSON
   implicit object NewsFormat extends Format[News] {
-    def reads(json: JsValue): News = News(
+    def reads(json: JsValue) = JsSuccess(News(
       id = Id((json \ "id").as[Long]),
       title = (json \ "title").as[String],
       content = (json \ "content").as[String],
@@ -49,7 +49,7 @@ object News {
       targetUrl = (json \ "targetUrl").as[String],
       draft = (json \ "draft").as[Boolean],
       publicationDate = new SimpleDateFormat("yyyy-MM-dd, HH:mm:ss").parse((json \ "publicationDate").as[String])
-    )
+    ))
 
     def writes(news: News): JsValue = JsObject(Seq(
       "id" -> JsNumber(news.id.get),

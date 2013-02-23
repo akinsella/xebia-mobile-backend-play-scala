@@ -145,7 +145,7 @@ class DbUserService(application: Application) extends UserServicePlugin(applicat
    * (actually save or update)
    *
    */
-  def save(user: Identity) {
+  def save(user: Identity):Identity = {
 
     if (Logger.isDebugEnabled) {
       Logger.debug("save...")
@@ -239,6 +239,7 @@ class DbUserService(application: Application) extends UserServicePlugin(applicat
 
       } // end else
 
+      user
     } // end DB
 
   } // end save

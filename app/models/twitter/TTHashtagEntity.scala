@@ -15,10 +15,10 @@ case class TTHashtagEntity(
 object TTHashtagEntity {
 
   implicit object TTHashtagEntityFormat extends Format[TTHashtagEntity] {
-    def reads(json: JsValue): TTHashtagEntity = TTHashtagEntity(
+    def reads(json: JsValue) = JsSuccess(TTHashtagEntity(
       (json \ "text").as[String],
       (json \ "indices").as[TTIndices]
-    )
+    ))
 
     def writes(hashtagEntity: TTHashtagEntity): JsValue = JsObject(Seq(
       "text" -> JsString(hashtagEntity.text),

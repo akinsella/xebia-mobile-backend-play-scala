@@ -14,7 +14,7 @@ case class EBVenue(
 object EBVenue {
 
   implicit object EBVenueFormat extends Format[EBVenue] {
-    def reads(json: JsValue): EBVenue = EBVenue(
+    def reads(json: JsValue) = JsSuccess(EBVenue(
       (json \ "id").as[Long],
       (json \ "name").as[String],
       (json \ "city").as[String],
@@ -26,7 +26,7 @@ object EBVenue {
       (json \ "postal_code").as[String],
       (json \ "longitude").as[Double],
       (json \ "latitude").as[Double]
-    )
+    ))
 
     def writes(tag: EBVenue): JsValue = JsObject(Seq(
       "id" -> JsNumber(tag.id),

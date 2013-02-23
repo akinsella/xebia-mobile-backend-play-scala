@@ -13,7 +13,7 @@ case class WPAuthor(
 object WPAuthor {
 
   implicit object WPAuthorFormat extends Format[WPAuthor] {
-    def reads(json: JsValue): WPAuthor = WPAuthor(
+    def reads(json: JsValue) = JsSuccess(WPAuthor(
       (json \ "id").as[Long],
       (json \ "slug").as[String],
       (json \ "name").as[String],
@@ -22,7 +22,7 @@ object WPAuthor {
       (json \ "nickname").as[String],
       (json \ "url").as[String],
       (json \ "description").as[String]
-    )
+    ))
 
     def writes(author: WPAuthor): JsValue = JsObject(Seq(
       "id" -> JsNumber(author.id),

@@ -1,6 +1,6 @@
 package models.twitter
 
-import play.api.libs.json.{Reads, JsValue}
+import play.api.libs.json._
 
 
 case class TwitterUser(login: String, email: String, avatar_url: String, name: String)
@@ -8,14 +8,14 @@ case class TwitterUser(login: String, email: String, avatar_url: String, name: S
 
 object TwitterUser {
 
-  implicit def TwitterUserReads: Reads[TwitterUser] = new Reads[TwitterUser] {
+  implicit def TwitterUserReacds: Reads[TwitterUser] = new Reads[TwitterUser] {
     def reads(json: JsValue) =
-      TwitterUser(
+      JsSuccess(TwitterUser(
         (json \ "login").as[String],
         (json \ "email").as[String],
         (json \ "avatar_url").as[String],
         (json \ "name").as[String]
-      )
+      ))
   }
 
 }

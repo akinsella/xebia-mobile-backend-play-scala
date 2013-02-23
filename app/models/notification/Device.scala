@@ -20,14 +20,12 @@ case class Device(id: Pk[Long] = NotAssigned, udid: String, token: String, creat
 
 object Device {
 
-  def apply(udid: String, token: String) = new Device(udid = udid, token = token)
-
   //JSON
   implicit object DeviceFormat extends Format[Device] {
-    def reads(json: JsValue): Device = Device(
+    def reads(json: JsValue) = JsSuccess(Device.apply(
       udid = (json \ "udid").as[String],
       token = (json \ "token").as[String]
-    )
+    ))
 
     def writes(device: Device): JsValue = JsObject(Seq(
       "id" -> JsNumber(device.id.get),

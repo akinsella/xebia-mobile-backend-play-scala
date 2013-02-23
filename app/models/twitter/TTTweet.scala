@@ -25,7 +25,7 @@ object TTTweet {
     def dfTwitter = new SimpleDateFormat("EEE MMM dd HH:mm:ss Z yyyy", Locale.US)
     def dfOutput = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
 
-    def reads(json: JsValue): TTTweet = TTTweet(
+    def reads(json: JsValue) = JsSuccess(TTTweet(
       (json \ "id").as[Long],
       (json \ "id_str").as[String],
       dfTwitter.parse((json \ "created_at").as[String]),
@@ -36,7 +36,7 @@ object TTTweet {
       (json \ "user").as[TTUser],
       (json \ "retweeted_status").asOpt[TTRetweetedStatus],
       (json \ "entities").asOpt[TTEntities]
-    )
+    ))
 
     def writes(tweet: TTTweet): JsValue = {
        var jsonFields:Seq[(String, JsValue)] = Seq(

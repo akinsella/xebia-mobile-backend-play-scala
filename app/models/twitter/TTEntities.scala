@@ -17,11 +17,11 @@ case class TTEntities(
 object TTEntities {
 
   implicit object TTEntitiesFormat extends Format[TTEntities] {
-    def reads(json: JsValue): TTEntities = TTEntities(
+    def reads(json: JsValue) = JsSuccess(TTEntities(
       (json \ "hashtags").asOpt[Seq[TTHashtagEntity]],
       (json \ "urls").asOpt[Seq[TTUrlEntity]],
       (json \ "user_mentions").asOpt[Seq[TTUserMentionEntity]]
-    )
+    ))
 
     def writes(tweet: TTEntities): JsValue = {
       var jsonFields:Seq[(String, JsValue)] = Seq()

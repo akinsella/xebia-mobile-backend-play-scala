@@ -21,7 +21,7 @@ object NotificationService extends Controller  {
   def register = Action { implicit request =>
     val json: JsValue = request.body.asJson.get
 
-    val device: Device = Device((json \ "udid").as[String], (json \ "token").as[String])
+    val device: Device = Device.apply(udid = (json \ "udid").as[String], token = (json \ "token").as[String])
     Device.create(device)
 
     Created("Device registered")

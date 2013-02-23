@@ -17,7 +17,7 @@ case class GHUser(
 object GHUser {
 
   implicit object GHUserFormat extends Format[GHUser] {
-    def reads(json: JsValue): GHUser = GHUser(
+    def reads(json: JsValue) = JsSuccess(GHUser(
       (json \ "id").as[Long],
       (json \ "name").as[String],
       (json \ "login").as[String],
@@ -33,7 +33,7 @@ object GHUser {
       (json \ "email").as[String],
       (json \ "created_at").as[String],
       (json \ "avatar_url").as[String]
-    )
+    ))
 
     def writes(user: GHUser): JsValue = JsObject(Seq(
       "id" -> JsNumber(user.id),

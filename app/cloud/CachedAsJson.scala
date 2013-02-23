@@ -1,6 +1,6 @@
 package cloud
 
-import play.api.libs.json.{Json, Format, JsValue}
+import play.api.libs.json._
 
 /**
  * Cache an element as a json string. If not found, use the data given or
@@ -11,7 +11,7 @@ import play.api.libs.json.{Json, Format, JsValue}
  */
 case class CachedAsJson[T](cacheKey: String, expiration: Option[Int] = None)(implicit jsonFormatter: Format[T]) {
 
-  def get: Option[T] = {
+  def get: Option[JsResult[T]] = {
     Cache
       .get(cacheKey)
       .map(x => (jsonFormatter.reads(Json.parse(x))))
@@ -23,7 +23,7 @@ case class CachedAsJson[T](cacheKey: String, expiration: Option[Int] = None)(imp
       .map(x => (Json.parse(x)))
   }
 
-  def getOrElse(data: => T): T = {
+  def getOrElse(data: => T) = {
     this.get
       .getOrElse {
       Cache.set(cacheKey, toJsonString(data), expiration)
