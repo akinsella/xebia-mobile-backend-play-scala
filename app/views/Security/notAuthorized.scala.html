@@ -1,9 +1,10 @@
-@views.html.Application.main(Messages("securesocial.notAuthorized.title"), None, Html.empty) {
+@()(implicit request: RequestHeader)
+@views.html.Application.main(Messages("securesocial.notAuthorized.title")){
     <div class="page-header">
         <h1>@Messages("securesocial.notAuthorized.title")</h1>
     </div>
 
     <div class="alert alert-error">
-    @Messages("securesocial.notAuthorized.message")
+        @Messages("securesocial.notAuthorized.message")
     </div>
-}
+}(request, models.web.Header())

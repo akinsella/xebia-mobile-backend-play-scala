@@ -28,4 +28,4 @@ addSbtPlugin("play" % "sbt-plugin" % "2.1.0")
 
 libraryDependencies += "com.typesafe" % "play-plugins-mailer_2.10" % "2.1.0"
 
-addSbtPlugin("net.litola" % "play-sass" % "0.1.3")
+// addSbtPlugin("net.litola" % "play-sass" % "0.1.3")

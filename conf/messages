@@ -1,1 +1,5 @@
 securesocial.signup=Sign Up
+security.change.password=Change Password
+news.sidebar.actions=Actions
+news.sidebar.action.all=All
+news.sidebar.action.create=Create

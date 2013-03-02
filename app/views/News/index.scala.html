@@ -1,8 +1,8 @@
-@(message: String, user: securesocial.core.Identity, news: Seq[models.news.News])(implicit request: RequestHeader)
+@(message: String, user: securesocial.core.Identity, news: Seq[models.news.News])(implicit request: RequestHeader, header:models.web.Header)
 
 @import views._
 
-@views.html.Application.main("News list", Some(user), html.News.sidebar.apply()) {
+@views.html.Application.main("News list", html.News.sidebar.apply()) {
     <table class="dataset">
         <thead>
             <tr>
@@ -20,7 +20,7 @@
                     <td>@n.id</td>
                     <td>@n.title</td>
                     <td>@n.content</td>
-                    <td><a href="@n.imageUrl    ">@n.imageUrl</a></td>
+                    <td><a href="@n.imageUrl">@n.imageUrl</a></td>
                     <td><a href="@n.targetUrl">@n.targetUrl</a></td>
                     <td>
                         <a href="/news/@n.id.get/updateForm">Edit</a> -

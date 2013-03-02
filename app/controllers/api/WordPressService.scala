@@ -6,6 +6,14 @@ import play.api.mvc.{Action, Call, Controller}
 import models.wordpress.{WPPosts, WPPost, WPCategory, WPTag, WPAuthor}
 import play.api.libs.json.{Json, JsValue, Writes}
 
+import play.api.Logger
+
+import play.libs.Akka
+
+import akka.actor._
+import scala.concurrent.duration._
+import play.api.libs.concurrent.Execution.Implicits._
+
 
 /**
  * Adapters for Wordpress Webservices API
@@ -202,6 +210,76 @@ object WordPressService extends Controller {
       },
       response => {
         Ok(Json.toJson(response)(WPPost.WPPostFormat))
+      }
+    )
+  }
+
+  def synchronize = Action {
+
+    // say hello
+    Logger.info("hello, synchronize action started")
+
+    val Tags = "tags"
+    val Categories = "tags"
+    val Authors = "tags"
+    val Posts = "tags"
+
+    val synchronizationActor = Akka.system.actorOf(Props(new Actor {
+      def receive = {
+        case Tags => synchronizeTags()
+        case Categories => synchronizeCategories()
+        case Authors => synchronizeAuthors()
+        case Posts => synchronizePosts()
+      }
+    }))
+
+    // Repeat every 5 seconds, start 5 seconds after start
+    Akka.system.scheduler.schedule( 10 seconds, 1 hour, synchronizationActor, Tags)
+    Akka.system.scheduler.schedule( 20 seconds, 1 hour, synchronizationActor, Categories)
+    Akka.system.scheduler.schedule( 30 seconds, 1 hour, synchronizationActor, Authors)
+
+    Ok("Your new application is ready.")
+  }
+
+  def synchronizeTags() {
+    CachedWSCall("http://blog.xebia.fr/wp-json-api/get_tag_index/").mapJson {
+      jsonFetched => (jsonFetched \ "tags").as[Seq[JsValue]] map (_.as[WPTag])
+    }.fold(
+      errorMessage => {
+        println("Got some error on tags synchronization")
+      },
+      response => {
+        println("Tags synchronized")
+      }
+    )
+  }
+
+  def synchronizeAuthors() {
+    CachedWSCall("http://blog.xebia.fr/wp-json-api/get_author_index/").mapJson {
+      jsonFetched => (jsonFetched \ "authors").as[Seq[JsValue]] map (_.as[WPAuthor])
+    }.fold(
+      errorMessage => {
+        println("Got some error on authors synchronization")
+      },
+      response => {
+        println("Authors synchronized")
+      }
+    )
+  }
+
+  def synchronizePosts() {
+
+  }
+
+  def synchronizeCategories() {
+    CachedWSCall("http://blog.xebia.fr/wp-json-api/get_category_index/").mapJson {
+      jsonFetched => (jsonFetched \ "categories").as[Seq[JsValue]] map (_.as[WPCategory])
+    }.fold(
+      errorMessage => {
+        println("Got some error on categories synchronization")
+      },
+      response => {
+        println("Categories synchronized")
       }
     )
   }

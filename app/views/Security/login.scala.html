@@ -9,7 +9,7 @@
 
 
 
-@html.Application.main(Messages("securesocial.login.title"), None, Html.empty) {
+@html.Application.main(Messages("securesocial.login.title") ) {
     <div class="page-header">
         <h1>@Messages("securesocial.login.title")</h1>
     </div>
@@ -58,4 +58,4 @@
         </div>
         }
     }
-}
+}(request, models.web.Header())

@@ -8,7 +8,7 @@ import ExecutionContext.Implicits.global
 
 case class CachedWSCall(wsRequest: WS.WSRequestHolder, expiration: Option[Int] = None)(implicit timeout: Long = 5000) {
 
-  private lazy val cacheResponse: CachedString = CachedString(wsRequest.toString(), expiration)
+  private lazy val cacheResponse: CachedString = CachedString(wsRequest.toString, expiration)
 
   private lazy val wsCall: Future[Either[String, String]] = {
     wsRequest
@@ -30,10 +30,10 @@ case class CachedWSCall(wsRequest: WS.WSRequestHolder, expiration: Option[Int] =
     val responseFromCache = cacheResponse.get()
 
     responseFromCache.map(x => {
-      play.Logger.debug("Response found in cache for %s".format(wsRequest.toString()))
+      play.Logger.debug("Response found in cache for %s".format(wsRequest.toString))
       Right(x)
     }).getOrElse({
-      play.Logger.debug("Response not found in cache for %s".format(wsRequest.toString()) + " call the external source")
+      play.Logger.debug("Response not found in cache for %s".format(wsRequest.toString) + " call the external source")
       wsData.right.map(x => {
         cacheResponse.set(x)
       })

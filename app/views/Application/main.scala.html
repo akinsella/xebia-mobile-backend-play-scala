@@ -1,4 +1,4 @@
-@(title: String, user:Option[securesocial.core.Identity] = None, sidebar: Html)(content: Html)
+@(title: String = "Xebia Mobile Backend", sidebar: Html = Html.empty)(content: Html)(implicit request: RequestHeader, header:models.web.Header = models.web.Header(), lang: Lang = Lang("en"))
 @import securesocial.core.IdentityProvider
 <!DOCTYPE html>
 <html>
@@ -10,19 +10,19 @@
 
         <link rel="shortcut icon" type="image/png" href="@routes.Assets.at("images/favicon.png")">
 
-        <link rel="stylesheet" media="screen" href="@routes.Assets.at("stylesheets/styles.css")">
-        <link rel="stylesheet" media="screen" href="@routes.Assets.at("stylesheets/gh-buttons.css")">
-        <link rel="stylesheet" media="screen" href="@routes.Assets.at("javascripts/libs/select2/select2.css")"/>
+        <link rel="stylesheet" media="screen" href="@routes.Assets.at("css/styles.css")">
+        <link rel="stylesheet" media="screen" href="@routes.Assets.at("css/gh-buttons.css")">
+        <link rel="stylesheet" media="screen" href="@routes.Assets.at("scripts/libs/select2/select2.css")"/>
 
-        <link rel="stylesheet" media="screen" href="@routes.Assets.at("javascripts/libs/jquery-ui/css/jquery-ui-timepicker-addon.css")"/>
-        <link rel="stylesheet" media="screen" href="@routes.Assets.at("javascripts/libs/jquery-ui/css/smoothness/jquery-ui-1.10.0.custom.min.css")"/>
+        <link rel="stylesheet" media="screen" href="@routes.Assets.at("scripts/libs/jquery-ui/css/jquery-ui-timepicker-addon.css")"/>
+        <link rel="stylesheet" media="screen" href="@routes.Assets.at("scripts/libs/jquery-ui/css/smoothness/jquery-ui-1.10.0.custom.min.css")"/>
 
-        <script src="@routes.Assets.at("javascripts/libs/jquery/jquery-1.9.0.min.js")"></script>
-        <script src="@routes.Assets.at("javascripts/libs/select2/select2.js")"></script>
-        <script src="@routes.Assets.at("javascripts/libs/moment/moment-1.7.2.js")"></script>
-        <script src="@routes.Assets.at("javascripts/libs/jquery-ui/js/jquery-ui-1.10.0.custom.min.js")"></script>
-        <script src="@routes.Assets.at("javascripts/libs/jquery-ui/js/jquery-ui-timepicker-addon.js")"></script>
-        <script src="@routes.Assets.at("javascripts/libs/jquery-ui/js/jquery-ui-sliderAccess.js")"></script>
+        <script src="@routes.Assets.at("scripts/libs/jquery/jquery-1.9.0.min.js")"></script>
+        <script src="@routes.Assets.at("scripts/libs/select2/select2.js")"></script>
+        <script src="@routes.Assets.at("scripts/libs/moment/moment-1.7.2.js")"></script>
+        <script src="@routes.Assets.at("scripts/libs/jquery-ui/js/jquery-ui-1.10.0.custom.min.js")"></script>
+        <script src="@routes.Assets.at("scripts/libs/jquery-ui/js/jquery-ui-timepicker-addon.js")"></script>
+        <script src="@routes.Assets.at("scripts/libs/jquery-ui/js/jquery-ui-sliderAccess.js")"></script>
     </head>
     <body>
         <header>
@@ -34,35 +34,59 @@
                     </ul>
                 </nav>
                 <div id="user">
-                    @if(user != None) {
+                    @header.user.map { user =>
                         <a href="/account">
-                            @if(!user.get.avatarUrl.isEmpty) {
-                                <img src="@user.get.avatarUrl" alt="@user.get.firstName" width="40px" height="40px"/>
+                            @header.user.map { user =>
+                                <img src="@user.avatarUrl" alt="@user.firstName" width="40px" height="40px"/>
+                                <span>@user.fullName <span>( @user.email )</span></span>
                             }
-                            <span>@user.get.fullName <span>( @user.get.email )</span></span>
                         </a> |
                         <a href="@securesocial.controllers.routes.LoginPage.logout()">Logout</a>
-                    } else {
+                    }.getOrElse {
                         <span><a href="@securesocial.controllers.routes.LoginPage.login()">Login</a></span>
                     }
                 </div>
             </div>
-             <div>
-                 <nav id="submenu">
-                     <ul>
-                         <li><a href="/">Sub Menu 1</a></li>
-                         <li><a href="/">Sub Menu 2</a></li>
-                     </ul>
-                 </nav>
-            </div>
+            <div>
+                <nav id="submenu">
+                    <ul>
+                        @header.menu.map { menu =>
+                            @menu.items.map { mi =>
+                                <li><a href="@mi.url">@Messages(mi.message)</a></li>
+                            }
+                        }
+                    </ul>
+                </nav>
+             </div>
         </header>
         <section id="main">
 
+<!--
             @if(!sidebar.body.isEmpty) {
                 <aside id="sidebar">
                     @sidebar
                 </aside>
             }
+-->
+
+
+            @header.sidebar.map { sidebar =>
+                <aside id="sidebar">
+                    @sidebar.groups.map { group =>
+                        <section id="sb-actions">
+                            <h1>Actions</h1>
+                            <ul>
+                                @group.actions.map { action =>
+                                    <li>
+                                        <a class="btn" href="@action.url">@Messages(action.message)</a>
+                                    </li>
+                                }
+                            </ul>
+                        </section>
+                    }
+                </aside>
+            }
+
             <section id="content" class="@if(sidebar.body.isEmpty) { nosidebar }">
                 @content
             </section>

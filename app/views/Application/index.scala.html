@@ -1,9 +1,9 @@
-@(message: String, user: securesocial.core.Identity)(implicit request: RequestHeader)
+@(title:String)(implicit request: RequestHeader, header: models.web.Header)
 @import securesocial.core.IdentityProvider
 @import views._
 
-@views.html.Application.main("Xebia Mobile Backend", Some(user), Html.empty) {
-
+@views.html.Application.main(title) {
+    <!-- Nothing to do -->
 }
 
 

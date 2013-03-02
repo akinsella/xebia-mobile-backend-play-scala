@@ -1,0 +1,422 @@
+/* Mixins */
+/* Styles Reset */
+html, body, div, span, applet, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+a, abbr, acronym, address, big, cite, code,
+del, dfn, em, img, ins, kbd, q, s, samp,
+small, strike, strong, sub, sup, tt, var,
+b, u, i, center,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td,
+article, aside, canvas, details, embed,
+figure, figcaption, footer, header, hgroup,
+menu, nav, output, ruby, section, summary,
+time, mark, audio, video {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font-size: 100%;
+  font: inherit;
+  vertical-align: baseline;
+}
+
+/* HTML5 display-role reset for older browsers */
+article, aside, details, figcaption, figure,
+footer, header, hgroup, menu, nav, section {
+  display: block;
+}
+
+body {
+  line-height: 1;
+}
+
+ol, ul {
+  list-style: none;
+}
+
+blockquote, q {
+  quotes: none;
+}
+
+blockquote:before, blockquote:after,
+q:before, q:after {
+  content: '';
+  content: none;
+}
+
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+
+/* Application styles */
+html {
+  font-family: "Myriad Pro", Lucida, Arial;
+  background: url("../images/background.jpg");
+}
+
+header {
+  position: relative;
+  border: 20px 0;
+  background: #682c5f;
+  background-image: url("../images/header-background.png");
+  background-repeat: repeat-x;
+}
+header a {
+  color: #fff;
+  text-decoration: none;
+}
+header a:hover {
+  text-decoration: underline;
+}
+header > div:first-child {
+  background-image: url("../images/logo.png");
+  background-repeat: no-repeat;
+  background-position: 10px 12px;
+  box-sizing: border-box;
+  width: 100%;
+  height: 84px;
+  padding-left: 230px;
+  padding-top: 34px;
+}
+header > div:first-child nav#menu ul {
+  display: inline;
+}
+header > div:first-child nav#menu ul li {
+  padding-left: 20px;
+  display: inline;
+}
+header > div:first-child nav#menu ul li:first-child {
+  padding-left: 0;
+}
+header > div:last-child nav#submenu ul {
+  border-top: 1px solid #000;
+  padding: 10px;
+  background: #323338;
+  height: 16px;
+}
+header > div:last-child nav#submenu ul li {
+  padding: 10px;
+  display: inline;
+}
+header div#user {
+  position: absolute;
+  top: 12px;
+  right: 10px;
+  padding: 10px;
+  margin-right: 0px;
+  line-height: 40px;
+  color: #eee;
+  height: 32px;
+}
+header div#user a > span {
+  padding: 0 10px;
+}
+header div#user a img {
+  vertical-align: middle;
+}
+header div#user a:last-child {
+  padding: 0 10px;
+}
+
+section#main {
+  min-height: 450px;
+  margin: 40px 20px 20px 20px;
+}
+
+aside#sidebar {
+  float: left;
+  background: #eee;
+  -webkit-border-radius: 3px;
+  -moz-border-radius: 3px;
+  -ms-border-radius: 3px;
+  -o-border-radius: 3px;
+  border-radius: 3px;
+  margin-right: 20px;
+  padding: 10px;
+  width: 240px;
+  border: 2px solid #ddd;
+}
+aside#sidebar a {
+  color: #444;
+  text-decoration: none;
+}
+aside#sidebar a:hover {
+  text-decoration: underline;
+}
+aside#sidebar section h1 {
+  font-size: 18px;
+  font-weight: bold;
+  color: #682C5F;
+  padding-left: 5px;
+  border-bottom: 2px solid #888;
+  padding-bottom: 5px;
+  margin-bottom: 10px;
+}
+aside#sidebar section ul {
+  padding: 5px;
+}
+aside#sidebar section ul li {
+  margin-left: 25px;
+  list-style: disc;
+  color: #999;
+  padding-bottom: 5px;
+  padding-left: 10px;
+}
+
+section#content {
+  padding-left: 300px;
+}
+section#content.nosidebar {
+  padding-left: 0px;
+}
+section#content a {
+  color: #682C5F;
+  text-decoration: none;
+}
+section#content a:hover {
+  text-decoration: underline;
+}
+section#content div.content-header h1 {
+  background: #ddd;
+  text-transform: uppercase;
+  color: #444;
+  font-weight: bold;
+  border-bottom: 2px solid #ccc;
+  margin: 5px;
+  padding: 10px 5px 5px 8px;
+  -webkit-border-radius: 2px;
+  -moz-border-radius: 2px;
+  -ms-border-radius: 2px;
+  -o-border-radius: 2px;
+  border-radius: 2px;
+}
+section#content div.content-body {
+  margin: 10px;
+  padding: 10px;
+}
+section#content table.dataset {
+  background: #ccc;
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0px;
+  border: 2px solid #666;
+  border-radius: 3px;
+}
+section#content table.dataset thead tr {
+  background: #4e1e48;
+}
+section#content table.dataset thead tr th {
+  padding: 10px 16px 6px 16px;
+  font-weight: bold;
+  text-transform: uppercase;
+  color: #eee;
+  text-shadow: 0 1px 0 #444;
+}
+section#content table.dataset thead tr td:first-child {
+  width: 10%;
+}
+section#content table.dataset thead tr td:last-child {
+  width: 20%;
+}
+section#content table.dataset tbody tr {
+  background: #eee;
+}
+section#content table.dataset tbody tr td {
+  padding: 8px 16px;
+  color: #444;
+}
+section#content table.dataset tbody tr td:first-child {
+  background: #aaa;
+  color: #444;
+  width: 5%;
+  text-align: right;
+  font-weight: bold;
+}
+section#content table.dataset tbody tr td:last-child {
+  background: #ccc;
+  width: 12%;
+  white-space: nowrap;
+  text-align: center;
+  font-style: italic;
+  font-weight: bold;
+}
+section#content table.dataset tbody tr:hover {
+  background: #e2e2e2;
+  -o-transition: all 0.1s ease-in-out;
+  -webkit-transition: all 0.1s ease-in-out;
+  -moz-transition: all 0.1s ease-in-out;
+  -ms-transition: all 0.1s ease-in-out;
+  transition: all 0.1s ease-in-out;
+}
+section#content table.dataset tbody tr:hover td:first-child {
+  background: #999;
+}
+section#content table.dataset tbody tr:hover td:last-child {
+  background: #bbb;
+}
+section#content table.dataset tbody tr:nth-child(even) {
+  background: #f5f5f5;
+  -o-box-shadow: 0 1px 0 rgba(255, 255, 255, 0.8) inset;
+  -webkit-box-shadow: 0 1px 0 rgba(255, 255, 255, 0.8) inset;
+  -moz-box-shadow: 0 1px 0 rgba(255, 255, 255, 0.8) inset;
+  -ms-box-shadow: 0 1px 0 rgba(255, 255, 255, 0.8) inset;
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.8) inset;
+}
+section#content table.dataset tbody tr:nth-child(even):hover {
+  background: #e8e8e8;
+  -o-transition: all 0.1s ease-in-out;
+  -webkit-transition: all 0.1s ease-in-out;
+  -moz-transition: all 0.1s ease-in-out;
+  -ms-transition: all 0.1s ease-in-out;
+  transition: all 0.1s ease-in-out;
+}
+section#content form {
+  color: #999;
+  padding: 5px;
+  background: #323338;
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+  -ms-border-radius: 5px;
+  -o-border-radius: 5px;
+  border-radius: 5px;
+  width: 400px;
+  margin: 0 auto;
+}
+section#content form a {
+  color: #bbb;
+  text-decoration: none;
+}
+section#content form a:hover {
+  text-decoration: underline;
+}
+section#content form a.small {
+  font-size: 0.8em;
+}
+section#content form fieldset div.input span.help-block {
+  display: none;
+}
+section#content form div.control-group div.controls span.help-block {
+  display: none;
+}
+section#content form div.control-group.error div.controls {
+  text-align: right;
+}
+section#content form div.control-group.error div.controls span.help-inline {
+  font-style: italic;
+  white-space: nowrap;
+  font-size: 0.8em;
+  color: #B00;
+}
+section#content form h1 {
+  text-transform: uppercase;
+  color: #fff;
+  font-weight: bold;
+  border-bottom: 2px solid #44474C;
+  margin: 5px;
+  padding: 5px 0 10px 0;
+}
+section#content form fieldset {
+  padding: 0px 10px 20px 10px;
+}
+section#content form fieldset label {
+  color: #ddd;
+  display: block;
+  padding: 10px 0 3px 0;
+}
+section#content form fieldset label:after {
+  content: ":";
+}
+section#content form fieldset div.input {
+  padding: 0 10px;
+}
+section#content form div.actions {
+  text-align: right;
+  background: #44474C;
+  margin: 5px;
+  padding: 5px;
+  -webkit-border-radius: 4px;
+  -moz-border-radius: 4px;
+  -ms-border-radius: 4px;
+  -o-border-radius: 4px;
+  border-radius: 4px;
+}
+section#content form input[type=text], section#content form input[type=password] {
+  box-sizing: border-box;
+  border: 2px solid #a9a9a9;
+  padding: 5px;
+  width: 100%;
+  -webkit-border-radius: 4px;
+  -moz-border-radius: 4px;
+  -ms-border-radius: 4px;
+  -o-border-radius: 4px;
+  border-radius: 4px;
+}
+section#content form span.help-block {
+  color: #ccc;
+  font-size: 0.9em;
+  font-style: italic;
+}
+section#content form#createNewsForm {
+  width: 600px;
+}
+
+footer {
+  border-top: 10px solid #757577;
+  background: #44474c;
+  postion: relative;
+  color: #999;
+  font-size: 13px;
+  font-family: "Myriad Pro", Lucida, Arial;
+  text-align: center;
+}
+footer a {
+  color: #999;
+  text-decoration: none;
+}
+footer > ul {
+  padding-top: 50px;
+  margin: 0 auto;
+  box-sizing: border-box;
+  width: 880px;
+  text-align: left;
+}
+footer > ul > li {
+  vertical-align: top;
+  display: inline-block;
+  box-sizing: border-box;
+  width: 280px;
+  margin: 10px;
+}
+footer > ul > li h1 {
+  font-size: 150%;
+  font-weight: bold;
+  text-transform: uppercase;
+  font-size: 16px;
+  font-weight: bold;
+  color: #fff;
+  padding-bottom: 10px;
+}
+footer > ul > li section {
+  padding-left: 10px;
+}
+footer > ul > li:first-child {
+  margin-left: 0;
+}
+footer > ul > li:last-child {
+  margin-right: 0;
+}
+footer > ul ul#websites {
+  padding-left: 25px;
+}
+footer > ul ul#websites li {
+  list-style: disc;
+  padding: 3px;
+}
+footer div#copyright {
+  margin: 0 auto;
+  width: 400px;
+  padding: 20px;
+  padding-top: 60px;
+}

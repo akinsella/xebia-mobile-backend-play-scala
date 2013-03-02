@@ -10,8 +10,29 @@ import views._
 
 import securesocial.core._
 import anorm.{NotAssigned, Id}
+import models.web._
+import models.web.ActionGroup
+import models.web.Header
+import securesocial.core.SecuredRequest
+import scala.Some
+import models.web.ActionItem
 
 object NewsController extends Controller with SecureSocial {
+
+  implicit def header[A](implicit request: SecuredRequest[A]) : Header = {
+    Header(
+      Option(request.user),
+      None,
+      Option(Sidebar(Seq(
+        ActionGroup("Actions",
+          Seq(
+            ActionItem("news.sidebar.action.all", "/news"),
+            ActionItem("news.sidebar.action.create", "/createForm")
+          )
+        )
+      )))
+    )
+  }
 
   /**
    * Display the news dashboard.
