@@ -1,0 +1,54 @@
+--20:08:49--  http://google.com/
+           => `index.html'
+Resolving google.com... 173.194.34.5, 173.194.34.9, 173.194.34.6, ...
+Connecting to google.com[173.194.34.5]:80... failed: Operation timed out.
+Connecting to google.com[173.194.34.9]:80... failed: Operation timed out.
+Connecting to google.com[173.194.34.6]:80... failed: Operation timed out.
+Connecting to google.com[173.194.34.3]:80... failed: Operation timed out.
+Connecting to google.com[173.194.34.7]:80... failed: Operation timed out.
+Connecting to google.com[173.194.34.14]:80... failed: Operation timed out.
+Connecting to google.com[173.194.34.8]:80... failed: Operation timed out.
+Connecting to google.com[173.194.34.0]:80... failed: Operation timed out.
+Connecting to google.com[173.194.34.4]:80... failed: Operation timed out.
+Connecting to google.com[173.194.34.2]:80... failed: Operation timed out.
+Connecting to google.com[173.194.34.1]:80... failed: Operation timed out.
+Retrying.
+
+--20:21:37--  http://google.com/
+  (try: 2) => `index.html'
+Connecting to google.com[173.194.34.5]:80... failed: Operation timed out.
+Connecting to google.com[173.194.34.9]:80... failed: Operation timed out.
+Connecting to google.com[173.194.34.6]:80... failed: Operation timed out.
+Connecting to google.com[173.194.34.3]:80... failed: Operation timed out.
+Connecting to google.com[173.194.34.7]:80... failed: Operation timed out.
+Connecting to google.com[173.194.34.14]:80... failed: Operation timed out.
+Connecting to google.com[173.194.34.8]:80... failed: Operation timed out.
+Connecting to google.com[173.194.34.0]:80... failed: Operation timed out.
+Connecting to google.com[173.194.34.4]:80... failed: Operation timed out.
+Connecting to google.com[173.194.34.2]:80... failed: Operation timed out.
+Connecting to google.com[173.194.34.1]:80... failed: Operation timed out.
+Retrying.
+
+--20:35:30--  http://google.com/
+  (try: 3) => `index.html'
+Connecting to google.com[173.194.34.5]:80... failed: Operation timed out.
+Connecting to google.com[173.194.34.9]:80... connected.
+HTTP request sent, awaiting response... 301 Moved Permanently
+Location: http://www.google.com/ [following]
+--20:37:06--  http://www.google.com/
+           => `index.html'
+Resolving www.google.com... 173.194.34.48, 173.194.34.52, 173.194.34.49, ...
+Connecting to www.google.com[173.194.34.48]:80... connected.
+HTTP request sent, awaiting response... 302 Found
+Location: http://www.google.fr/ [following]
+--20:37:06--  http://www.google.fr/
+           => `index.html'
+Resolving www.google.fr... 173.194.34.31, 173.194.34.23, 173.194.34.24
+Connecting to www.google.fr[173.194.34.31]:80... connected.
+HTTP request sent, awaiting response... 200 OK
+Length: unspecified [text/html]
+
+    0K ..........                                                9.68 MB/s
+
+20:37:06 (9.68 MB/s) - `index.html' saved [10712]
+

@@ -3,7 +3,7 @@ package controllers.security
 import securesocial.controllers.TemplatesPlugin
 import play.api.mvc._
 import play.api.data.Form
-import play.api.templates.Html
+import play.api.templates.{Txt, Html}
 import securesocial.controllers.Registration.RegistrationInfo
 import securesocial.core.{Identity, SecuredRequest}
 import securesocial.controllers.PasswordChange.ChangeInfo
@@ -17,6 +17,7 @@ class SecurityTemplatesPlugin(application: play.Application) extends TemplatesPl
    * @tparam A
    * @return
    */
+
   override def getLoginPage[A](implicit request: Request[A], form: Form[(String, String)], msg: Option[String] = None): Html = {
     html.Security.login(form, msg)
   }
@@ -77,16 +78,26 @@ class SecurityTemplatesPlugin(application: play.Application) extends TemplatesPl
     html.Security.passwordChange(form)
   }
 
+  /**
+   * Returns the html for the not authorized page
+   *
+   * @param request
+   * @tparam A
+   * @return
+   */
+  def getNotAuthorizedPage[A](implicit request: Request[A]): Html = {
+    html.Security.notAuthorized()
+  }
 
   /**
    * Returns the email sent when a user starts the sign up process
    *
    * @param token the token used to identify the request
    * @param request the current http request
-   * @return a String with the html code for the email
+   * @return a String with the text and/or html body for the email
    */
-  def getSignUpEmail(token: String)(implicit request: RequestHeader): String = {
-    html.Security.email.signUpEmail(token).body
+  def getSignUpEmail(token: String)(implicit request: RequestHeader): (Option[Txt], Option[Html]) = {
+    (None, Some(html.Security.email.signUpEmail(token)))
   }
 
   /**
@@ -94,11 +105,11 @@ class SecurityTemplatesPlugin(application: play.Application) extends TemplatesPl
    *
    * @param user the user
    * @param request the current request
-   * @return a String with the html code for the email
+   * @return a String with the text and/or html body for the email
    */
 
-  def getAlreadyRegisteredEmail(user: Identity)(implicit request: RequestHeader): String = {
-    html.Security.email.alreadyRegisteredEmail(user).body
+  def getAlreadyRegisteredEmail(user: Identity)(implicit request: RequestHeader): (Option[Txt], Option[Html]) = {
+    (None, Some(html.Security.email.alreadyRegisteredEmail(user)))
   }
 
   /**
@@ -106,10 +117,10 @@ class SecurityTemplatesPlugin(application: play.Application) extends TemplatesPl
    *
    * @param user the user
    * @param request the current request
-   * @return a String with the html code for the email
+   * @return a String with the text and/or html body for the email
    */
-  def getWelcomeEmail(user: Identity)(implicit request: RequestHeader): String = {
-    html.Security.email.welcomeEmail(user).body
+  def getWelcomeEmail(user: Identity)(implicit request: RequestHeader): (Option[Txt], Option[Html]) = {
+    (None, Some(html.Security.email.welcomeEmail(user)))
   }
 
   /**
@@ -117,10 +128,10 @@ class SecurityTemplatesPlugin(application: play.Application) extends TemplatesPl
    * that email address in the system
    *
    * @param request the current request
-   * @return a String with the html code for the email
+   * @return a String with the text and/or html body for the email
    */
-  def getUnknownEmailNotice()(implicit request: RequestHeader): String = {
-    html.Security.email.unknownEmailNotice(request).body
+  def getUnknownEmailNotice()(implicit request: RequestHeader): (Option[Txt], Option[Html]) = {
+    (None, Some(html.Security.email.unknownEmailNotice(request)))
   }
 
   /**
@@ -129,10 +140,10 @@ class SecurityTemplatesPlugin(application: play.Application) extends TemplatesPl
    * @param user the user
    * @param token the token used to identify the request
    * @param request the current http request
-   * @return a String with the html code for the email
+   * @return a String with the text and/or html body for the email
    */
-  def getSendPasswordResetEmail(user: Identity, token: String)(implicit request: RequestHeader): String = {
-    html.Security.email.passwordResetEmail(user, token).body
+  def getSendPasswordResetEmail(user: Identity, token: String)(implicit request: RequestHeader): (Option[Txt], Option[Html]) = {
+    (None, Some(html.Security.email.passwordResetEmail(user, token)))
   }
 
   /**
@@ -140,14 +151,10 @@ class SecurityTemplatesPlugin(application: play.Application) extends TemplatesPl
    *
    * @param user the user
    * @param request the current http request
-   * @return a String with the html code for the email
+   * @return a String with the text and/or html body for the email
    */
-  def getPasswordChangedNoticeEmail(user: Identity)(implicit request: RequestHeader): String = {
-    html.Security.email.passwordChangedNotice(user).body
-  }
-
-  def getNotAuthorizedPage[A](implicit request: Request[A]): Html = {
-    html.Security.notAuthorized()
+  def getPasswordChangedNoticeEmail(user: Identity)(implicit request: RequestHeader): (Option[Txt], Option[Html]) = {
+    (None, Some(html.Security.email.passwordChangedNotice(user)))
   }
 
 }

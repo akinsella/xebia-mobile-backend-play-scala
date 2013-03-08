@@ -27,7 +27,7 @@ object NewsController extends Controller with SecureSocial {
         ActionGroup("Actions",
           Seq(
             ActionItem("news.sidebar.action.all", "/news"),
-            ActionItem("news.sidebar.action.create", "/createForm")
+            ActionItem("news.sidebar.action.create", "/news/createForm")
           )
         )
       )))

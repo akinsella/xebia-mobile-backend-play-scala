@@ -20,6 +20,7 @@ import _root_.java.util.{Date, UUID}
 
 import securesocial.core._
 import providers.Token
+import providers.utils.GravatarHelper._
 import securesocial.core.UserId
 import securesocial.core.PasswordInfo
 import scala.Some
@@ -70,7 +71,7 @@ class PgSqlUserService(application: Application) extends UserServicePlugin(appli
           row[String]("lastName"),
           row[String]("firstName") + " " + row[String]("lastName"),
           row[Option[String]]("email"),
-          None,
+          row[Option[String]]("email").flatMap(avatarFor(_)),
           AuthenticationMethod("userPassword"),
           None,
           None,

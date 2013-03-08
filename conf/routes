@@ -44,11 +44,10 @@ DELETE  /api/ios/device/:id                         controllers.api.ios.DeviceSe
 #News
 OPTIONS /api/news                                   controllers.api.NewsService.options
 GET     /api/news                                   controllers.api.NewsService.all
-GET     /api/news/published                         controllers.api.NewsService.allPublished
 GET     /api/news/:id                               controllers.api.NewsService.show(id: Long)
-POST    /api/news                                   controllers.api.NewsService.create
-PUT     /api/news/:id                               controllers.api.NewsService.save(id: Long)
-DELETE  /api/news/:id                               controllers.api.NewsService.delete(id: Long)
+#POST    /api/news                                   controllers.api.NewsService.create
+#PUT     /api/news/:id                               controllers.api.NewsService.save(id: Long)
+#DELETE  /api/news/:id                               controllers.api.NewsService.delete(id: Long)
 
 # News
 GET     /news                                       controllers.NewsController.index

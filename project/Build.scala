@@ -18,6 +18,7 @@ object ApplicationBuild extends Build {
     "net.debasishg" % "redisclient_2.10" % "2.9",
     /*,"eu.teamon" %% "play-navigator" % "0.4.0"*/
     "org.cloudfoundry" % "cloudfoundry-runtime" % "0.8.2",
+    "org.cloudfoundry" % "auto-reconfiguration" % "0.6.6",
     "securesocial" % "securesocial_2.10" % "master-SNAPSHOT",
     "com.typesafe" % "play-plugins-mailer_2.10" % "2.1.0",
     "joda-time" % "joda-time" % "1.6.2"
@@ -29,6 +30,7 @@ object ApplicationBuild extends Build {
   lazy val typesafeSnapshot = "Typesafe Snapshots Repository" at "http://repo.typesafe.com/typesafe/snapshots/"
   lazy val typesafe = "Typesafe Repository" at "http://repo.typesafe.com/typesafe/releases/"
   lazy val repo = if (buildVersion.endsWith("SNAPSHOT")) typesafeSnapshot else typesafe
+
 
   val main = play.Project(appName, appVersion, appDependencies).settings(
 //    scalaVersion := "2.10.0",
