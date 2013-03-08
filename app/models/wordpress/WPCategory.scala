@@ -4,9 +4,7 @@ import play.api.libs.json._
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsNumber
 
-case class WPCategory(id:Long, slug:String, title:String, parent:Long, description:String, postCount:Long) {
-
-}
+case class WPCategory(id:Long, slug:String, title:String, parent:Long, description:String, postCount:Long)
 
 object WPCategory {
 

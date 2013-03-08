@@ -1,14 +1,13 @@
-package models.wordpress
+package models.wordpress.stripped
 
 import play.api.libs.json._
-import models.wordpress.WPCategory.WPCategoryFormat
+import models.wordpress.stripped.WPCategory.WPCategoryFormat
 
 case class WPPosts(
                     count: Int,
                     countTotal: Option[Int],
                     pages: Int,
-                    posts: Seq[WPPost]) {
-}
+                    posts: Seq[WPPost])
 
 object WPPosts {
 

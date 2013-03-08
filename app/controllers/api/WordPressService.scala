@@ -3,7 +3,8 @@ package controllers.api
 import cloud.{CachedWSCall, PagedContent}
 import play.api.libs.ws.WS
 import play.api.mvc.{Action, Call, Controller}
-import models.wordpress.{WPPosts, WPPost, WPCategory, WPTag, WPAuthor}
+import models.wordpress.{WPPost, WPCategory, WPTag, WPAuthor}
+import models.wordpress.stripped.WPPosts
 import play.api.libs.json.{Json, JsValue, Writes}
 
 import play.api.Logger
@@ -13,6 +14,7 @@ import play.libs.Akka
 import akka.actor._
 import scala.concurrent.duration._
 import play.api.libs.concurrent.Execution.Implicits._
+import models.wordpress.stripped.WPPosts
 
 
 /**
@@ -54,7 +56,6 @@ object WordPressService extends Controller {
     )
   }
 
-
   /**
    * @return categories of posts from Xebia blogs
    */
@@ -70,6 +71,35 @@ object WordPressService extends Controller {
       }
     )
   }
+
+  /**
+   *
+   * @param id id of the post
+   * @return the post identified by its id
+   */
+  def showPost(id: Long) = Action {
+    val url: String = "http://blog.xebia.fr/wp-json-api/get_post"
+
+    val ws = WS
+      .url(url)
+      .withQueryString(("post_id" -> id.toString))
+
+    CachedWSCall(ws).mapJson {
+      jsonFetched => (jsonFetched \ "post").as[WPPost]
+    }.fold(
+      errorMessage => {
+        InternalServerError(errorMessage)
+      },
+      response => {
+        Ok(Json.toJson(response)(WPPost.WPPostFormat))
+      }
+    )
+  }
+
+
+
+
+
 
   /**
    * @param id id of the post
@@ -150,7 +180,6 @@ object WordPressService extends Controller {
     }
   }
 
-
   /**
    * @param _type type of entity fetched
    * @param id optional id of a post or all posts if None
@@ -190,46 +219,42 @@ object WordPressService extends Controller {
     }
   }
 
-  /**
-   *
-   * @param id id of the post
-   * @return the post identified by its id
-   */
-  def showPost(id: Long) = Action {
-    val url: String = "http://blog.xebia.fr/wp-json-api/get_post"
 
-    val ws = WS
-      .url(url)
-      .withQueryString(("post_id" -> id.toString))
 
-    CachedWSCall(ws).mapJson {
-      jsonFetched => (jsonFetched \ "post").as[WPPost]
-    }.fold(
-      errorMessage => {
-        InternalServerError(errorMessage)
-      },
-      response => {
-        Ok(Json.toJson(response)(WPPost.WPPostFormat))
-      }
-    )
-  }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  // TODO = Is it needed ?
   def synchronize = Action {
 
     // say hello
     Logger.info("hello, synchronize action started")
 
     val Tags = "tags"
-    val Categories = "tags"
-    val Authors = "tags"
-    val Posts = "tags"
+    val Categories = "categories"
+    val Authors = "authors"
+    val Posts = "posts"
 
     val synchronizationActor = Akka.system.actorOf(Props(new Actor {
       def receive = {
         case Tags => synchronizeTags()
         case Categories => synchronizeCategories()
         case Authors => synchronizeAuthors()
-        case Posts => synchronizePosts()
       }
     }))
 
@@ -265,10 +290,6 @@ object WordPressService extends Controller {
         println("Authors synchronized")
       }
     )
-  }
-
-  def synchronizePosts() {
-
   }
 
   def synchronizeCategories() {

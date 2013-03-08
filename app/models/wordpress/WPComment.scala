@@ -5,8 +5,7 @@ import play.api.libs.json.JsObject
 import play.api.libs.json.JsNumber
 
 case class WPComment(
-                   id:Long, name:String, url:String, date:String, content:String, parent:Long) {
-}
+                   id:Long, name:String, url:String, date:String, content:String, parent:Long)
 
 object WPComment {
 
