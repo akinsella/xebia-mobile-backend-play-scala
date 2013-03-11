@@ -62,6 +62,7 @@ POST    /api/ios/notification/register              controllers.api.ios.Notifica
 POST    /api/ios/notification/push                  controllers.api.ios.NotificationService.push
 
 #Wordpress
+GET     /api/wordpress/dates                        controllers.api.WordPressService.dates
 GET     /api/wordpress/authors                      controllers.api.WordPressService.authors
 GET     /api/wordpress/tags                         controllers.api.WordPressService.tags
 GET     /api/wordpress/categories                   controllers.api.WordPressService.categories
@@ -77,7 +78,6 @@ GET     /api/wordpress/post/:id                     controllers.api.WordPressSer
 
 #GitHub
 GET     /api/github/repositories                    controllers.api.GitHubService.repositories
-GET     /api/github/users                           controllers.api.GitHubService.users
 GET     /api/github/owners                          controllers.api.GitHubService.owners
 
 #EventBrite

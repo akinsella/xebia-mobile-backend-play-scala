@@ -1,11 +1,10 @@
 package controllers.api
 
-import cloud.{CachedWSCall, PagedContent}
+import cloud.CachedWSCall
 import play.api.libs.ws.WS
-import play.api.mvc.{Action, Call, Controller}
-import models.wordpress.{WPPost, WPCategory, WPTag, WPAuthor}
-import models.wordpress.stripped.WPPosts
-import play.api.libs.json.{Json, JsValue, Writes}
+import play.api.mvc.{Action, Controller}
+import models.wordpress._
+import play.api.libs.json._
 
 import play.api.Logger
 
@@ -15,6 +14,12 @@ import akka.actor._
 import scala.concurrent.duration._
 import play.api.libs.concurrent.Execution.Implicits._
 import models.wordpress.stripped.WPPosts
+import scala.Some
+import play.api.mvc.Call
+import cloud.PagedContent
+import scala.Some
+import play.api.mvc.Call
+import cloud.PagedContent
 
 
 /**
@@ -27,10 +32,32 @@ object WordPressService extends Controller {
   /**
    * @return authors from Xebia blogs
    */
+  def dates = Action {
+    CachedWSCall("http://blog.xebia.fr/wp-json-api/get_date_index/")
+      .mapJson { jsonFetched =>
+        val jsArray: JsArray = jsonFetched.as[JsArray](WPYear.WPYearSeqRead)
+        println(jsArray.toString())
+        jsArray.as[Seq[WPYear]]
+      }
+      .fold(
+        errorMessage => {
+          InternalServerError(errorMessage)
+        },
+        response => {
+          Ok(Json.toJson(response))
+        }
+      )
+  }
+
+  /**
+   * @return authors from Xebia blogs
+   */
   def authors = Action {
-    CachedWSCall("http://blog.xebia.fr/wp-json-api/get_author_index/").mapJson {
+    CachedWSCall("http://blog.xebia.fr/wp-json-api/get_author_index/")
+      .mapJson {
       jsonFetched => (jsonFetched \ "authors").as[Seq[JsValue]] map (_.as[WPAuthor])
-    }.fold(
+    }
+      .fold(
       errorMessage => {
         InternalServerError(errorMessage)
       },
@@ -44,32 +71,36 @@ object WordPressService extends Controller {
    * @return tags from Xebia blogs
    */
   def tags = Action {
-    CachedWSCall("http://blog.xebia.fr/wp-json-api/get_tag_index/").mapJson {
-      jsonFetched => (jsonFetched \ "tags").as[Seq[JsValue]] map (_.as[WPTag])
-    }.fold(
-      errorMessage => {
-        InternalServerError(errorMessage)
-      },
-      response => {
-        Ok(Json.toJson(response))
+    CachedWSCall("http://blog.xebia.fr/wp-json-api/get_tag_index/")
+      .mapJson {
+        jsonFetched => (jsonFetched \ "tags").as[Seq[JsValue]] map (_.as[WPTag])
       }
-    )
+      .fold(
+        errorMessage => {
+          InternalServerError(errorMessage)
+        },
+        response => {
+          Ok(Json.toJson(response))
+        }
+      )
   }
 
   /**
    * @return categories of posts from Xebia blogs
    */
   def categories = Action {
-    CachedWSCall("http://blog.xebia.fr/wp-json-api/get_category_index/").mapJson {
-      jsonFetched => (jsonFetched \ "categories").as[Seq[JsValue]] map (_.as[WPCategory])
-    }.fold(
-      errorMessage => {
-        InternalServerError(errorMessage)
-      },
-      response => {
-        Ok(Json.toJson(response))
+    CachedWSCall("http://blog.xebia.fr/wp-json-api/get_category_index/")
+      .mapJson {
+        jsonFetched => (jsonFetched \ "categories").as[Seq[JsValue]] map (_.as[WPCategory])
       }
-    )
+      .fold(
+        errorMessage => {
+          InternalServerError(errorMessage)
+        },
+        response => {
+          Ok(Json.toJson(response))
+        }
+      )
   }
 
   /**
@@ -95,11 +126,6 @@ object WordPressService extends Controller {
       }
     )
   }
-
-
-
-
-
 
   /**
    * @param id id of the post
@@ -208,35 +234,17 @@ object WordPressService extends Controller {
         jsonFetched => (jsonFetched).as[WPPosts]
       }
 
-      responsePost.fold(
-        message => InternalServerError(message),
-        response => {
-          val links = PagedContent(response.count, response.pages, currentPage)(urlToPage).getHeader
-          Ok(Json.toJson(response)(postWriter)).withHeaders(links)
+      responsePost
+        .fold(
+          message => InternalServerError(message),
+          response => {
+            val links = PagedContent(response.count, response.pages, currentPage)(urlToPage).getHeader
+            Ok(Json.toJson(response)(postWriter)).withHeaders(links)
 
-        }
-      )
+          }
+        )
     }
   }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
   // TODO = Is it needed ?

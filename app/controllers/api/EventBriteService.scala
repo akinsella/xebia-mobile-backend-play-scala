@@ -1,6 +1,6 @@
 package controllers.api
 
-import cloud.{CachedWSCall, Connectivity}
+import cloud.CachedWSCall
 import models.eventbrite.EBEvent
 import play.Play
 import play.api.libs.json._
@@ -24,18 +24,20 @@ object EventBriteService extends Controller {
     val wsRequestHolder = WS.url(wpEventsUrl)
       .withQueryString("id" -> xebiaOrganizationId, "app_key" -> appKey)
 
-    CachedWSCall(wsRequestHolder).mapJson {
-      jsonFetched => (jsonFetched \\ "events").head.as[Seq[JsObject]]
-        .filter(jsonEvent => List("Live").contains(jsonEvent.\("event").\("status").as[String]))
-        .map(_.\("event").as[EBEvent])
-    }.fold(
-      errorMessage => {
-        InternalServerError(errorMessage)
-      },
-      response => {
-        Ok(Json.toJson(response))
+    CachedWSCall(wsRequestHolder)
+      .mapJson { jsonFetched =>
+          (jsonFetched \\ "events").head.as[Seq[JsObject]]
+          .filter(jsonEvent => List("Live").contains(jsonEvent.\("event").\("status").as[String]))
+          .map(_.\("event").as[EBEvent])
       }
-    )
+      .fold(
+        errorMessage => {
+          InternalServerError(errorMessage)
+        },
+        response => {
+          Ok(Json.toJson(response))
+        }
+      )
   }
 
 }

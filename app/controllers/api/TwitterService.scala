@@ -3,8 +3,6 @@ package controllers.api
 import cloud.{CachedWSCall, Connectivity}
 import models.twitter.TTTweet
 import play.Play
-import play.api.Play.current
-import play.api.cache.Cache
 import play.api.libs.json._
 import play.api.libs.oauth.ConsumerKey
 import play.api.libs.oauth.OAuth
@@ -47,16 +45,18 @@ object TwitterService extends Controller {
       val wsRequestHolder: WSRequestHolder = createUserTimelineUrl(request)
 
       play.Logger.debug("Twitter tiemline resource url : %s".format(wsRequestHolder))
-      CachedWSCall(wsRequestHolder).mapJson {
-        jsonFetched => jsonFetched.as[Seq[JsObject]] map (_.as[TTTweet])
-      }.fold(
-        errorMessage => {
-          InternalServerError(errorMessage)
-        },
-        response => {
-          Ok(Json.toJson(response))
+      CachedWSCall(wsRequestHolder)
+        .mapJson {
+          jsonFetched => jsonFetched.as[Seq[JsObject]] map (_.as[TTTweet])
         }
-      )
+        .fold(
+          errorMessage => {
+            InternalServerError(errorMessage)
+          },
+          response => {
+            Ok(Json.toJson(response))
+          }
+        )
     }
   }
 

@@ -12,51 +12,39 @@ import play.api.mvc.{Action, Controller}
 object GitHubService extends Controller {
 
   /**
-   * @return all members of xebia-france github account
-   */
-  def users = Action {
-    CachedWSCall("https://api.github.com/orgs/xebia-france/public_members").mapJson {
-      jsonFetched => jsonFetched.as[Seq[JsValue]] map (_.as[GHUser])
-    }.fold(
-      errorMessage => {
-        InternalServerError(errorMessage)
-      },
-      response => {
-        Ok(Json.toJson(response))
-      }
-    )
-  }
-
-  /**
    * @return all repos of xebia-france github account
    */
   def repositories = Action {
-    CachedWSCall("https://api.github.com/orgs/xebia-france/repos").mapJson {
-      jsonFetched => jsonFetched.as[Seq[JsValue]] map (_.as[GHRepository])
-    }.fold(
-      errorMessage => {
-        InternalServerError(errorMessage)
-      },
-      response => {
-        Ok(Json.toJson(response))
+    CachedWSCall("https://api.github.com/orgs/xebia-france/repos")
+      .mapJson {
+        jsonFetched => jsonFetched.as[Seq[JsValue]] map (_.as[GHRepository])
       }
-    )
+      .fold(
+        errorMessage => {
+          InternalServerError(errorMessage)
+        },
+        response => {
+          Ok(Json.toJson(response))
+        }
+      )
   }
 
   /**
    * @return all owners of xebia-france github account
    */
   def owners = Action {
-    CachedWSCall("https://api.github.com/orgs/xebia-france/public_members").mapJson {
-      jsonFetched => jsonFetched.as[Seq[JsValue]] map (_.as[GHOwner])
-    }.fold(
-      errorMessage => {
-        InternalServerError(errorMessage)
-      },
-      response => {
-        Ok(Json.toJson(response))
+    CachedWSCall("https://api.github.com/orgs/xebia-france/public_members")
+      .mapJson {
+        jsonFetched => jsonFetched.as[Seq[JsValue]] map (_.as[GHOwner])
       }
-    )
+      .fold(
+        errorMessage => {
+          InternalServerError(errorMessage)
+        },
+        response => {
+          Ok(Json.toJson(response))
+        }
+      )
   }
 
 }
