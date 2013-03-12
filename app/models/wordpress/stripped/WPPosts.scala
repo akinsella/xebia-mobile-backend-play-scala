@@ -34,22 +34,4 @@ object WPPosts {
 
   }
 
-  object WPPostsIdsWrites extends Writes[WPPosts] {
-
-    def writes(postsResponse: WPPosts): JsValue = {
-      var jsonFields: Seq[(String, JsValue)] = Seq(
-        "count" -> JsNumber(postsResponse.count),
-        "pages" -> JsNumber(postsResponse.pages),
-        "posts" -> JsArray(postsResponse.posts.map((x => WPPost.WPPostIdsWrites.writes(x)))
-        )
-      )
-      postsResponse.countTotal.map(c => {
-        jsonFields = jsonFields.:+("count_total" -> JsNumber(c))
-      })
-
-      JsObject(jsonFields)
-    }
-
-  }
-
 }
