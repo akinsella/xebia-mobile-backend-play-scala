@@ -124,9 +124,7 @@ object TwitterService extends Controller {
               }
             }
           }
-          case Left(e) => {
-            throw e
-          }
+          case Left(e) => throw e
         })
   }
 

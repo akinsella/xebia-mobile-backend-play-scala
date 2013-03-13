@@ -20,14 +20,14 @@ object WPPosts {
     ))
 
     def writes(postsResponse: WPPosts): JsValue = {
-      var jsonFields: Seq[(String, JsValue)] = Seq(
+      val total:Int = postsResponse.countTotal.getOrElse(postsResponse.count)
+      val jsonFields: Seq[(String, JsValue)] = Seq(
         "count" -> JsNumber(postsResponse.count),
+        "total" -> JsNumber(total),
         "pages" -> JsNumber(postsResponse.pages),
-        "posts" -> JsArray(postsResponse.posts.map((x => WPPost.WPPostFormat.writes(x)))
+        "data" -> JsArray(postsResponse.posts.map((x => WPPost.WPPostFormat.writes(x)))
         )
       )
-
-      postsResponse.countTotal.map(c => jsonFields = jsonFields.:+("count_total" -> JsNumber(c)))
 
       JsObject(jsonFields)
     }
