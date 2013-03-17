@@ -6,7 +6,7 @@ import play.api.libs.json._
 import scala.concurrent._
 import ExecutionContext.Implicits.global
 
-case class CachedWSCall(wsRequest: WS.WSRequestHolder, expiration: Option[Int] = None)(implicit timeout: Long = 5000) {
+case class CachedWSCall(wsRequest: WS.WSRequestHolder, expiration: Option[Int] = None)(implicit timeout: Long = 10000) {
 
   private lazy val cacheResponse: CachedString = CachedString(wsRequest.toString, expiration)
 
@@ -14,7 +14,7 @@ case class CachedWSCall(wsRequest: WS.WSRequestHolder, expiration: Option[Int] =
     wsRequest
       .get()
       .map(response => {
-      response.getAHCResponse.getStatusText match {
+      response.statusText match {
         case "OK" => Right(response.body)
         case _ => Left(response.body)
       }

@@ -1,27 +1,34 @@
 package models.twitter
 
 import play.api.libs.json._
+import play.api.libs.functional.syntax._
 import play.api.libs.json.JsObject
 import models.twitter.TTUserMentionEntity.TTUserMentionEntityFormat
 import models.twitter.TTHashtagEntity.TTHashtagEntityFormat
 import models.twitter.TTUrlEntity.TTUrlEntityFormat
+import play.api.libs.functional.FunctionalBuilder
 
 case class TTEntities(
-                       hashtags:Option[Seq[TTHashtagEntity]],
-                       urls:Option[Seq[TTUrlEntity]],
-                       user_mentions:Option[Seq[TTUserMentionEntity]]
-                    ) {
-
-}
+   hashtags:Option[Seq[TTHashtagEntity]],
+   urls:Option[Seq[TTUrlEntity]],
+   user_mentions:Option[Seq[TTUserMentionEntity]]
+)
 
 object TTEntities {
 
   implicit object TTEntitiesFormat extends Format[TTEntities] {
-    def reads(json: JsValue) = JsSuccess(TTEntities(
-      (json \ "hashtags").asOpt[Seq[TTHashtagEntity]],
-      (json \ "urls").asOpt[Seq[TTUrlEntity]],
-      (json \ "user_mentions").asOpt[Seq[TTUserMentionEntity]]
-    ))
+
+    val entitiesReads = {
+      (
+        (__ \ "hashtags").readNullable[Seq[TTHashtagEntity]] and
+        (__ \ "urls").readNullable[Seq[TTUrlEntity]] and
+        (__ \ "user_mentions").readNullable[Seq[TTUserMentionEntity]]
+      ).apply(TTEntities.apply _)
+    }
+
+    def reads(json: JsValue) = {
+      json.validate[TTEntities](entitiesReads)
+    }
 
     def writes(tweet: TTEntities): JsValue = {
       var jsonFields:Seq[(String, JsValue)] = Seq()
