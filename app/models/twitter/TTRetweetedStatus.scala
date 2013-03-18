@@ -9,6 +9,7 @@ import models.twitter.TTEntities.TTEntitiesFormat
 import java.text.SimpleDateFormat
 import java.util.Locale
 import java.util.Date
+import utils.DefaultReads
 
 case class TTRetweetedStatus(
   id:Long, id_str:String, created_at:Date, text:String,
@@ -35,13 +36,11 @@ object TTRetweetedStatus {
 //      (json \ "entities").asOpt[TTEntities]
 //    ))
 
-    val createdAtReads:Reads[Date] = (__ \ "created_at").read[Date](Reads.dateReads("EEE MMM dd HH:mm:ss Z yyyy"))
-
     val retweetedStatusReads = {
       (
         (__ \ "id").read[Long] and
         (__ \ "id_str").read[String] and
-        createdAtReads and
+        (__ \ "created_at").read[Date](DefaultReads.dateReads("EEE MMM dd HH:mm:ss Z yyyy", Locale.US)) and
         (__ \ "text").read[String] and
         (__ \ "favorited").read[Boolean] and
         (__ \ "retweeted").read[Boolean] and
